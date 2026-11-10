@@ -52,6 +52,8 @@ function browserExecutable() {
 const executable = browserExecutable();
 if (!executable) throw new Error('Chrome or Edge was not found; set CHROME_PATH or --browser');
 const baseUrl = baseUrlOption.replace(/\/$/, '');
+const lessonMode = process.argv.includes('--lessons');
+const visualSelector = lessonMode ? '[data-review-visual-host] [data-coding-visual]' : '[data-coding-visual]';
 const viewportWidth = Number(option('width', '1280'));
 assert(Number.isInteger(viewportWidth) && viewportWidth >= 320, '--width must be an integer of at least 320 CSS pixels');
 const { codingQuestionVisuals } = await import('./coding-visuals/index.mjs');
@@ -62,7 +64,8 @@ const routes = slugs.map((slug) => {
 	const article = readFileSync(join(root, `src/content/posts/2026-09-01-${slug}.md`), 'utf8');
 	const category = article.match(/^---\n[\s\S]*?^category:\s*["']?([^"'\n]+)["']?\s*$[\s\S]*?^---$/m)?.[1]?.trim();
 	if (!category) throw new Error(`Could not read category for ${slug}`);
-	return { slug, url: `${baseUrl}/${category}/${slug}/` };
+	const articleUrl = `${baseUrl}/${category}/${slug}/`;
+	return { slug, articleUrl, url: lessonMode ? `${baseUrl}/review/#${slug}` : articleUrl };
 });
 
 let currentStage = 'browser startup';
@@ -193,16 +196,27 @@ async function evaluate(cdp, expression, awaitPromise = false) {
 	return response.result.value;
 }
 
+let navigationSequence = 0;
 async function navigate(cdp, url) {
+	const target = new URL(url);
+	target.searchParams.set('interaction-check', String(++navigationSequence));
 	const loaded = cdp.once('Page.loadEventFired');
-	await cdp.call('Page.navigate', { url });
+	await cdp.call('Page.navigate', { url: target.toString() });
 	await withTimeout(loaded, 'page load');
 	for (let attempt = 0; attempt < 30; attempt += 1) {
 		await delay(50);
-		const ready = await evaluate(cdp, `document.readyState === 'complete' && document.fonts.status === 'loaded'`);
+		const ready = await evaluate(cdp, `document.readyState === 'complete' && document.fonts.status === 'loaded' && (!document.querySelector('[data-visual-review-mode]') || document.querySelector('[data-review-visual-host]')?.getAttribute('aria-busy') === 'false')`);
 		if (ready) break;
 	}
 	await delay(120);
+	if (lessonMode && target.pathname === '/review/') await evaluate(cdp, `(async () => {
+		const host = document.querySelector('[data-review-visual-host]');
+		const figures = [...host.querySelectorAll(':scope > [data-visual-lesson-step]')];
+		const index = figures.findIndex(figure => figure.matches('[data-coding-visual]') || figure.querySelector('[data-coding-visual]'));
+		if (index < 0) throw new Error('Lesson has no execution trace');
+		for (let position = 0; position < index; position += 1) host.querySelector('[data-visual-lesson-next]').click();
+		await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+	})()`, true);
 }
 
 const snapshotBody = `
@@ -210,7 +224,7 @@ const snapshotBody = `
 	const keyed = [...activeFrame.querySelectorAll('[data-motion-key]')].map((element) => {
 		const rect = element.getBoundingClientRect();
 		const style = getComputedStyle(element);
-		const descendantPaint = [...element.querySelectorAll('circle, rect, path, line, text')].map((child) => {
+		const descendantPaint = [...element.querySelectorAll('circle, rect, path, line, text, i')].map((child) => {
 			const childStyle = getComputedStyle(child);
 			return [childStyle.color, childStyle.backgroundColor, childStyle.borderColor, childStyle.fill, childStyle.stroke].join('|');
 		}).join('||');
@@ -248,6 +262,7 @@ function trackedDifference(before, after) {
 }
 
 const report = [];
+const output = resolve(root, option('output', 'scratch/coding-interaction-report.json'));
 let cdp;
 try {
 	await waitForBrowser();
@@ -264,7 +279,14 @@ try {
 		await cdp.call('Emulation.setScriptExecutionDisabled', { value: false });
 		await cdp.call('Emulation.setEmulatedMedia', { media: 'screen', features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
 		await navigate(cdp, route.url);
-		const initial = await evaluate(cdp, `(() => { const visual = document.querySelector('[data-coding-visual]'); ${snapshotBody} })()`);
+		await evaluate(cdp, `(() => {
+			window.__visualIntervals = new Set();
+			const originalSet = window.setInterval;
+			const originalClear = window.clearInterval;
+			window.setInterval = (...args) => { const timer = Reflect.apply(originalSet, window, args); window.__visualIntervals.add(timer); return timer; };
+			window.clearInterval = timer => { window.__visualIntervals.delete(timer); return originalClear(timer); };
+		})()`);
+		const initial = await evaluate(cdp, `(() => { const visual = document.querySelector(${JSON.stringify(visualSelector)}); ${snapshotBody} })()`);
 		assert.equal(initial.innerWidth, viewportWidth, `${route.slug}: actual viewport width differs from the requested width`);
 		assert.equal(initial.enhanced, 'true', `${route.slug}: enhancement did not initialize`);
 		assert.equal(initial.activeFrame, 0, `${route.slug}: initial frame is not zero`);
@@ -275,7 +297,7 @@ try {
 		for (let frameIndex = 1; frameIndex < initial.frameCount; frameIndex += 1) {
 			currentStage = `${route.slug}/frame-${frameIndex}`;
 			const transition = await evaluate(cdp, `(async () => {
-				const visual = document.querySelector('[data-coding-visual]');
+				const visual = document.querySelector(${JSON.stringify(visualSelector)});
 				visual.querySelector('[data-coding-next]').click();
 				await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 				const animations = visual.getAnimations({ subtree: true }).filter((animation) => animation.playState === 'running');
@@ -297,40 +319,74 @@ try {
 		if (trackedPosition) assert.ok(animationObserved, `${route.slug}: keyed positions changed without a live transition`);
 
 		currentStage = `${route.slug}/controls`;
-		const previousIndex = await evaluate(cdp, `(() => { const visual = document.querySelector('[data-coding-visual]'); visual.querySelector('[data-coding-previous]').click(); return Number(visual.dataset.activeFrame); })()`);
+		const previousIndex = await evaluate(cdp, `(() => { const visual = document.querySelector(${JSON.stringify(visualSelector)}); visual.querySelector('[data-coding-previous]').click(); return Number(visual.dataset.activeFrame); })()`);
 		assert.equal(previousIndex, initial.frameCount - 2, `${route.slug}: Previous did not move exactly one frame`);
 		const directIndex = Math.min(2, initial.frameCount - 1);
-		const selectedIndex = await evaluate(cdp, `(() => { const visual = document.querySelector('[data-coding-visual]'); visual.querySelectorAll('[data-coding-frame-button]')[${directIndex}].click(); return Number(visual.dataset.activeFrame); })()`);
+		const selectedIndex = await evaluate(cdp, `(() => { const visual = document.querySelector(${JSON.stringify(visualSelector)}); visual.querySelectorAll('[data-coding-frame-button]')[${directIndex}].click(); return Number(visual.dataset.activeFrame); })()`);
 		assert.equal(selectedIndex, directIndex, `${route.slug}: direct selection failed`);
 		const keyResults = await evaluate(cdp, `(() => {
-			const visual = document.querySelector('[data-coding-visual]');
-			const press = (key) => { visual.focus(); visual.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })); return Number(visual.dataset.activeFrame); };
-			return { home: press('Home'), right: press('ArrowRight'), end: press('End'), left: press('ArrowLeft') };
+			const visual = document.querySelector(${JSON.stringify(visualSelector)});
+			const press = (key) => { visual.focus(); visual.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })); return Number(visual.dataset.activeFrame); };
+			const results = { home: press('Home'), right: press('ArrowRight'), end: press('End'), left: press('ArrowLeft') };
+			if (${lessonMode} && location.hash !== ${JSON.stringify(`#${route.slug}`)}) throw new Error('Trace keyboard action changed the lesson route');
+			return results;
 		})()`);
 		assert.deepEqual(keyResults, { home: 0, right: 1, end: initial.frameCount - 1, left: initial.frameCount - 2 }, `${route.slug}: keyboard navigation skipped frames`);
 		const playStarted = await evaluate(cdp, `(() => {
-			const visual = document.querySelector('[data-coding-visual]');
-			visual.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+			const visual = document.querySelector(${JSON.stringify(visualSelector)});
+			visual.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
 			visual.querySelector('[data-coding-play]').click();
-			return { visibility: document.visibilityState, playing: visual.dataset.codingPlaying };
+			return { visibility: document.visibilityState, playing: visual.dataset.codingPlaying, traceVisible: visual.getClientRects().length > 0 };
 		})()`);
 		assert.equal(playStarted.visibility, 'visible', `${route.slug}: playback needs a visible browser target`);
+		assert.ok(playStarted.traceVisible, `${route.slug}: playback needs the selected visible trace`);
 		assert.equal(playStarted.playing, 'true', `${route.slug}: Play did not start playback`);
 		currentStage = `${route.slug}/playback`;
-		await delay(980);
-		const playResult = await evaluate(cdp, `(() => {
-			const visual = document.querySelector('[data-coding-visual]');
+		const playResult = await evaluate(cdp, `(async () => {
+			const visual = document.querySelector(${JSON.stringify(visualSelector)});
+			if (Number(visual.dataset.activeFrame) === 0) await new Promise(resolve => {
+				const observer = new MutationObserver(() => { if (Number(visual.dataset.activeFrame) > 0) { observer.disconnect(); resolve(); } });
+				observer.observe(visual, { attributes: true, attributeFilter: ['data-active-frame'] });
+			});
 			const result = { activeFrame: Number(visual.dataset.activeFrame), playing: visual.dataset.codingPlaying };
 			if (visual.dataset.codingPlaying === 'true') visual.querySelector('[data-coding-play]').click();
 			return result;
-		})()`);
+		})()`, true);
 		assert.ok(playResult.activeFrame >= 1, `${route.slug}: Play did not visibly advance`);
+		let lifecycle;
+		if (lessonMode) {
+			currentStage = `${route.slug}/lesson-lifecycle`;
+			lifecycle = await evaluate(cdp, `(() => {
+				const host = document.querySelector('[data-review-visual-host]');
+				const visual = host.querySelector('[data-coding-visual]');
+				const reset = () => visual.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+				reset();
+				const next = host.querySelector('[data-visual-lesson-next]');
+				const previous = host.querySelector('[data-visual-lesson-previous]');
+				let hiddenStopped = null;
+				if (next || previous) {
+					visual.querySelector('[data-coding-play]').click();
+					const forward = !next.disabled;
+					(forward ? next : previous).click();
+					hiddenStopped = visual.dataset.codingPlaying === 'false' && window.__visualIntervals.size === 0;
+					(forward ? previous : next).click();
+					if (visual.dataset.codingPlaying !== 'false') throw new Error('Hidden playback restarted on selection');
+				}
+				reset();
+				visual.querySelector('[data-coding-play]').click();
+				const advance = document.querySelector('[data-review-next]');
+				(advance.disabled ? document.querySelector('[data-review-previous]') : advance).click();
+				return { hiddenStopped, detachedStopped: visual.dataset.codingPlaying === 'false' && window.__visualIntervals.size === 0, detached: !visual.isConnected };
+			})()`);
+			assert.notEqual(lifecycle.hiddenStopped, false, `${route.slug}: hidden trace retained playback`);
+			assert.ok(lifecycle.detachedStopped && lifecycle.detached, `${route.slug}: entry replacement retained playback`);
+		}
 
 		currentStage = `${route.slug}/reduced-motion`;
 		await cdp.call('Emulation.setEmulatedMedia', { media: 'screen', features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
 		await navigate(cdp, route.url);
 		const reduced = await evaluate(cdp, `(() => {
-			const visual = document.querySelector('[data-coding-visual]');
+			const visual = document.querySelector(${JSON.stringify(visualSelector)});
 			visual.querySelector('[data-coding-play]').click();
 			return {
 				activeFrame: Number(visual.dataset.activeFrame),
@@ -343,7 +399,7 @@ try {
 
 		currentStage = `${route.slug}/no-js`;
 		await cdp.call('Emulation.setScriptExecutionDisabled', { value: true });
-		await navigate(cdp, route.url);
+		await navigate(cdp, route.articleUrl);
 		const noJs = await evaluate(cdp, `(() => {
 			const visual = document.querySelector('[data-coding-visual]');
 			const frames = [...visual.querySelectorAll('[data-coding-frame]')];
@@ -361,14 +417,17 @@ try {
 		assert.ok(noJs.firstVisible && noJs.hiddenRemainder && noJs.controlsHidden && noJs.timelineHidden, `${route.slug}: no-JS first-frame fallback is incomplete`);
 		assert.equal(noJs.lessonLengths.length, 3, `${route.slug}: no-JS learning cues are missing`);
 		assert.ok(noJs.lessonLengths.every((length) => length > 20) && noJs.firstFrameText > 20, `${route.slug}: no-JS content is not understandable`);
-		report.push({ slug: route.slug, frames: initial.frameCount, trackedAppearance, trackedPosition, animationObserved });
+		report.push({ slug: route.slug, frames: initial.frameCount, trackedAppearance, trackedPosition, animationObserved, lifecycle });
 		console.log(`Coding interaction passed: ${route.slug}, ${initial.frameCount} frames at ${viewportWidth}px.`);
 	}
 
-	const output = resolve(root, option('output', 'scratch/coding-interaction-report.json'));
 	mkdirSync(resolve(output, '..'), { recursive: true });
-	writeFileSync(output, `${JSON.stringify({ viewportWidth, routes: report }, null, 2)}\n`);
+	writeFileSync(output, `${JSON.stringify({ viewportWidth, lessonMode, complete: true, routes: report }, null, 2)}\n`);
 	console.log(`Coding visual browser interactions passed at ${viewportWidth}px: ${report.length} routes and ${report.reduce((sum, item) => sum + item.frames, 0)} authored frames.`);
+} catch (error) {
+	mkdirSync(resolve(output, '..'), { recursive: true });
+	writeFileSync(output, `${JSON.stringify({ viewportWidth, lessonMode, complete: false, stage: currentStage, error: error.stack, routes: report }, null, 2)}\n`);
+	throw error;
 } finally {
 	cdp?.close();
 	await stopBrowser();

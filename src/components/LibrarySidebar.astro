@@ -156,8 +156,8 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
   }
   .sidebar-toggle {
     display: inline-grid;
-    width: 2rem;
-    height: 2rem;
+    width: 44px;
+    height: 44px;
     place-items: center;
     padding: 0;
     border: 1px solid var(--c-rule);
@@ -185,7 +185,7 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
   .book-disclosure { margin: 0; border-bottom: 1px solid var(--c-rule); }
   .book-disclosure > summary {
     display: grid;
-    grid-template-columns: 2.3rem minmax(0, 1fr) auto;
+    grid-template-columns: 2.8rem minmax(0, 1fr) auto;
     gap: .4rem;
     align-items: baseline;
     padding: .58rem .1rem;
@@ -205,7 +205,7 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
   .book-disclosure > summary > strong {
     overflow: hidden;
     color: var(--c-text-soft);
-    font-size: .72rem;
+    font-size: .82rem;
     font-weight: 550;
     line-height: 1.35;
     text-overflow: ellipsis;
@@ -235,7 +235,7 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
   .entry-list > li { margin: 0; }
   .chapter-link {
     display: grid;
-    grid-template-columns: 2.3rem minmax(0, 1fr);
+    grid-template-columns: 2.8rem minmax(0, 1fr);
     gap: .4rem;
     padding: .32rem .1rem;
     color: var(--c-muted);
@@ -248,7 +248,7 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
     line-height: 1.45;
   }
   .chapter-link > strong {
-    font-size: .68rem;
+    font-size: .8rem;
     font-weight: 450;
     line-height: 1.38;
   }
@@ -271,13 +271,14 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
     grid-template-columns: 1.35rem minmax(0, 1fr);
     gap: .3rem;
     margin-left: -1px;
-    padding: .26rem .25rem .26rem .45rem;
+    min-height: 2.2rem;
+    padding: .45rem .25rem .45rem .45rem;
     border-left: 1px solid transparent;
     color: var(--c-muted);
     text-decoration: none;
   }
   .entry-list a > strong {
-    font-size: .66rem;
+    font-size: .8rem;
     font-weight: 450;
     line-height: 1.35;
   }

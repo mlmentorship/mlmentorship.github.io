@@ -47,7 +47,7 @@ const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id ==
       ) : <span class="reader-step reader-step--disabled" aria-hidden="true"><span class="reader-word">Next </span>→</span>}
 
       <details class="book-contents" data-book-contents>
-        <summary><span>Sections</span></summary>
+        <summary><span>Contents</span></summary>
         <div class="contents-panel">
           <header>
             <div><span>Book {volume.number}</span><strong>{volume.title}</strong></div>
@@ -150,14 +150,15 @@ const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id ==
   .reader-step,
   .book-contents > summary {
     display: flex;
-    min-width: 4.7rem;
+    min-width: 44px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     gap: .35rem;
     padding: .5rem .6rem;
     color: var(--c-muted);
     font-family: var(--font-ui);
-    font-size: .72rem;
+    font-size: .82rem;
     font-weight: 550;
     text-decoration: none;
   }
@@ -214,7 +215,7 @@ const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id ==
   }
   .chapter-link > span,
   .entry-list a > span { color: var(--c-muted); font-family: var(--font-ui); font-size: .64rem; }
-  .chapter-link strong { font-size: .77rem; font-weight: 550; }
+  .chapter-link strong { font-size: .86rem; font-weight: 550; }
   .chapter-link:hover strong { color: var(--c-accent); text-decoration: underline; }
   .is-current-chapter > .chapter-link { color: var(--c-text); }
   .is-current-chapter > .chapter-link > span { color: var(--c-text-soft); }
@@ -224,11 +225,12 @@ const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id ==
     display: grid;
     grid-template-columns: 1.6rem minmax(0, 1fr);
     gap: .45rem;
-    padding: .3rem .5rem;
+    min-height: 44px;
+    padding: .55rem .5rem;
     color: var(--c-muted);
     text-decoration: none;
   }
-  .entry-list a strong { font-size: .73rem; font-weight: 450; line-height: 1.35; }
+  .entry-list a strong { font-size: .86rem; font-weight: 450; line-height: 1.4; }
   .entry-list a:hover { color: var(--c-text); }
   .entry-list a[aria-current='page'] { background: var(--c-bg-tint); color: var(--c-text); }
   .entry-list a[aria-current='page'] > span { color: var(--c-text-soft); }
@@ -248,9 +250,9 @@ const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id ==
     .book-mark { max-width: calc(100vw - 9rem); padding: .5rem 0; }
     .book-mark span { display: none; }
     .book-mark strong { font-size: .77rem; }
-    .reader-step { min-width: 2.3rem; padding: .45rem; }
+    .reader-step { min-width: 44px; padding: .45rem; }
     .reader-word { display: none; }
-    .book-contents > summary { min-width: 4.7rem; padding: .45rem .55rem; }
+    .book-contents > summary { min-width: 5rem; padding: .45rem .55rem; }
     .contents-panel {
       top: calc(100% + 1px);
       right: 0;

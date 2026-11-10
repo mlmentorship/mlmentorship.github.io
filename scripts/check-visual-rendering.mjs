@@ -1,13 +1,35 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { parseFragment, serialize } from 'parse5';
 import { renderVisualArgument } from './illustration-arguments.mjs';
+import sharp from 'sharp';
 
 const root = resolve(import.meta.dirname, '..');
+
+function svgLabelIsContained(svg, text, epsilon) {
+  const box = text.getBBox();
+  if (!box.width || !box.height) return true;
+  const matrix = svg.getCTM().inverse().multiply(text.getCTM());
+  const view = svg.viewBox.baseVal;
+  return [
+    new DOMPoint(box.x, box.y),
+    new DOMPoint(box.x + box.width, box.y),
+    new DOMPoint(box.x, box.y + box.height),
+    new DOMPoint(box.x + box.width, box.y + box.height),
+  ].map(point => point.matrixTransform(matrix)).every(point =>
+    point.x >= view.x - epsilon && point.y >= view.y - epsilon &&
+    point.x <= view.x + view.width + epsilon && point.y <= view.y + view.height + epsilon
+  );
+}
+
+function lessonFitsWorkspace(figure, workspace, epsilon) {
+  return figure.getBoundingClientRect().bottom <= workspace.getBoundingClientRect().bottom + epsilon;
+}
 
 function option(name, fallback = '') {
   const prefix = `--${name}=`;
@@ -41,6 +63,9 @@ const outputDir = resolve(root, option('output', 'scratch/visual-render-review')
 const allFrames = process.argv.includes('--all-frames');
 const proofCaptures = process.argv.includes('--proof-captures');
 const supplemental = process.argv.includes('--supplemental');
+const lessonMode = process.argv.includes('--lessons');
+const bindDist = process.argv.includes('--bind-dist');
+const lessonCatalog = lessonMode ? JSON.parse(readFileSync(join(root, 'data/visual-lessons.json'), 'utf8')).lessons : {};
 const auditsDir = join(root, 'data', 'visual-audits');
 const auditedEntries = slugs.map((slug) => {
   const auditPath = join(auditsDir, `${slug}.json`);
@@ -119,6 +144,7 @@ class Cdp {
     this.nextId = 1;
     this.pending = new Map();
     this.events = new Map();
+    this.listeners = new Map();
     this.socket.onmessage = ({ data }) => {
       const message = JSON.parse(data);
       if (message.id) {
@@ -132,6 +158,7 @@ class Cdp {
       const listeners = this.events.get(message.method) ?? [];
       this.events.delete(message.method);
       for (const resolveEvent of listeners) resolveEvent(message.params);
+      for (const listener of this.listeners.get(message.method) ?? []) listener(message.params);
     };
   }
 
@@ -157,6 +184,12 @@ class Cdp {
       listeners.push(resolveEvent);
       this.events.set(method, listeners);
     });
+  }
+
+  on(method, listener) {
+    const listeners = this.listeners.get(method) ?? [];
+    listeners.push(listener);
+    this.listeners.set(method, listeners);
   }
 
   close() {
@@ -288,8 +321,210 @@ async function stopBrowser() {
 }
 
 const report = [];
+const articleResponses = new Map();
+function sourceSnapshot() {
+  const listing = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], { cwd: root, encoding: 'utf8' });
+  if (listing.status !== 0) throw new Error(`Cannot inventory source: ${listing.stderr}`);
+  return Object.fromEntries(listing.stdout.split('\0').filter(filename => /^(?:src\/|public\/|scripts\/|data\/|package(?:-lock)?\.json$|astro\.config\.[^/]+$|tsconfig\.json$)/.test(filename)).sort().map(filename => [filename, createHash('sha256').update(readFileSync(join(root, filename))).digest('hex')]));
+}
+const frozenSource = lessonMode ? sourceSnapshot() : undefined;
 let cdp;
 let currentLabel = 'browser startup';
+async function checkLesson(entry, mode) {
+  const lesson = lessonCatalog[entry.slug];
+  if (!lesson) throw new Error(`${entry.slug}: no authored visual lesson`);
+  if (mode.name === 'desktop-light' || mode.name === 'mobile-light') {
+    await cdp.call('Emulation.setScriptExecutionDisabled', { value: true });
+    const articleLoaded = cdp.once('Page.loadEventFired');
+    const noJsUrl = `${baseUrl}/${entry.category}/${entry.slug}/?no-js-check=${mode.name}`;
+    await cdp.call('Page.navigate', { url: noJsUrl });
+    let articleTimer;
+    try {
+      await Promise.race([articleLoaded, new Promise((_, reject) => { articleTimer = setTimeout(() => reject(new Error('No-JavaScript article did not load')), 20000); })]);
+    } finally { clearTimeout(articleTimer); }
+    const noJs = await cdp.call('Runtime.evaluate', {
+      expression: `(async () => {
+        await document.fonts.ready;
+        const lead = document.querySelector('[data-article-quick-review]');
+        if (!lead || lead.hidden || !lead.getBoundingClientRect().height || lead.querySelector('[data-review-visual-host]').getAttribute('aria-busy') !== 'false') throw new Error('No-JavaScript lead is unavailable');
+        const figures = [...document.querySelectorAll('[data-visual-lesson-step]')];
+        const order = figures.map(figure => figure.dataset.visualLessonStep);
+        if (JSON.stringify(order) !== ${JSON.stringify(JSON.stringify(lesson.steps.map(step => `${step.visualId}:${step.view}`)))}) throw new Error('No-JavaScript lesson order differs');
+        if (figures.some(figure => figure.closest('details') || !figure.getClientRects().length)) throw new Error('Essential no-JavaScript figure is hidden');
+        if (document.querySelector('[data-coding-enhanced="true"]')) throw new Error('No-JavaScript article ran enhancement');
+        if (innerWidth !== ${mode.width} || document.documentElement.scrollWidth > innerWidth + 1) throw new Error('No-JavaScript article overflows its actual viewport');
+        return {order, width: innerWidth};
+      })()`, returnByValue: true, awaitPromise: true,
+    });
+    if (noJs.exceptionDetails) throw new Error(noJs.exceptionDetails.exception?.description ?? noJs.exceptionDetails.text);
+    const response = articleResponses.get(noJsUrl);
+    if (!response || response.status !== 200) throw new Error(`${entry.slug}: no-JavaScript article response is unsuccessful`);
+    const delivered = await cdp.call('Network.getResponseBody', { requestId: response.requestId });
+    const bytes = Buffer.from(delivered.body, delivered.base64Encoded ? 'base64' : 'utf8');
+    if (bindDist && !bytes.equals(readFileSync(join(root, 'dist', entry.category, entry.slug, 'index.html')))) throw new Error(`${entry.slug}: no-JavaScript article differs from built output`);
+    appendFileSync(join(outputDir, 'no-js-articles.ndjson'), `${JSON.stringify({slug: entry.slug, mode: mode.name, articleSha256: createHash('sha256').update(bytes).digest('hex'), ...noJs.result.value})}\n`);
+    await cdp.call('Emulation.setScriptExecutionDisabled', { value: false });
+  }
+  const loaded = cdp.once('Page.loadEventFired');
+  await cdp.call('Page.navigate', { url: `${baseUrl}/review/?visual-check=${encodeURIComponent(`${entry.slug}-${mode.name}`)}#${entry.slug}` });
+  let loadTimer;
+  try {
+    await Promise.race([loaded, new Promise((_, reject) => { loadTimer = setTimeout(() => reject(new Error('Lesson document did not load')), 20000); })]);
+  } finally { clearTimeout(loadTimer); }
+  const ready = await cdp.call('Runtime.evaluate', {
+    expression: `(async () => {
+      document.documentElement.dataset.theme = ${JSON.stringify(mode.theme)};
+      await document.fonts.ready;
+      const deadline = performance.now() + 20000;
+      while (performance.now() < deadline) {
+        const host = document.querySelector('[data-review-visual-host]');
+        if (host?.getAttribute('aria-busy') === 'false' && host.querySelector('[data-visual-lesson-step]')) return true;
+        if (host?.querySelector('.review-error')) throw new Error(host.textContent);
+        await new Promise(resolve => requestAnimationFrame(resolve));
+      }
+      throw new Error('Visual lesson did not become ready');
+    })()`, returnByValue: true, awaitPromise: true,
+  });
+  if (ready.exceptionDetails) throw new Error(ready.exceptionDetails.exception?.description ?? ready.exceptionDetails.text);
+  const articleUrl = `${baseUrl}/${entry.category}/${entry.slug}/`;
+  const response = articleResponses.get(articleUrl);
+  if (!response || response.status !== 200) throw new Error(`${entry.slug}: browser article response is missing or unsuccessful`);
+  const delivered = await cdp.call('Network.getResponseBody', { requestId: response.requestId });
+  const articleBytes = Buffer.from(delivered.body, delivered.base64Encoded ? 'base64' : 'utf8');
+  const articleSha256 = createHash('sha256').update(articleBytes).digest('hex');
+  if (bindDist && !articleBytes.equals(readFileSync(join(root, 'dist', entry.category, entry.slug, 'index.html')))) throw new Error(`${entry.slug}: browser-fetched article differs from built output`);
+  for (const [index, step] of lesson.steps.entries()) {
+    let frameCount = 1;
+    let initialFrameHeight;
+    for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+    currentLabel = `${entry.slug}/${mode.name}/${step.visualId}:${step.view}/frame-${frameIndex}`;
+    const inspected = await cdp.call('Runtime.evaluate', {
+      expression: `(async () => {
+        const host = document.querySelector('[data-review-visual-host]');
+        const figures = [...host.querySelectorAll(':scope > [data-visual-lesson-step]')];
+        if (${index} > 0 && ${frameIndex} === 0) host.querySelector('[data-visual-lesson-next]').click();
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const visible = figures.filter(figure => !figure.hidden);
+        if (visible.length !== 1) throw new Error('Expected exactly one visible teaching step, got ' + visible.length);
+        const figure = visible[0];
+        if (${frameIndex} > 0) {
+          figure.querySelector('[data-coding-next]').click();
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          figure.getAnimations({subtree: true}).filter(animation => animation.playState === 'running').forEach(animation => animation.finish());
+        }
+        if (figure.dataset.visualLessonStep !== ${JSON.stringify(`${step.visualId}:${step.view}`)}) throw new Error('Wrong teaching step');
+        if (figures.length !== ${lesson.steps.length}) throw new Error('Incomplete lesson');
+        if (innerWidth !== ${mode.width}) throw new Error('Actual viewport differs from requested viewport: ' + innerWidth);
+        if (document.querySelector('[data-review-explanation]').getAttribute('aria-hidden') !== 'true') throw new Error('Explanation opened without request');
+        const ids = [...host.querySelectorAll('[id]')].map(element => element.id);
+        if (new Set(ids).size !== ids.length) throw new Error('Duplicate cloned IDs');
+        for (const element of host.querySelectorAll('[aria-labelledby], [aria-describedby], [aria-controls]')) {
+          for (const attribute of ['aria-labelledby', 'aria-describedby', 'aria-controls']) {
+            for (const identity of (element.getAttribute(attribute) ?? '').split(/\\s+/).filter(Boolean)) {
+              if (!document.getElementById(identity)) throw new Error('Unresolved accessible reference: ' + identity);
+            }
+          }
+        }
+        const failures = [];
+        const labels = [];
+        const printPanels = [];
+        for (const panels of figure.querySelectorAll('.visual-lesson-print-panels')) {
+          if (!panels.querySelector('[data-visual-lesson-print-panel="1"]')) continue;
+          const source = panels.previousElementSibling.querySelector('[data-visual-lesson-screen]');
+          const originalLabels = [...source.querySelectorAll('text')].map(label => label.textContent).filter(text => text.trim()).sort();
+          const panelLabels = [...panels.querySelectorAll('text')].map(label => label.textContent).filter(text => text.trim()).sort();
+          if (JSON.stringify(originalLabels) !== JSON.stringify(panelLabels)) failures.push('Print panels lost or duplicated drawing labels');
+          printPanels.push({ sourceLabels: originalLabels.length, panelLabels: panelLabels.length });
+        }
+        const labelIsContained = ${svgLabelIsContained.toString()};
+        for (const svg of figure.querySelectorAll('svg')) {
+          if (!svg.getBoundingClientRect().width || getComputedStyle(svg).display === 'none') continue;
+          if (!svg.querySelector('title') && !svg.getAttribute('aria-label')) failures.push('Unnamed SVG');
+          for (const text of svg.querySelectorAll('text')) {
+            const box = text.getBBox();
+            if (!box.width || !box.height) continue;
+            if (!labelIsContained(svg, text, 1)) failures.push('Label outside SVG: ' + text.textContent);
+            const scale = svg.getScreenCTM();
+            const size = parseFloat(getComputedStyle(text).fontSize) * Math.hypot(scale.a, scale.b);
+            if (size < 12) failures.push('Unreadable label ' + size.toFixed(2) + 'px: ' + text.textContent);
+            labels.push({ text: text.textContent, pixels: size });
+          }
+        }
+        if (document.documentElement.scrollWidth > innerWidth + 1) failures.push('Page horizontal overflow');
+        const scrollers = [...figure.querySelectorAll('.visual-lesson-canvas')].map(canvas => {
+          const maximum = canvas.scrollWidth - canvas.clientWidth;
+          canvas.scrollLeft = maximum;
+          const reachable = Math.abs(canvas.scrollLeft - maximum) <= 1;
+          canvas.scrollLeft = 0;
+          if (!reachable) failures.push('Diagram right edge is unreachable');
+          return { maximum, reachable };
+        });
+        const rect = figure.getBoundingClientRect();
+        const fitsWorkspace = ${lessonFitsWorkspace.toString()};
+        if (!fitsWorkspace(figure, document.querySelector('[data-review-workspace]'), 1)) failures.push('Lesson extends below its workspace into the following section');
+        const pinned = [...document.querySelectorAll('header, nav')].map(element => ({element, style: getComputedStyle(element), rect: element.getBoundingClientRect()})).filter(({style, rect}) => ['fixed', 'sticky'].includes(style.position) && rect.width && rect.height);
+        const clearanceTop = 16 + Math.max(0, ...pinned.filter(({element}) => !element.matches('[data-review-controls]')).map(({style, rect}) => Number.isFinite(parseFloat(style.top)) ? parseFloat(style.top) + rect.height : 0));
+        const clearanceBottom = 16 + Math.max(0, ...pinned.filter(({element}) => element.matches('[data-review-controls]')).map(({style, rect}) => Number.isFinite(parseFloat(style.bottom)) ? parseFloat(style.bottom) + rect.height : 0));
+        const activeFrame = figure.querySelector('[data-coding-frame]:not([hidden])');
+        return {failures, labels, printPanels, scrollers, frames: figure.querySelectorAll('[data-frame-key]').length, folds: figure.querySelectorAll('details').length,
+          frameIndex: activeFrame ? Number(activeFrame.dataset.codingFrame) : undefined, frameHeight: activeFrame?.getBoundingClientRect().height,
+          clearanceTop, clearanceBottom,
+          rect: {x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height}};
+      })()`, returnByValue: true, awaitPromise: true,
+    });
+    if (inspected.exceptionDetails) throw new Error(inspected.exceptionDetails.exception?.description ?? inspected.exceptionDetails.text);
+    const details = inspected.result.value;
+    if (allFrames && mode.media === 'screen' && step.view === 'trace') {
+      frameCount = details.frames;
+      if (details.frameIndex !== frameIndex) throw new Error(`${currentLabel}: trace skipped a checkpoint`);
+      initialFrameHeight ??= details.frameHeight;
+      if (Math.abs(details.frameHeight - initialFrameHeight) > .5) throw new Error(`${currentLabel}: trace stage changed height`);
+    }
+    const prefix = `${entry.slug}--${mode.name}--lesson-${index + 1}${allFrames && mode.media === 'screen' && step.view === 'trace' ? `--frame-${frameIndex + 1}` : ''}`;
+    if (proofCaptures || details.failures.length) {
+      const proofHeight = Math.max(mode.height, Math.ceil(details.rect.height + details.clearanceTop + details.clearanceBottom), mode.media === 'print' ? Math.ceil(details.rect.y + details.rect.height + details.clearanceBottom) : 0);
+      await cdp.call('Emulation.setDeviceMetricsOverride', { width: mode.width, height: proofHeight, deviceScaleFactor: 1, mobile: Boolean(mode.mobile), screenWidth: mode.width, screenHeight: proofHeight });
+      const positioned = await cdp.call('Runtime.evaluate', {
+        expression: `(async () => {
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          const figure = document.querySelector('[data-review-visual-host] > [data-visual-lesson-step]:not([hidden])');
+          const before = figure.getBoundingClientRect();
+          window.scrollTo({top: Math.max(0, before.top + scrollY - ${details.clearanceTop}), left: 0, behavior: 'instant'});
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          const rect = figure.getBoundingClientRect();
+          if (Math.abs(rect.width - ${details.rect.width}) > .5 || Math.abs(rect.height - ${details.rect.height}) > .5) throw new Error('Capture viewport changed figure geometry');
+          if (rect.top < ${details.clearanceTop} - 1 || rect.bottom > innerHeight - ${details.clearanceBottom} + 1) throw new Error('Pinned controls obstruct the capture: ' + JSON.stringify({top: rect.top, bottom: rect.bottom, height: innerHeight, topClearance: ${details.clearanceTop}, bottomClearance: ${details.clearanceBottom}}));
+          return { x: rect.x + scrollX, y: rect.y + scrollY, width: rect.width, height: rect.height };
+        })()`, returnByValue: true, awaitPromise: true,
+      });
+      if (positioned.exceptionDetails) throw new Error(positioned.exceptionDetails.exception?.description ?? positioned.exceptionDetails.text);
+      const capture = async suffix => {
+        const screenshot = await cdp.call('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false, clip: {...positioned.result.value, scale: 1}});
+        const bytes = Buffer.from(screenshot.data, 'base64');
+        const metadata = await sharp(bytes).metadata();
+        if (Math.abs(metadata.width - details.rect.width) > 1 || Math.abs(metadata.height - details.rect.height) > 1) throw new Error('Capture truncated the figure');
+        writeFileSync(join(outputDir, `${prefix}${suffix}.png`), bytes);
+      };
+      await capture('');
+      if (details.scrollers.some(canvas => canvas.maximum > 0)) {
+        await cdp.call('Runtime.evaluate', { expression: `document.querySelector('[data-review-visual-host] > [data-visual-lesson-step]:not([hidden])').querySelectorAll('.visual-lesson-canvas').forEach(canvas => { canvas.scrollLeft = canvas.scrollWidth; })` });
+        await capture('--right-edge');
+      }
+      await cdp.call('Emulation.setDeviceMetricsOverride', { width: mode.width, height: mode.height, deviceScaleFactor: 1, mobile: Boolean(mode.mobile), screenWidth: mode.width, screenHeight: mode.height });
+    }
+    report.push({slug: entry.slug, mode: mode.name, step, articleSha256, ...details});
+    appendFileSync(join(outputDir, 'renders.ndjson'), `${JSON.stringify(report.at(-1))}\n`);
+    writeFileSync(join(outputDir, 'progress.json'), `${JSON.stringify({cases: report.length, latest: currentLabel, complete: false}, null, 2)}\n`);
+    if (details.failures.length) throw new Error(`${currentLabel}: ${details.failures.join('; ')}`);
+    }
+  }
+  if (proofCaptures && mode.media === 'print') {
+    const printed = await cdp.call('Page.printToPDF', { printBackground: true, preferCSSPageSize: true, generateTaggedPDF: true });
+    const bytes = Buffer.from(printed.data, 'base64');
+    if (bytes.length < 1000 || bytes.subarray(0, 4).toString() !== '%PDF') throw new Error(`${entry.slug}: invalid printed lesson`);
+    writeFileSync(join(outputDir, `${entry.slug}--lesson.pdf`), bytes);
+  }
+}
 try {
   await waitForBrowser();
   const targetResponse = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' });
@@ -299,6 +534,74 @@ try {
   await cdp.ready();
   await cdp.call('Page.enable');
   await cdp.call('Runtime.enable');
+  const geometryControls = await cdp.call('Runtime.evaluate', {
+    expression: `(() => {
+      const labelIsContained = ${svgLabelIsContained.toString()};
+      const namespace = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(namespace, 'svg');
+      svg.setAttribute('viewBox', '0 0 300 180');
+      svg.setAttribute('width', '300');
+      svg.setAttribute('height', '180');
+      const cases = [
+        {name: 'valid-direct', x: 32, y: 40, expected: true},
+        {name: 'valid-rotated', transform: 'translate(32 150) rotate(-90)', expected: true},
+        {name: 'valid-nested', x: 12, y: 20, ancestor: 'translate(60 60) rotate(20)', expected: true},
+        {name: 'outside-direct', x: 330, y: 40, expected: false},
+        {name: 'outside-rotated', transform: 'translate(-20 150) rotate(-90)', expected: false},
+        {name: 'outside-nested', x: 12, y: 20, ancestor: 'translate(330 60) rotate(20)', expected: false},
+      ];
+      document.body.append(svg);
+      try {
+        return cases.map(control => {
+          const group = document.createElementNS(namespace, 'g');
+          if (control.ancestor) group.setAttribute('transform', control.ancestor);
+          const text = document.createElementNS(namespace, 'text');
+          text.setAttribute('x', String(control.x ?? 0));
+          text.setAttribute('y', String(control.y ?? 0));
+          text.setAttribute('font-size', '16');
+          if (control.transform) text.setAttribute('transform', control.transform);
+          text.textContent = control.name;
+          group.append(text);
+          svg.append(group);
+          const contained = labelIsContained(svg, text, 1);
+          if (contained !== control.expected) throw new Error('SVG geometry control failed: ' + control.name);
+          return {name: control.name, contained, expected: control.expected};
+        });
+      } finally { svg.remove(); }
+    })()`, returnByValue: true,
+  });
+  if (geometryControls.exceptionDetails) throw new Error(geometryControls.exceptionDetails.exception?.description ?? geometryControls.exceptionDetails.text);
+  writeFileSync(join(outputDir, 'geometry-controls.json'), `${JSON.stringify(geometryControls.result.value, null, 2)}\n`);
+  if (lessonMode) {
+    const flowControls = await cdp.call('Runtime.evaluate', {
+      expression: `(() => {
+        const fitsWorkspace = ${lessonFitsWorkspace.toString()};
+        const workspace = document.createElement('div');
+        const stage = document.createElement('div');
+        const figure = document.createElement('figure');
+        figure.style.cssText = 'height:180px;margin:0';
+        stage.append(figure);
+        workspace.append(stage);
+        document.body.append(workspace);
+        try {
+          return [{name: 'natural-stage', maximum: '', expected: true}, {name: 'capped-stage', maximum: '80px', expected: false}].map(control => {
+            stage.style.maxHeight = control.maximum;
+            const fits = fitsWorkspace(figure, workspace, 1);
+            if (fits !== control.expected) throw new Error('Lesson flow control failed: ' + control.name);
+            return {name: control.name, fits, expected: control.expected};
+          });
+        } finally { workspace.remove(); }
+      })()`, returnByValue: true,
+    });
+    if (flowControls.exceptionDetails) throw new Error(flowControls.exceptionDetails.exception?.description ?? flowControls.exceptionDetails.text);
+    writeFileSync(join(outputDir, 'flow-controls.json'), `${JSON.stringify(flowControls.result.value, null, 2)}\n`);
+  }
+  if (lessonMode) {
+    await cdp.call('Network.enable');
+    cdp.on('Network.responseReceived', ({ requestId, response }) => {
+      if (response.mimeType === 'text/html') articleResponses.set(response.url, { requestId, status: response.status });
+    });
+  }
 
   for (const mode of modes) {
     await cdp.call('Emulation.setDeviceMetricsOverride', {
@@ -311,10 +614,15 @@ try {
     });
     await cdp.call('Emulation.setEmulatedMedia', {
       media: mode.media,
-      features: [{ name: 'prefers-color-scheme', value: mode.theme }],
+      features: [{ name: 'prefers-color-scheme', value: mode.theme }, ...(lessonMode ? [{name: 'prefers-reduced-motion', value: 'reduce'}] : [])],
     });
 
     for (const entry of entries) {
+      if (lessonMode) {
+        await checkLesson(entry, mode);
+        if ((entries.indexOf(entry) + 1) % 25 === 0) console.log(`Visual lessons verified: ${entries.indexOf(entry) + 1}/${entries.length} in ${mode.name}.`);
+        continue;
+      }
       currentLabel = `${entry.slug}/${mode.name}/navigation`;
       const loaded = cdp.once('Page.loadEventFired');
       await cdp.call('Page.navigate', { url: `${baseUrl}/${entry.category}/${entry.slug}/` });
@@ -399,34 +707,9 @@ try {
             const clippedText = ${JSON.stringify(entry.medium === 'svg')} ? svgElements.flatMap((svg) => {
               const viewBox = svg.viewBox.baseVal;
               if (!viewBox?.width) return [];
+              const labelIsContained = ${svgLabelIsContained.toString()};
               return [...svg.querySelectorAll('text')].flatMap((text) => {
-                const box = text.getBBox();
-                const rootMatrix = svg.getCTM();
-                const textMatrix = text.getCTM();
-                const matrix = rootMatrix && textMatrix
-                  ? rootMatrix.inverse().multiply(textMatrix)
-                  : { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
-                const corners = [
-                  [box.x, box.y],
-                  [box.x + box.width, box.y],
-                  [box.x, box.y + box.height],
-                  [box.x + box.width, box.y + box.height],
-                ].map(([x, y]) => ({
-                  x: matrix.a * x + matrix.c * y + matrix.e,
-                  y: matrix.b * x + matrix.d * y + matrix.f,
-                }));
-                const bounds = {
-                  left: Math.min(...corners.map((point) => point.x)),
-                  top: Math.min(...corners.map((point) => point.y)),
-                  right: Math.max(...corners.map((point) => point.x)),
-                  bottom: Math.max(...corners.map((point) => point.y)),
-                };
-                const epsilon = 0.5;
-                return bounds.left < viewBox.x - epsilon || bounds.top < viewBox.y - epsilon ||
-                  bounds.right > viewBox.x + viewBox.width + epsilon ||
-                  bounds.bottom > viewBox.y + viewBox.height + epsilon
-                  ? [text.textContent.trim()]
-                  : [];
+                return labelIsContained(svg, text, 0.5) ? [] : [text.textContent.trim()];
               });
             }) : [];
             const renderedTextSizes = svgElements.flatMap((svg) => {
@@ -873,7 +1156,8 @@ try {
     }
   }
 
-  writeFileSync(join(outputDir, 'report.json'), `${JSON.stringify({ renders: report, noVisualSlugs }, null, 2)}\n`);
+  if (lessonMode && JSON.stringify(sourceSnapshot()) !== JSON.stringify(frozenSource)) throw new Error('Source changed during native lesson verification');
+  writeFileSync(join(outputDir, 'report.json'), `${JSON.stringify({ complete: true, lessonMode, bindDist, baseUrl, sourceFiles: frozenSource, renders: report, noVisualSlugs }, null, 2)}\n`);
   console.log(`Visual rendering passed: ${report.length} renders, ${noVisualSlugs.length} no-visual outcome(s); screenshots saved to ${outputDir}`);
 } catch (error) {
   writeFileSync(join(outputDir, 'failure.json'), `${JSON.stringify({ label: currentLabel, error: error.stack, browserExitCode: browser.exitCode, browserStderr: browserErrors.slice(-4000) }, null, 2)}\n`);

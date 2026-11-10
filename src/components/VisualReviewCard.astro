@@ -70,9 +70,9 @@ const {
     margin: 0;
     color: var(--c-accent);
     font-family: var(--font-ui);
-    font-size: .68rem;
+    font-size: .78rem;
     font-weight: 700;
-    letter-spacing: .11em;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
   .visual-review-overline :global(*) {
@@ -86,19 +86,41 @@ const {
     margin: .35rem 0 .25rem;
     color: var(--c-text);
     font-family: var(--font-display);
-    font-size: clamp(1.35rem, 3vw, 1.8rem);
+    font-size: 1.8rem;
     line-height: 1.2;
-    letter-spacing: -.018em;
+    letter-spacing: 0;
   }
   .visual-review-summary {
     max-width: 48rem;
     margin: .35rem 0 0;
     color: var(--c-text-soft);
     font-family: var(--font-reading);
-    font-size: clamp(.94rem, 1.8vw, 1.04rem);
+    font-size: 1rem;
     line-height: 1.5;
   }
   .visual-review-visual { min-width: 0; }
+  .visual-review-visual :global(.visual-lesson-step .visual-argument) { width: min(100%, 36rem); margin-inline: auto; }
+  .visual-review-visual :global(.visual-lesson-canvas) { min-width: 0; max-width: 100%; overflow-x: auto; }
+  .visual-review-visual :global(.visual-lesson-controls) {
+    position: sticky;
+    top: calc(var(--header-height) + .25rem);
+    z-index: 25;
+    display: grid;
+    grid-template-columns: 2.75rem 6rem 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .5rem 0;
+    margin-bottom: .75rem;
+    border-bottom: 1px solid var(--c-rule);
+    background: var(--c-bg);
+    font-family: var(--font-ui);
+  }
+  .visual-review-visual :global(.visual-lesson-controls button) { width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid var(--c-rule); border-radius: 4px; color: var(--c-text); background: var(--c-surface); font-size: 1.25rem; cursor: pointer; }
+  .visual-review-visual :global(.visual-lesson-controls button:disabled) { opacity: .4; cursor: default; }
+  .visual-review-visual :global(.visual-lesson-controls button:focus-visible) { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+  .visual-review-visual :global(.visual-lesson-controls output) { text-align: center; font-size: .8rem; }
+  .visual-review-card--deck .visual-review-visual :global(.visual-lesson-controls) { top: calc(var(--header-height) + var(--review-toolbar-height, 3.2rem)); }
   .visual-review-visual :global(.learning-figure) {
     width: 100%;
     max-width: 100% !important;
@@ -186,10 +208,10 @@ const {
     width: min(100%, 68rem);
     display: block;
     margin-bottom: 0;
-    padding: clamp(.9rem, 2.5vw, 1.35rem);
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius-lg);
-    background: var(--c-bg);
+    padding: .3rem 0 1rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
   }
   .visual-review-card--article {
     display: block;
@@ -246,12 +268,15 @@ const {
     .visual-review-card--article:has(.information-budget-visual),
     .visual-review-card--article:has(.weight-decay-path-visual) { width: 100%; margin-left: 0; transform: none; }
     .visual-review-card--article .visual-review-visual { overflow-y: visible; }
-    .visual-review-card--deck { max-height: none; display: block; padding: .8rem; }
+    h1, h2 { font-size: 1.55rem; }
+    .visual-review-card--deck { max-height: none; display: block; padding: .3rem 0 1rem; }
     .visual-review-card--deck .visual-review-visual { max-height: none; overflow-y: visible; }
     .visual-review-actions :global(a),
     .visual-review-actions :global(button) { min-height: 2.75rem; }
   }
   @media print {
+    .visual-review-visual :global(.visual-lesson-controls) { display: none !important; }
+    .visual-review-visual :global(.visual-lesson-step[hidden]) { display: block !important; }
     .visual-review-card { break-inside: avoid; border: 0; }
     .visual-review-card--article { height: auto; display: block; break-inside: auto; }
     .visual-review-card--article .visual-review-visual { overflow: visible; }

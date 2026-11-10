@@ -14,8 +14,9 @@ import { getSubcategoryMap, type Category } from '../utils/subcategories';
 import { getPracticeMode } from '../data/prepCurriculum';
 import { findLibraryLocation, getLibraryShelf } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
-import { getImplementedVisualAudit } from '../utils/visualAudits';
+import { getImplementedVisualAudit, getVisualLesson } from '../utils/visualAudits';
 import { getColdPrompt, getLearningContext } from '../utils/learningMechanisms';
+import { placeArticleVisualLesson } from '../utils/visualLessonHtml';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -28,6 +29,11 @@ const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 const category = post.data.category as Category;
 const visualAudit = getImplementedVisualAudit(slug);
+const visualLesson = getVisualLesson(slug);
+const leadStep = visualLesson?.steps[0];
+if (visualAudit && !visualLesson) throw new Error(`Missing authored visual lesson for ${slug}`);
+const renderedContent = await Astro.slots.render('default');
+const articleLesson = visualLesson ? placeArticleVisualLesson(renderedContent, visualLesson) : undefined;
 const learning = getLearningContext(slug);
 const hasExtension = rawContent.includes('data-learning-extension');
 const coldPrompt = category === 'questions' ? getColdPrompt(rawContent) : undefined;
@@ -154,27 +160,6 @@ const fullContentLabel: Record<Category, string> = {
 
       {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} prompt={coldPrompt} />}
 
-      {visualAudit && (
-        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} hidden data-pagefind-ignore="all">
-          <VisualReviewCard
-            id="quick-review"
-            eyebrow={quickReviewLabel[category]}
-            summary={visualAudit.learningObjective || description}
-            loading
-          >
-            <span slot="status">Visual first · depth when needed</span>
-          </VisualReviewCard>
-          <noscript><style is:inline>[data-article-quick-review] { display: none !important; }</style></noscript>
-        </div>
-      )}
-
-      {visualAudit && (
-        <div id="full-explanation" class="full-explanation-divider" data-full-explanation hidden data-pagefind-ignore="all">
-          <span>{fullContentLabel[category]}</span>
-          <small>{Math.max(1, Math.round(stats.minutes))} min read</small>
-        </div>
-      )}
-
       {pageHeadings.length > 2 && <nav class="reader-tools" aria-label="On this page" data-pagefind-ignore="all">
         <details class="reader-tool">
           <summary>
@@ -189,15 +174,32 @@ const fullContentLabel: Record<Category, string> = {
         </details>
       </nav>}
 
+      {articleLesson && (
+        <div data-article-quick-review data-visual-id={leadStep?.visualId} data-visual-view={leadStep?.view} data-ready="true" data-pagefind-ignore="all">
+          <VisualReviewCard
+            id="quick-review"
+            eyebrow={quickReviewLabel[category]}
+            summary={visualLesson?.idea}
+          >
+            <Fragment slot="visual" set:html={articleLesson.lead} />
+          </VisualReviewCard>
+        </div>
+      )}
+
+      {articleLesson && (
+        <div id="full-explanation" class="full-explanation-divider" data-full-explanation data-pagefind-ignore="all">
+          <span>{fullContentLabel[category]}</span>
+          <small>{Math.max(1, Math.round(stats.minutes))} min read</small>
+        </div>
+      )}
+
       {hasExtension && <fieldset class="reading-depth" data-reading-depth-controls>
         <legend class="sr-only">Reading depth</legend>
         <label><input type="radio" name="reading-depth" value="full" checked /><span>Full</span></label>
         <label><input type="radio" name="reading-depth" value="core" /><span>Core</span></label>
       </fieldset>}
 
-      <div id="answer" class="prose docs-body" itemprop="articleBody">
-        <slot />
-      </div>
+      <div id="answer" class="prose docs-body" itemprop="articleBody" set:html={articleLesson?.body ?? renderedContent} />
 
       {learning && <nav class="mechanism-reading" aria-label="Mechanism reading links" data-pagefind-ignore="all">
         <p class="mechanism-name"><a href={`/mechanisms/#${learning.family.id}`}>{learning.family.title}</a></p>
@@ -208,8 +210,6 @@ const fullContentLabel: Record<Category, string> = {
       </nav>}
 
       {category !== 'questions' && <CompletionToggle itemId={`entry:${slug}`} />}
-
-      <Subscribe placement="entry" />
 
       <nav class="journey-nav" aria-label={`Continue through ${libraryLocation ? libraryLocation.volume.title : categoryMeta.plural}`} data-pagefind-ignore="all">
         <div class="journey-context">
@@ -232,6 +232,8 @@ const fullContentLabel: Record<Category, string> = {
         </div>
       </nav>
 
+      <Subscribe placement="entry" />
+
       <p class="correction-link" data-pagefind-ignore="all">Found an error or stale claim? <a href={correctionIssueUrl} rel="noopener">Report a correction <span aria-hidden="true">↗</span></a> or <a href={correctionEmailUrl}>send a private note</a>.</p>
       </article>
     </div>
@@ -239,7 +241,6 @@ const fullContentLabel: Record<Category, string> = {
 </BaseLayout>
 
 <script>
-  import { extractLearningVisual } from '../utils/visualReviewClient';
   import { enhanceCodingVisuals } from '../utils/codingVisuals';
 
   function fragmentTarget(hash: string) {
@@ -279,42 +280,8 @@ const fullContentLabel: Record<Category, string> = {
     inputs.forEach((input) => input.addEventListener('change', () => { if (input.checked) apply(input.value, true); }));
   }
 
-  function promoteArticleVisual() {
-    const wrapper = document.querySelector<HTMLElement>('[data-article-quick-review]');
-    const articleBody = document.querySelector<HTMLElement>('#answer');
-    if (!wrapper || !articleBody || wrapper.dataset.ready === 'true') return;
-
-    const card = wrapper.querySelector<HTMLElement>('[data-visual-review-card]');
-    const host = wrapper.querySelector<HTMLElement>('[data-review-visual-host]');
-    const extracted = extractLearningVisual(articleBody, wrapper.dataset.visualId);
-    if (!card || !host || !extracted) {
-      wrapper.hidden = true;
-      return;
-    }
-
-    const visualNodes: Node[] = extracted.marker
-      ? [extracted.marker, extracted.figure]
-      : [extracted.figure];
-    host.replaceChildren(...visualNodes);
-    host.setAttribute('aria-busy', 'false');
-    if (extracted.source) {
-      const sourceHost = wrapper.querySelector<HTMLElement>('[data-review-source-host]');
-      const sourceDetails = wrapper.querySelector<HTMLDetailsElement>('[data-review-source-details]');
-      sourceHost?.append(extracted.source);
-      if (sourceDetails) sourceDetails.hidden = false;
-    }
-
-    wrapper.hidden = false;
-    card.hidden = false;
-    const divider = document.querySelector<HTMLElement>('[data-full-explanation]');
-    if (divider) divider.hidden = false;
-    wrapper.dataset.ready = 'true';
-  }
-
-  promoteArticleVisual();
   enhanceCodingVisuals();
   initializeReadingDepth();
-  document.addEventListener('astro:page-load', promoteArticleVisual);
   document.addEventListener('astro:page-load', () => enhanceCodingVisuals());
   document.addEventListener('astro:page-load', initializeReadingDepth);
   window.addEventListener('hashchange', () => {
@@ -343,7 +310,7 @@ const fullContentLabel: Record<Category, string> = {
     align-items: center;
     gap: .35rem;
     font-family: var(--font-ui);
-    font-size: .72rem;
+    font-size: .8rem;
     font-weight: 500;
     color: var(--c-muted);
     margin: 0 0 .75rem;
@@ -352,10 +319,10 @@ const fullContentLabel: Record<Category, string> = {
   .breadcrumbs a:hover { color: var(--c-text); text-decoration: underline; }
   .docs-head h1 {
     font-family: var(--font-display);
-    font-size: clamp(1.65rem, 3vw, 1.95rem);
+    font-size: 1.95rem;
     font-weight: 600;
     line-height: 1.2;
-    letter-spacing: -.018em;
+    letter-spacing: 0;
     margin: 0 0 .45rem;
   }
   .lede {
@@ -378,6 +345,11 @@ const fullContentLabel: Record<Category, string> = {
     line-height: 1.68;
   }
   #answer { scroll-margin-top: var(--sticky-offset); }
+  .docs-body :global(.article-lesson-support) { min-width: 0; margin-block: 1.5rem; }
+  .docs-body :global(.article-lesson-support .visual-argument) { width: min(100%, 36rem); margin-inline: auto; }
+  .docs-body :global(.visual-lesson-canvas) { min-width: 0; max-width: 100%; overflow-x: auto; }
+  .docs-body :global(.article-visual-reference) { margin-block: 1rem; }
+  .docs-body :global(.article-visual-reference > summary) { color: var(--c-text-soft); font-family: var(--font-ui); font-size: .8rem; cursor: pointer; }
   .docs-body :global(h2) { margin-top: 1.9rem; }
   .docs-body :global(h3) { margin-top: 1.4rem; }
   .docs-body :global(h2), .docs-body :global(h3) { scroll-margin-top: var(--sticky-offset); }
@@ -409,6 +381,7 @@ const fullContentLabel: Record<Category, string> = {
   }
   .reader-tool summary {
     display: flex;
+    min-height: 44px;
     align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
@@ -416,7 +389,7 @@ const fullContentLabel: Record<Category, string> = {
     cursor: pointer;
     list-style: none;
     color: var(--c-text);
-    font-size: .76rem;
+    font-size: .86rem;
     font-weight: 550;
   }
   .reader-tool summary::-webkit-details-marker { display: none; }
@@ -438,7 +411,7 @@ const fullContentLabel: Record<Category, string> = {
   }
   .reader-tool li { margin: 0.25rem 0; color: var(--c-muted); }
   .reader-tool li.depth-3 { margin-left: 0.8rem; font-size: 0.92em; }
-  .reader-tool a { color: var(--c-text-soft); text-decoration: none; }
+  .reader-tool a { display: block; min-height: 2.5rem; padding: .4rem .25rem; color: var(--c-text-soft); font-size: .86rem; text-decoration: none; }
   .reader-tool a:hover { color: var(--c-accent); text-decoration: underline; }
   .reader-tool a[aria-current='page'] { color: var(--c-accent); font-weight: 650; }
 
@@ -467,17 +440,18 @@ const fullContentLabel: Record<Category, string> = {
   }
   .journey-context {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: .55rem;
     font-family: var(--font-ui);
-    font-size: .72rem;
+    font-size: .8rem;
     color: var(--c-muted);
   }
   .journey-context > span {
     font-weight: 550;
   }
-  .journey-context a { color: var(--c-text-soft); }
+  .journey-context a { flex: 0 0 auto; color: var(--c-text-soft); }
   .journey-context a:hover { color: var(--c-accent); }
   .journey-links {
     display: grid;
@@ -489,7 +463,8 @@ const fullContentLabel: Record<Category, string> = {
     flex-direction: column;
     gap: .25rem;
     min-width: 0;
-    padding: .6rem 0;
+    min-height: 44px;
+    padding: .8rem 0;
     color: var(--c-text);
     text-decoration: none;
     transition: color var(--transition);
@@ -503,7 +478,7 @@ const fullContentLabel: Record<Category, string> = {
   }
   .journey-link strong {
     font-family: var(--font-display);
-    font-size: .84rem;
+    font-size: .94rem;
     line-height: 1.35;
     overflow-wrap: anywhere;
   }
@@ -525,7 +500,6 @@ const fullContentLabel: Record<Category, string> = {
     .journey-link--next { text-align: left; }
   }
   @media (min-width: 861px) {
-    .breadcrumbs { display: none; }
     #answer,
     .docs-body :global(h2),
     .docs-body :global(h3) { scroll-margin-top: calc(var(--header-height) + .75rem); }

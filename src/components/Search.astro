@@ -5,7 +5,7 @@
 // doesn't fail.
 ---
 
-<button id="search-trigger" class="search-trigger" aria-label="Search, Control or Command K" aria-keyshortcuts="Meta+K Control+K" type="button" data-pagefind-ignore="all">
+<button id="search-trigger" class="search-trigger" aria-label="Search, Control or Command K" aria-keyshortcuts="Meta+K Control+K" title="Search" type="button" data-pagefind-ignore="all">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <circle cx="11" cy="11" r="7"/>
     <path d="m21 21-4.3-4.3"/>
@@ -24,15 +24,17 @@
       <p data-topic-hint-copy></p>
       <a data-topic-hint-link></a>
     </aside>
+    <p class="search-loading" data-search-loading role="status" hidden>Loading search...</p>
     <div id="pagefind-host"></div>
     <p id="search-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
-    <p class="search-hint" id="search-hint" hidden>Search index not available in dev. Run <code>npm run build &amp;&amp; npm run preview</code> to use search locally.</p>
+    <p class="search-hint" id="search-hint" hidden>Search is temporarily unavailable. <a href="/#curriculum">Browse the library</a></p>
   </div>
 </dialog>
 
 <style is:global>
   .search-trigger {
     display: inline-flex;
+    min-height: 44px;
     align-items: center;
     gap: .35rem;
     background: transparent;
@@ -41,7 +43,7 @@
     padding: .35rem .45rem;
     border-radius: var(--radius);
     font-family: var(--font-ui);
-    font-size: .76rem;
+    font-size: .82rem;
     cursor: pointer;
     transition: border-color var(--transition), color var(--transition);
   }
@@ -71,8 +73,9 @@
   }
   .search-inner { padding: 1rem; min-height: 4rem; }
   .search-toolbar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: flex-end; padding-bottom: .65rem; background: var(--c-surface); }
-  .search-close { display: grid; width: 2rem; height: 2rem; margin: 0; place-items: center; border: 1px solid var(--c-rule); border-radius: 50%; background: var(--c-bg); color: var(--c-text-soft); cursor: pointer; font-size: 1.15rem; line-height: 1; }
+  .search-close { display: grid; width: 44px; height: 44px; margin: 0; place-items: center; border: 1px solid var(--c-rule); border-radius: 50%; background: var(--c-bg); color: var(--c-text-soft); cursor: pointer; font-size: 1.15rem; line-height: 1; }
   .search-close:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .search-loading { padding: 1rem 0; color: var(--c-muted); font-size: .9rem; }
   .search-hint {
     color: var(--c-muted);
     font-size: 0.9rem;
@@ -96,7 +99,7 @@
   @media (max-width: 480px) {
     .search-trigger-label,
     .search-trigger-kbd { display: none; }
-    .search-trigger { width: 32px; height: 32px; justify-content: center; padding: 0; }
+    .search-trigger { width: 44px; height: 44px; justify-content: center; padding: 0; }
   }
 
   .pagefind-ui {
@@ -117,6 +120,7 @@
     background: var(--c-bg) !important;
     border: 1px solid var(--c-rule) !important;
   }
+  .search-dialog .pagefind-ui .pagefind-ui__drawer { gap: 1rem; }
   .pagefind-ui__result-link { color: var(--c-text) !important; font-weight: 600 !important; }
   .pagefind-ui__result-excerpt { color: var(--c-text-soft) !important; }
   .pagefind-ui__result mark { background: var(--c-highlight) !important; color: var(--c-text) !important; }
@@ -128,6 +132,7 @@
     const trigger = document.getElementById('search-trigger');
     const dialog = document.getElementById('search-dialog');
     const hint = document.getElementById('search-hint');
+    const loading = document.querySelector('[data-search-loading]');
     const topicHint = document.getElementById('search-topic-hint');
     const topicHints = [
       {
@@ -162,8 +167,7 @@
       ['rlvr', 'verifiable rewards'],
       ['gqa', 'grouped query attention'],
     ]);
-    let pagefindLoaded = false;
-    let pagefindFailed = false;
+    let pagefindRequest;
 
     function loadScript(src) {
       return new Promise((resolve, reject) => {
@@ -175,26 +179,29 @@
       });
     }
 
-    async function loadPagefind() {
-      if (pagefindLoaded || pagefindFailed) return;
-      try {
-        // Load both the UI script and its CSS.
-        const css = document.createElement('link');
-        css.rel = 'stylesheet';
-        css.href = '/pagefind/pagefind-ui.css';
-        document.head.appendChild(css);
-        await loadScript('/pagefind/pagefind-ui.js');
-        // PagefindUI is now globally available
-        // eslint-disable-next-line no-new
+    function loadPagefind() {
+      if (pagefindRequest) return pagefindRequest;
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = '/pagefind/pagefind-ui.css';
+      document.head.appendChild(css);
+      pagefindRequest = loadScript('/pagefind/pagefind-ui.js').then(() => {
         new window.PagefindUI({
           element: '#pagefind-host',
           pageSize: 8,
           showSubResults: false,
           showEmptyFilters: false,
-          resetStyles: false,
+          resetStyles: true,
           showImages: false,
           excerptLength: 24,
           processTerm: (term) => aliases.get(term.trim().toLowerCase()) || term,
+          processResult: (result) => {
+            const parts = new URL(result.url, window.location.origin).pathname.split('/').filter(Boolean);
+            if (window.location.pathname === '/review/' && parts.length === 2 && ['concepts', 'questions', 'guides'].includes(parts[0])) {
+              result.url = `/review/#${parts[1]}`;
+            }
+            return result;
+          },
         });
         const host = document.getElementById('pagefind-host');
         const status = document.getElementById('search-status');
@@ -217,17 +224,20 @@
             link.href = match.href;
           });
         }
-        pagefindLoaded = true;
-      } catch (err) {
-        pagefindFailed = true;
+      }).catch(() => {
         if (hint) hint.hidden = false;
-      }
+      }).finally(() => {
+        if (loading) loading.hidden = true;
+      });
+      return pagefindRequest;
     }
 
     function openDialog() {
-      if (!dialog) return;
+      if (!dialog || dialog.open) return;
+      dialog.showModal();
+      if (loading && !pagefindRequest) loading.hidden = false;
       loadPagefind().then(() => {
-        dialog.showModal();
+        if (!dialog.open) return;
         requestAnimationFrame(() => {
           const input = dialog.querySelector('.pagefind-ui__search-input');
           if (input) {

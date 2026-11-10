@@ -1,17 +1,22 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
-import { parse } from 'parse5';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { parse, parseFragment, serializeOuter } from 'parse5';
 
 const root = resolve(import.meta.dirname, '..');
 const dist = join(root, 'dist');
 const auditsDir = join(root, 'data', 'visual-audits');
 const reviewCardSource = readFileSync(join(root, 'src/components/VisualReviewCard.astro'), 'utf8');
+const sourceMode = process.argv.includes('--source');
+const catalog = JSON.parse(readFileSync(join(root, 'data/visual-lessons.json'), 'utf8'));
+const postSlugs = readdirSync(join(root, 'src/content/posts')).filter(filename => filename.endsWith('.md')).map(filename => filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '')).sort();
+if (JSON.stringify(Object.keys(catalog.lessons).sort()) !== JSON.stringify(postSlugs)) throw new Error('Every source post needs exactly one authored visual lesson');
 
-if (!process.argv.includes('--dist')) {
+if (!sourceMode && !process.argv.includes('--dist')) {
   throw new Error('check-visual-review.mjs validates generated output; pass --dist after astro build');
 }
-if (!existsSync(dist)) throw new Error('dist does not exist; run astro build first');
+if (!sourceMode && !existsSync(dist)) throw new Error('dist does not exist; run astro build first');
 if (/visual-review-card--(?:article|deck)[\s\S]{0,500}overflow-y:\s*auto/.test(reviewCardSource)) {
   throw new Error('visual review cards must use the document scrollbar, not nested vertical scrolling');
 }
@@ -37,6 +42,65 @@ function elements(root) {
 
 const attribute = (node, name) => node.attrs?.find((item) => item.name === name)?.value;
 const textContent = (node) => node.value ?? (node.childNodes ?? []).map(textContent).join('');
+
+function sourceVisualHtml(source) {
+  const fragments = [];
+  function visit(node) {
+    if (node.type === 'html') fragments.push(node.value);
+    for (const child of node.children ?? []) visit(child);
+  }
+  visit(fromMarkdown(source));
+  return fragments.join('\n');
+}
+
+if (sourceMode) {
+  const artwork = JSON.parse(readFileSync(join(root, 'data/visual-lesson-artwork.json'), 'utf8'));
+  const requested = process.argv.find((argument) => argument.startsWith('--slugs='))?.slice('--slugs='.length).split(',');
+  const slugs = requested ?? Object.keys(catalog.lessons);
+  for (const slug of slugs) {
+    const lesson = catalog.lessons[slug];
+    const audit = JSON.parse(readFileSync(join(auditsDir, `${slug}.json`), 'utf8'));
+    const source = readFileSync(join(root, audit.article), 'utf8');
+    const figures = [];
+    function visitMarkdown(node) {
+      if (node.type === 'html') {
+        figures.push(...elements(parseFragment(node.value)).filter((element) => element.tagName === 'figure' && /(?:^|\s)learning-figure(?:\s|$)/.test(attribute(element, 'class') ?? '')));
+      }
+      for (const child of node.children ?? []) visitMarkdown(child);
+    }
+    visitMarkdown(fromMarkdown(source));
+    if (!lesson?.idea || !lesson.steps?.length) {
+      failures.push(`${slug}: a visual lesson needs an idea and ordered teaching steps`);
+      continue;
+    }
+    const identities = new Set();
+    for (const step of lesson.steps) {
+      const identity = `${step.visualId}:${step.view}`;
+      if (identities.has(identity)) failures.push(`${slug}: repeated teaching step ${identity}`);
+      identities.add(identity);
+      const scene = artwork.scenes[step.visualId];
+      const figure = scene
+        ? elements(parseFragment(scene.html)).find((element) => attribute(element, 'data-lesson-visual') === step.visualId)
+        : figures.find((element) => elements(element).some((child) => attribute(child, 'data-visual-argument') === step.visualId));
+      if (!figure) {
+        failures.push(`${slug}: missing visual asset ${step.visualId}`);
+        continue;
+      }
+      const children = elements(figure);
+      if (!['mechanism', 'detail', 'trace'].includes(step.view)) failures.push(`${slug}: unsupported teaching view ${step.view}`);
+      if (step.view === 'detail' && !children.some((element) => /(?:^|\s)visual-derivation-content(?:\s|$)/.test(attribute(element, 'class') ?? ''))) failures.push(`${slug}: ${identity} has no detailed drawing`);
+      if (step.view === 'trace' && !children.some((element) => attribute(element, 'data-frame-key') !== undefined)) failures.push(`${slug}: ${identity} has no executable visual checkpoints`);
+    }
+  }
+  if (failures.length) {
+    console.error(failures.join('\n'));
+    process.exit(1);
+  }
+  console.log(`Visual lesson source validation passed: ${slugs.length} posts and their ordered asset views.`);
+  process.exit(0);
+}
+
+const { renderVisualLessonSteps } = await import('../src/utils/visualLessonHtml.ts');
 
 for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.json'))) {
   const audit = JSON.parse(readFileSync(join(auditsDir, filename), 'utf8'));
@@ -66,11 +130,24 @@ for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.j
   const nodes = elements(parse(html));
   const lead = nodes.find((node) => attribute(node, 'data-article-quick-review') !== undefined);
   const answer = nodes.find((node) => attribute(node, 'id') === 'answer');
-  if (!lead || attribute(lead, 'hidden') === undefined || attribute(lead, 'data-inline-visual') !== undefined) {
-    failures.push(`${audit.slug}: the main illustration must have a top slot, hidden only until its figure is ready`);
+  if (!lead || attribute(lead, 'hidden') !== undefined || attribute(lead, 'data-ready') !== 'true' || attribute(lead, 'data-inline-visual') !== undefined) {
+    failures.push(`${audit.slug}: the main illustration must be server-rendered and visible without JavaScript`);
   }
   if (!answer || nodes.indexOf(lead) >= nodes.indexOf(answer)) {
     failures.push(`${audit.slug}: the main illustration slot must precede the article body`);
+  }
+  const lesson = catalog.lessons[audit.slug];
+  const selected = nodes.filter(node => attribute(node, 'data-visual-lesson-step') !== undefined);
+  const expected = renderVisualLessonSteps(sourceVisualHtml(article), lesson, 'article-lesson');
+  if (selected.length !== expected.length) failures.push(`${audit.slug}: incomplete authored article lesson`);
+  for (const [index, expectedHtml] of expected.entries()) {
+    const expectedFigure = elements(parseFragment(expectedHtml))[0];
+    if (!selected[index] || serializeOuter(selected[index]) !== serializeOuter(expectedFigure)) failures.push(`${audit.slug}: built teaching step ${index + 1} differs from its source-selected figure`);
+    let parent = selected[index]?.parentNode;
+    while (parent) {
+      if (parent.tagName === 'details') failures.push(`${audit.slug}: essential teaching step ${index + 1} is inside a fold`);
+      parent = parent.parentNode;
+    }
   }
   if (category === 'questions') {
     const practice = nodes.find((node) => attribute(node, 'data-practice-start') !== undefined);
@@ -118,6 +195,8 @@ else {
         if (JSON.stringify(entry.visualIds) !== JSON.stringify(implementedVisuals.get(entry.slug))) {
           failures.push(`library-wide review must include every declared visual for ${entry.slug}`);
         }
+        const lesson = catalog.lessons[entry.slug];
+        if (JSON.stringify(entry.lesson) !== JSON.stringify({ idea: lesson.idea, steps: lesson.steps })) failures.push(`${entry.slug}: article and review selections differ`);
       }
       if (entries.length !== implemented.size) failures.push(`library-wide review has ${entries.length} entries; expected ${implemented.size}`);
     }

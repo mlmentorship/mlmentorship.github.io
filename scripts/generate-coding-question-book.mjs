@@ -393,10 +393,11 @@ function renderTrieTopology(scene) {
   const edges = scene.edges.map((edge) => {
     const from = nodes.get(edge.from);
     const to = nodes.get(edge.to);
-    return `<g${motionKey(edge.key)}${edge.hidden ? ' visibility="hidden" aria-hidden="true"' : ''}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y + 16}" x2="${to.x}" y2="${to.y - 16}" /><text class="coding-trace-trie-edge-label" x="${(from.x + to.x) / 2 + 14}" y="${(from.y + to.y) / 2 + 4}">${escapeHtml(edge.label)}</text></g>`;
+    const labelX = (from.x + to.x) / 2 + (from.x === to.x ? 36 : 14);
+    return `<g${motionKey(edge.key)}${edge.hidden ? ' visibility="hidden" aria-hidden="true"' : ''}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y + 16}" x2="${to.x}" y2="${to.y - 16}" /><text class="coding-trace-trie-edge-label" x="${labelX}" y="${(from.y + to.y) / 2 + 4}">${escapeHtml(edge.label)}</text></g>`;
   }).join('');
   const renderedNodes = scene.nodes.map((node) => {
-    const cursor = active.has(node.key) ? `<text class="coding-trace-trie-cursor" x="${node.x}" y="${node.y - 23}"${motionKey('trie-cursor')}>current</text>` : '';
+    const cursor = active.has(node.key) ? `<rect x="${node.x - 28}" y="${node.y - 36}" width="56" height="17" rx="2" style="fill:var(--viz-focus-bg);stroke:none" /><text class="coding-trace-trie-cursor" x="${node.x}" y="${node.y - 23}"${motionKey('trie-cursor')}>current</text>` : '';
     const classes = `${active.has(node.key) ? ' is-focus' : ''}${queued.has(node.key) ? ' is-state' : ''}${node.terminal ? ' is-terminal' : ''}`;
     return `<g class="coding-trace-trie-node${classes}"${motionKey(node.key)}${node.hidden ? ' visibility="hidden" aria-hidden="true"' : ''}>${cursor}<rect x="${node.x - 33}" y="${node.y - 16}" width="66" height="32" rx="3" /><text x="${node.x}" y="${node.y + 5}">${escapeHtml(node.label)}</text></g>`;
   }).join('');
@@ -550,12 +551,21 @@ function renderVisual(problem) {
 
 function replaceVisual(article, visual) {
   const ranges = [];
+  function findElement(node, predicate) {
+    if (predicate(node)) return node;
+    return (node.childNodes ?? []).map((child) => findElement(child, predicate)).find(Boolean);
+  }
+  const hasClass = (node, name) => node.attrs?.some((attribute) => attribute.name === 'class' && attribute.value.split(/\s+/).includes(name));
   function htmlWalk(node, offset) {
     const attributes = Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
     if (node.nodeName === 'figure' && attributes['aria-labelledby'] === `${visual.visualId}-title`) {
       const location = node.sourceCodeLocation;
       assert(location?.endTag, 'Visual must have a complete closing tag');
-      ranges.push([offset + location.startOffset, offset + location.endOffset]);
+      const content = findElement(node, (child) => hasClass(child, 'visual-derivation-content'));
+      const caption = content && findElement(content, (child) => hasClass(child, 'visual-derivation-caption'));
+      ranges.push(content
+        ? [offset + content.sourceCodeLocation.startTag.endOffset, offset + (caption?.sourceCodeLocation.startOffset ?? content.sourceCodeLocation.endTag.startOffset), true]
+        : [offset + location.startOffset, offset + location.endOffset, false]);
     }
     for (const child of node.childNodes ?? []) htmlWalk(child, offset);
   }
@@ -565,9 +575,14 @@ function replaceVisual(article, visual) {
   }
   walk(fromMarkdown(article));
   assert.equal(ranges.length, 1, `Expected one existing visual: ${visual.visualId}`);
-  const [start, end] = ranges[0];
+  const [start, end, contentOnly] = ranges[0];
   const figure = visual.source.slice(visual.source.indexOf('\n') + 1);
-  return article.slice(0, start) + figure + article.slice(end);
+  const generated = contentOnly && findElement(parseFragment(figure, { sourceCodeLocationInfo: true }), (node) => node.nodeName === 'figure');
+  const replacement = generated
+    ? generated.childNodes.filter((node) => node.sourceCodeLocation && node.nodeName !== 'figcaption' && !hasClass(node, 'visual-title') && !hasClass(node, 'visual-kicker'))
+      .map((node) => figure.slice(node.sourceCodeLocation.startOffset, node.sourceCodeLocation.endOffset)).join('')
+    : figure;
+  return article.slice(0, start) + replacement + article.slice(end);
 }
 
 function parseProblems(source) {
@@ -682,6 +697,9 @@ if (selfTest) {
   const visual = { visualId: 'fixture', source: '<!-- visual:fixture -->\n<figure aria-labelledby="fixture-title"><p>New.</p></figure>' };
   const before = '---\ntitle: "Keep"\n---\n\n## Problem\n\nKeep this prose.\n\n<!-- visual:fixture -->\n<figure aria-labelledby="fixture-title"><p>Old.</p></figure>\n\n```python\nprint("keep")\n```\n';
   assert.equal(replaceVisual(before, visual), before.replace('<p>Old.</p>', '<p>New.</p>'));
+  const layered = before.replace('<p>Old.</p>', '<h3 class="visual-title">Keep title</h3><div data-visual-argument="fixture">Keep primary</div><details><div class="visual-derivation-content"><p>Old.</p><div class="visual-derivation-caption">Keep caption</div></div></details>');
+  const updatedLayer = { ...visual, source: visual.source.replace('<p>New.</p>', '<h3 class="visual-title">Generated title</h3><p>New.</p><figcaption>Generated caption</figcaption>') };
+  assert.equal(replaceVisual(layered, updatedLayer), layered.replace('<p>Old.</p>', '<p>New.</p>'));
   assert.throws(() => replaceVisual('No visual.', visual), /Expected one existing visual/);
   assert.throws(() => replaceVisual(`${before}\n<figure aria-labelledby="fixture-title"></figure>`, visual), /Expected one existing visual/);
   assert.throws(() => replaceVisual('```html\n<figure aria-labelledby="fixture-title"></figure>\n```', visual), /Expected one existing visual/);
@@ -765,7 +783,17 @@ if (selfTest) {
   for (const rendered of [graphGrid, visibleGrid]) {
     assert.deepEqual([...rendered.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]), [...originalGrid.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]));
   }
-  console.log('Coding generator selftest passed: selective imports, exact replacement, preserved bytes, exact coordinate/legacy-weighted endpoints, graph display/state isolation, unique marker references, grid/adjacency companions with original motion identity, opt-in visible grids and invalid definition/visual rejection.');
+  const trie = renderTrieTopology({
+    width: 360, height: 260,
+    nodes: [{ key: 'root', label: 'root', x: 180, y: 40 }, { key: 'b', label: 'b', x: 60, y: 100 }, { key: 'ba', label: 'ba', x: 60, y: 160 }],
+    edges: [{ key: 'first', from: 'root', to: 'b', label: 'b' }, { key: 'next', from: 'b', to: 'ba', label: 'a' }],
+    active: ['ba'],
+  });
+  assert.match(trie, /class="coding-trace-trie-edge-label" x="134" y="74">b/);
+  assert.match(trie, /class="coding-trace-trie-edge-label" x="96" y="134">a/);
+  assert.match(trie, /x="32" y="124" width="56" height="17" rx="2" style="fill:var\(--viz-focus-bg\);stroke:none"/);
+  assert.match(trie, /class="coding-trace-trie-cursor" x="60" y="137"[^>]*>current/);
+  console.log('Coding generator selftest passed: selective imports, exact replacement, preserved bytes, exact coordinate/legacy-weighted endpoints, graph display/state isolation, unique marker references, grid/adjacency companions with original motion identity, opt-in visible grids, separated trie labels and invalid definition/visual rejection.');
   process.exit(0);
 }
 if (visualsOnly) assert(requestedSlugs.size > 0, '--visuals-only requires explicit --slugs');

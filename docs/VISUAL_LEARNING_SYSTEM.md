@@ -143,12 +143,20 @@ After these twelve, measure article completion, figure visibility, search landin
 
 ## Visual-first review experience
 
+The current authored selection is in [data/visual-lessons.json](../data/visual-lessons.json), generated from [scripts/visual-lessons.mjs](../scripts/visual-lessons.mjs).
+Each post declares its ordered mechanism, detail, or trace views, with an explicit assessment of available and missing visual teaching.
+Mechanism views come before diagnostics, efficiency comparisons, counterexamples, and numerical derivations; distinct examples and algorithm variants must be named.
+New scenes live in [scripts/visual-lesson-scenes.mjs](../scripts/visual-lesson-scenes.mjs).
+Keep essential selected pictures outside folds and use prose as backup, not as a replacement for a missing visual operation.
+
 The full article remains the source of truth, but an implemented visual also powers two faster review surfaces:
 
-- Article pages promote the marker-linked figure immediately below the article header. The learning objective frames it, the existing “Read it this way” caption explains the inference, and a Full explanation boundary preserves the complete curated article below.
-- Chapter pages link to a focused Review visually mode. It presents one article visual at a time with previous/next, arrow-key, swipe, progress, and a direct route back to the full explanation.
+- Article pages server-render the authored lead immediately below the article header. Supporting views appear at their existing topic locations, in authored order and outside folds. Original figures remain as reference drawings, preserving their source and fragment identities.
+- Chapter pages link to a focused Review visually mode. It starts with prose closed, presents the same authored figure order through step controls, and preserves previous/next article navigation, progress, and a direct route back to full explanation.
 
-Do not maintain a second copy of a figure or caption for review mode. The article marker, audit sidecar, and article visual remain one unit; review mode loads that unit from the static article page. Review routes are progressive enhancements with a complete article-link fallback, are excluded from Pagefind and the sitemap, and must remain compatible with GitHub Pages.
+Do not maintain a second copy of a figure or caption for review mode. The article marker, audit sidecar, selected view, and article visual remain one unit; review mode and landing previews clone server-prepared views from the static article page. Review routes are progressive enhancements with a complete article-link fallback, are excluded from Pagefind and the sitemap, and must remain compatible with GitHub Pages.
+
+Run `npm run check:lessons` after selection or scene edits. Complete coverage and exact generated data are mandatory; the production build checks article/review order and exact source-selected markup. Browser qualification uses `scripts/check-visual-rendering.mjs --lessons --all-frames --bind-dist` against a served production build, with the existing native interaction script's `--lessons` mode for playback and hidden/detached cleanup.
 
 An implemented visual must use either `figure.learning-figure` immediately after its marker or a marker-linked Mermaid block with its direct caption. Build validation rejects other shapes so an article cannot silently disappear from visual review.
 

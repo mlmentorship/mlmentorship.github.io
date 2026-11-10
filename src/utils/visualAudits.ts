@@ -1,3 +1,22 @@
+import visualLessonCatalog from '../../data/visual-lessons.json';
+
+export interface VisualLessonStep {
+  visualId: string;
+  view: 'mechanism' | 'detail' | 'trace';
+  title?: string;
+  printPanels?: string[];
+}
+
+export interface VisualLesson {
+  idea: string;
+  steps: VisualLessonStep[];
+  review: {
+    available: string;
+    missing: string;
+    decision: string;
+  };
+}
+
 export interface VisualAuditSummary {
   slug: string;
   status: 'implemented' | 'planned' | 'no-visual' | 'unreviewed';
@@ -44,4 +63,8 @@ export function getVisualAudit(slug: string): VisualAuditSummary | undefined {
 export function getImplementedVisualAudit(slug: string): VisualAuditSummary | undefined {
   const audit = getVisualAudit(slug);
   return audit?.status === 'implemented' && audit.visualIds.length > 0 ? audit : undefined;
+}
+
+export function getVisualLesson(slug: string): VisualLesson | undefined {
+  return (visualLessonCatalog.lessons as Record<string, VisualLesson>)[slug];
 }

@@ -15,6 +15,10 @@ function display(value) {
   return String(value);
 }
 
+function isFixedWidthBits(scene) {
+  return scene.items?.length === 32 && scene.indexLabels?.[0] === 31;
+}
+
 export function retainedState(scene) {
   const entries = new Map();
   const add = (identity, label, value, priority = 1) => {
@@ -152,7 +156,7 @@ function mechanism(scene, previous) {
     }
     body += label(180, 355, '6 interval occurrences; only 3 distinct strings.', 'c-text-soft', 12);
     height = 380;
-  } else if (scene.items?.length === 32 && scene.indexLabels?.[0] === 31) {
+  } else if (isFixedWidthBits(scene)) {
     const source = scene.items.join('');
     const processed = scene.sourceBitPosition === undefined ? 0 : Number(scene.sourceBitPosition) + 1;
     const bit = Math.max(0, processed - 1);
@@ -202,7 +206,7 @@ function mechanism(scene, previous) {
 
 export function renderNumericTransition(scene, previous) {
   if (!previous) return '';
-  const numeric = checkpointChanges(scene, previous).filter((change) => /^-?\d+(?:\.\d+)?$/.test(change.before ?? '') && /^-?\d+(?:\.\d+)?$/.test(change.after ?? ''));
+  const numeric = checkpointChanges(scene, previous).filter((change) => !/^state:.*bits$/i.test(change.identity) && !(isFixedWidthBits(scene) && change.identity === 'state:remainingInput') && /^-?\d+(?:\.\d+)?$/.test(change.before ?? '') && /^-?\d+(?:\.\d+)?$/.test(change.after ?? ''));
   if (!numeric.length) return '';
   const rows = numeric.slice(0, 3);
   const text = (horizontal, vertical, value, anchor = 'start', tone = 'c-text') => `<text x="${horizontal}" y="${vertical}" style="font:12px var(--font-mono);text-anchor:${anchor};fill:var(--${tone})">${escapeHtml(value)}</text>`;
@@ -273,6 +277,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   assert.equal(repeatedTree.get('tree-status:1:0').label, 'node 1 (1)');
   assert.equal(repeatedTree.get('tree-status:1:1').value, 'right pending');
   assert.equal(JSON.stringify([before, after]), frozen);
+  const binaryBefore = { items: [...'0'.repeat(32)], indexLabels: Array.from({ length: 32 }, (_, index) => 31 - index), answerBits: '11100101111000001'.padStart(32, '0'), remainingInput: '11111'.padStart(32, '0'), processed: 27 };
+  const binaryAfter = { ...binaryBefore, answerBits: '111001011110000010'.padStart(32, '0'), remainingInput: '1111'.padStart(32, '0'), processed: 28 };
+  assert.doesNotMatch(renderNumericTransition(binaryAfter, binaryBefore), /state:answerBits/);
+  assert.doesNotMatch(renderNumericTransition(binaryAfter, binaryBefore), /state:remainingInput/);
+  assert.match(renderNumericTransition(binaryAfter, binaryBefore), /data-numeric-transition="state:processed"/);
+  assert.ok(renderStateTransition(binaryAfter, binaryBefore).includes(binaryBefore.answerBits));
+  assert.ok(renderStateTransition(binaryAfter, binaryBefore).includes(binaryAfter.answerBits));
   const { parseFragment } = await import('parse5');
   const numericBefore = { type: 'array', items: [-4, 2], running: -3 };
   const numericAfter = { ...numericBefore, items: [6, 2], running: 5 };

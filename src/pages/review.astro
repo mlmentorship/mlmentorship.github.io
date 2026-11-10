@@ -4,13 +4,15 @@ import VisualReviewCard from '../components/VisualReviewCard.astro';
 import Subscribe from '../components/Subscribe.astro';
 import { LIBRARY_VOLUMES } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
-import { getImplementedVisualAudit } from '../utils/visualAudits';
+import { getImplementedVisualAudit, getVisualLesson } from '../utils/visualAudits';
 
 const allEntries = await getLibraryEntries();
 const reviewEntries = LIBRARY_VOLUMES.flatMap((volume) => volume.chapters.flatMap((chapter, chapterIndex) =>
   entriesForChapter(allEntries, chapter).flatMap((entry) => {
     const audit = getImplementedVisualAudit(entry.slug);
     if (!audit) return [];
+    const lesson = getVisualLesson(entry.slug);
+    if (!lesson) throw new Error(`Missing authored visual lesson for ${entry.slug}`);
     return [{
       slug: entry.slug,
       title: entry.title,
@@ -20,6 +22,7 @@ const reviewEntries = LIBRARY_VOLUMES.flatMap((volume) => volume.chapters.flatMa
       medium: audit.medium,
       visualId: audit.visualIds[0],
       visualIds: audit.visualIds,
+      lesson: { idea: lesson.idea, steps: lesson.steps },
       volumeId: volume.id,
       volumeNumber: volume.number,
       volumeTitle: volume.title,
@@ -94,24 +97,35 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     <section class="review-index" data-review-index aria-labelledby="review-index-title">
       <header class="review-index-header">
         <div>
-          <p class="fallback-kicker">Visual library</p>
-          <h1 id="review-index-title">Choose a visual lesson.</h1>
-          <p>Pick a chapter, then open any lesson in the visual review workspace. Each visual leads with the mechanism before the explanation.</p>
+          <p class="fallback-kicker">The field guide</p>
+          <h1 id="review-index-title">Visual library</h1>
+          <p>{reviewEntries.length} lessons · {reviewContents.length} books</p>
         </div>
-        <a class="review-index-back" href="/#curriculum"><span aria-hidden="true">←</span> Browse the library</a>
+        <a class="review-index-back" href="/#curriculum"><span aria-hidden="true">←</span> All books</a>
       </header>
 
+      <div class="review-index-tools" data-review-index-tools hidden>
+        <label class="review-index-search">
+          <span class="sr-only">Find a visual lesson</span>
+          <input type="search" name="lesson" placeholder="Find a lesson" autocomplete="off" data-review-index-search />
+        </label>
+        <p role="status" aria-live="polite" data-review-index-count>{reviewEntries.length} lessons</p>
+      </div>
+      <div class="review-index-empty" data-review-index-empty hidden>
+        <p>No matching lessons.</p>
+        <button type="button" data-review-index-clear>Clear search</button>
+      </div>
       <div class="review-index-list">
         {reviewContents.map(({ volume, chapters }, volumeIndex) => (
-          <details class="review-index-volume" open={volumeIndex === 0}>
+          <details class="review-index-volume" data-review-index-volume={volume.id} open={volumeIndex === 0}>
             <summary>
               <span><small>{volume.number} · {volume.shortTitle}</small><strong>{volume.title}</strong></span>
-              <span>{chapters.length} chapters · {chapters.reduce((total, item) => total + item.entries.length, 0)} visuals</span>
+              <span>{chapters.length} chapters · {chapters.reduce((total, item) => total + item.entries.length, 0)} lessons</span>
             </summary>
             <div class="review-index-chapters">
               {chapters.map(({ chapter, entries }, chapterIndex) => (
-                <details class="review-index-chapter" open={volumeIndex === 0 && chapterIndex === 0}>
-                  <summary><strong>{chapter.title}</strong><span>{entries.length} visuals</span></summary>
+                <details class="review-index-chapter" data-review-index-chapter={chapter.id} open={volumeIndex === 0 && chapterIndex === 0}>
+                  <summary><strong>{chapter.title}</strong><span>{entries.length} lessons</span></summary>
                   <ol>
                     {entries.map((entry) => (
                       <li>
@@ -138,7 +152,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
           headingLevel={1}
           variant="deck"
         >
-          <span slot="status" data-review-position>Visual 1 of {reviewEntries.length}</span>
+          <span slot="status" class="sr-only" data-review-position>Visual 1 of {reviewEntries.length}</span>
           <p slot="visual" class="review-loading" data-review-loading>Loading the visual…</p>
         </VisualReviewCard>
       </section>
@@ -148,14 +162,16 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
           <div><span>Full explanation</span><strong tabindex="-1" data-review-explanation-title>{firstEntry.title}</strong></div>
           <div class="explanation-actions">
             <a href={firstEntry.href} data-review-open-article>Open article <span aria-hidden="true">↗</span></a>
-            <button type="button" data-review-explanation-close aria-label="Close full explanation">Close</button>
+            <button type="button" data-review-explanation-close aria-label="Close full explanation" title="Close full explanation"><span aria-hidden="true">&times;</span></button>
           </div>
         </header>
         <div class="prose review-explanation-body" data-review-explanation-host></div>
       </aside>
     </div>
 
-    <Subscribe placement="review" heading="Get ML from Primitives notes after your visual review." />
+    <div data-review-subscribe>
+      <Subscribe placement="review" heading="ML from Primitives" />
+    </div>
 
     <section class="review-fallback" data-review-fallback hidden>
       <p class="fallback-kicker">Visual review</p>
@@ -165,9 +181,9 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     </section>
 
     <nav class="review-bottom" aria-label="Visual review navigation" data-review-controls hidden>
-      <button type="button" data-review-previous aria-label="Previous visual" aria-keyshortcuts="ArrowLeft"><span aria-hidden="true">←</span><span>Previous</span></button>
+      <button type="button" data-review-previous aria-label="Previous lesson" aria-keyshortcuts="ArrowLeft"><span aria-hidden="true">←</span><span>Previous lesson</span></button>
       <button class="explanation-toggle" type="button" data-review-explanation-toggle aria-expanded="false" aria-controls="review-explanation"><span data-review-mode-label>Full explanation</span></button>
-      <button type="button" data-review-next aria-label="Next visual" aria-keyshortcuts="ArrowRight"><span>Next</span><span aria-hidden="true">→</span></button>
+      <button type="button" data-review-next aria-label="Next lesson" aria-keyshortcuts="ArrowRight"><span>Next lesson</span><span aria-hidden="true">→</span></button>
     </nav>
 
     <p class="sr-only" aria-live="polite" data-review-announcer></p>
@@ -176,8 +192,10 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
 </BaseLayout>
 
 <script>
-  import { absolutizeVisualLinks, extractLearningVisual } from '../utils/visualReviewClient';
-  import { enhanceCodingVisuals } from '../utils/codingVisuals';
+  import { absolutizeVisualLinks, extractVisualLessonStep } from '../utils/visualReviewClient';
+  import type { VisualLesson } from '../utils/visualAudits';
+  import { enhanceCodingVisuals, stopCodingVisuals } from '../utils/codingVisuals';
+  import { enhanceVisualLesson } from '../utils/visualLessonControls';
 
   interface ReviewEntry {
     slug: string;
@@ -188,6 +206,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     medium: string;
     visualId: string;
     visualIds: string[];
+    lesson: Pick<VisualLesson, 'idea' | 'steps'>;
     volumeId: string;
     volumeNumber: string;
     volumeTitle: string;
@@ -224,6 +243,17 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     const sourceDetails = root.querySelector<HTMLDetailsElement>('[data-review-source-details]');
     const reviewIndex = root.querySelector<HTMLElement>('[data-review-index]');
     const reviewIndexEntries = [...root.querySelectorAll<HTMLAnchorElement>('[data-review-index-entry]')];
+    const indexTools = root.querySelector<HTMLElement>('[data-review-index-tools]');
+    const indexSearch = root.querySelector<HTMLInputElement>('[data-review-index-search]');
+    const indexCount = root.querySelector<HTMLElement>('[data-review-index-count]');
+    const indexEmpty = root.querySelector<HTMLElement>('[data-review-index-empty]');
+    const indexClear = root.querySelector<HTMLButtonElement>('[data-review-index-clear]');
+    const indexVolumes = [...root.querySelectorAll<HTMLDetailsElement>('[data-review-index-volume]')];
+    const indexChapters = [...root.querySelectorAll<HTMLDetailsElement>('[data-review-index-chapter]')];
+    const indexDisclosures = [...indexVolumes, ...indexChapters];
+    const indexOpenState = new Map<HTMLDetailsElement, boolean>();
+    const entryBySlug = new Map(entries.map((entry) => [entry.slug, entry]));
+    const subscribe = root.querySelector<HTMLElement>('[data-review-subscribe]');
     const position = root.querySelector<HTMLElement>('[data-review-position]');
     const counter = root.querySelector<HTMLElement>('[data-review-counter]');
     const book = root.querySelector<HTMLElement>('[data-review-book]');
@@ -246,16 +276,50 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     const contentsChapters = [...root.querySelectorAll<HTMLDetailsElement>('[data-review-contents-chapter]')];
     const cache = new Map<string, Promise<Document>>();
     const labels = {
-      concepts: 'Concept · Visual quick review',
-      questions: 'Question · 30-second answer map',
-      guides: 'Guide · Decision map',
+      concepts: 'Concept · Visual lesson',
+      questions: 'Question · Visual lesson',
+      guides: 'Guide · Visual lesson',
     } as const;
     let currentIndex = 0;
     let requestToken = 0;
-    let touchStartX: number | undefined;
+    let touchStart: { x: number; y: number } | undefined;
     const desktopExplanation = window.matchMedia('(min-width: 721px)');
-    let explanationOpen = true;
+    let explanationOpen = false;
+    let explanationReturnScroll = 0;
     let explanationTransitionTimer: number | undefined;
+    const navigationObserver = new ResizeObserver((changes) => {
+      changes.forEach(({ target }) => {
+        const property = target === reviewToolbar ? '--review-toolbar-height' : '--review-controls-height';
+        root.style.setProperty(property, `${Math.ceil(target.getBoundingClientRect().height)}px`);
+      });
+    });
+    if (reviewToolbar) navigationObserver.observe(reviewToolbar);
+    if (controls) navigationObserver.observe(controls);
+    lifecycle.signal.addEventListener('abort', () => navigationObserver.disconnect(), { once: true });
+
+    function filterIndex() {
+      const terms = (indexSearch?.value ?? '').trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+      if (terms.length > 0 && indexOpenState.size === 0) {
+        indexDisclosures.forEach((details) => indexOpenState.set(details, details.open));
+      }
+      let count = 0;
+      reviewIndexEntries.forEach((link) => {
+        const entry = entryBySlug.get(link.dataset.reviewIndexEntry ?? '')!;
+        const searchable = `${entry.title} ${entry.volumeTitle} ${entry.chapterTitle} ${entry.lesson.idea}`.toLocaleLowerCase();
+        const matches = terms.every((term) => searchable.includes(term));
+        link.closest('li')!.hidden = !matches;
+        if (matches) count += 1;
+      });
+      indexDisclosures.forEach((details) => {
+        const matches = Boolean(details.querySelector('li:not([hidden]) [data-review-index-entry]'));
+        details.hidden = !matches;
+        if (terms.length > 0) details.open = matches;
+        else if (indexOpenState.has(details)) details.open = indexOpenState.get(details)!;
+      });
+      if (terms.length === 0) indexOpenState.clear();
+      if (indexEmpty) indexEmpty.hidden = count > 0;
+      if (indexCount) indexCount.textContent = `${count} ${count === 1 ? 'lesson' : 'lessons'}`;
+    }
 
     function syncContents(entry: ReviewEntry) {
       if (!root) return;
@@ -264,14 +328,16 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         if (link.dataset.reviewContentEntry === entry.slug) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
       });
-      contentsVolumes.forEach((volume) => volume.removeAttribute('data-current'));
-      contentsChapters.forEach((chapter) => chapter.removeAttribute('data-current'));
-      const currentVolume = root.querySelector<HTMLDetailsElement>(`[data-review-contents-volume="${entry.volumeId}"]`);
-      const currentChapter = root.querySelector<HTMLDetailsElement>(`[data-review-contents-chapter="${entry.chapterId}"]`);
-      currentVolume?.setAttribute('data-current', 'true');
-      currentChapter?.setAttribute('data-current', 'true');
-      if (currentVolume) currentVolume.open = true;
-      if (currentChapter) currentChapter.open = true;
+      contentsVolumes.forEach((volume) => {
+        const current = volume.dataset.reviewContentsVolume === entry.volumeId;
+        volume.toggleAttribute('data-current', current);
+        volume.open = current;
+      });
+      contentsChapters.forEach((chapter) => {
+        const current = chapter.dataset.reviewContentsChapter === entry.chapterId;
+        chapter.toggleAttribute('data-current', current);
+        chapter.open = current;
+      });
     }
 
     function fetchArticle(entry: ReviewEntry): Promise<Document> {
@@ -319,9 +385,12 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
 
     function showIndex() {
       requestToken += 1;
+      if (visualHost) stopCodingVisuals(visualHost);
       reviewToolbar?.setAttribute('hidden', '');
       reviewIndex?.removeAttribute('hidden');
       reviewIndex?.setAttribute('aria-hidden', 'false');
+      indexTools?.removeAttribute('hidden');
+      subscribe?.removeAttribute('hidden');
       stage?.setAttribute('hidden', '');
       stage?.setAttribute('aria-hidden', 'true');
       stage?.setAttribute('aria-busy', 'false');
@@ -331,7 +400,26 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       controls?.setAttribute('hidden', '');
       workspace?.classList.remove('is-explanation-open', 'is-explanation-closing');
       contentsDetails?.removeAttribute('open');
+      const scope = new URLSearchParams(window.location.search);
+      const bookId = scope.get('book');
+      const chapterId = scope.get('chapter');
+      const scopedEntry = entries.find((entry) => entry.volumeId === bookId && (!chapterId || entry.chapterId === chapterId));
+      const fullHref = scopedEntry
+        ? `/library/${scopedEntry.volumeId}/${chapterId ? `${scopedEntry.chapterId}/` : ''}`
+        : '/#curriculum';
+      document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode="full"]').forEach((link) => { link.href = fullHref; });
+      if (scopedEntry) {
+        root?.querySelectorAll<HTMLDetailsElement>('[data-review-index-volume]').forEach((volume) => {
+          volume.open = volume.dataset.reviewIndexVolume === scopedEntry.volumeId;
+        });
+        root?.querySelectorAll<HTMLDetailsElement>('[data-review-index-chapter]').forEach((chapter) => {
+          chapter.open = chapter.dataset.reviewIndexChapter === scopedEntry.chapterId;
+        });
+      }
       window.scrollTo({ top: 0, behavior: 'auto' });
+      if (scopedEntry) window.requestAnimationFrame(() => {
+        root?.querySelector(`[data-review-index-chapter="${scopedEntry.chapterId}"]`)?.scrollIntoView({ block: 'start' });
+      });
     }
 
     function renderExplanation(article: Document, entry: ReviewEntry) {
@@ -348,12 +436,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       }
       const body = document.importNode(articleBody, true);
       body.removeAttribute('id');
-      body.querySelectorAll('.learning-figure, .diagram-source, pre.mermaid, .mermaid, script').forEach((element) => element.remove());
+      body.querySelectorAll('.article-lesson-support, .article-visual-reference, .learning-figure, .diagram-source, pre.mermaid, .mermaid, script').forEach((element) => element.remove());
       absolutizeVisualLinks(body, entry.href);
       explanationHost.replaceChildren(...body.childNodes);
     }
 
     function setExplanation(open: boolean, focus = true) {
+      if (open && focus) explanationReturnScroll = window.scrollY;
       explanationOpen = open;
       if (explanationTransitionTimer !== undefined) {
         window.clearTimeout(explanationTransitionTimer);
@@ -378,7 +467,12 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
           window.requestAnimationFrame(() => {
             if (explanationOpen && !desktopExplanation.matches && explanation) explanation.style.setProperty('max-height', `${explanation.scrollHeight}px`);
           });
-          if (focus) explanationClose?.focus({ preventScroll: true });
+          if (focus) {
+            explanationClose?.focus({ preventScroll: true });
+            const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+            if (desktopExplanation.matches) window.scrollTo({ top: 0, behavior });
+            else explanation?.scrollIntoView({ block: 'start', behavior });
+          }
         });
       } else {
         workspace?.classList.remove('is-explanation-open');
@@ -389,7 +483,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
           stage?.style.removeProperty('max-height');
           explanation?.style.removeProperty('max-height');
         } else {
-          stage?.style.setProperty('max-height', `${stage?.scrollHeight ?? 0}px`);
+          stage?.style.removeProperty('max-height');
           explanation?.style.setProperty('max-height', '0px');
         }
         explanationTransitionTimer = window.setTimeout(() => {
@@ -405,7 +499,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       explanationToggle?.setAttribute('aria-expanded', String(open));
       explanationToggle?.setAttribute('aria-pressed', String(open));
       if (modeLabel) modeLabel.textContent = open ? 'Hide explanation' : 'Show explanation';
-      window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      if (focus && !open) window.scrollTo({ top: explanationReturnScroll, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
 
     async function showEntry(index: number, options: { push?: boolean; focus?: boolean } = {}) {
@@ -417,19 +511,21 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       reviewToolbar?.removeAttribute('hidden');
       reviewIndex?.setAttribute('hidden', '');
       reviewIndex?.setAttribute('aria-hidden', 'true');
+      subscribe?.setAttribute('hidden', '');
       syncContents(entry);
       stage.setAttribute('aria-busy', 'true');
       visualHost.setAttribute('aria-busy', 'true');
+      stopCodingVisuals(visualHost);
       visualHost.innerHTML = '<p class="review-loading">Loading the visual…</p>';
       title.textContent = entry.title;
       eyebrow.textContent = labels[entry.category];
-      summary.textContent = entry.objective;
+      summary.textContent = entry.lesson.idea;
       position.textContent = `Visual ${boundedIndex + 1} of ${entries.length}`;
       counter.textContent = `${boundedIndex + 1} / ${entries.length}`;
       book.textContent = `Book ${entry.volumeNumber} · Chapter ${entry.chapterIndex}`;
       chapter.textContent = entry.chapterTitle;
-      back.href = `/library/${entry.volumeId}/${entry.chapterId}/`;
-      back.innerHTML = '<span aria-hidden="true">←</span> Chapter';
+      back.href = `/review/?${new URLSearchParams({ book: entry.volumeId, chapter: entry.chapterId })}`;
+      back.innerHTML = '<span aria-hidden="true">←</span> Library';
       if (explanationTitle && openArticle && explanationHost) {
         explanationTitle.textContent = entry.title;
         openArticle.href = entry.href;
@@ -440,24 +536,27 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode="full"]').forEach((link) => { link.href = entry.href; });
       previous.disabled = boundedIndex === 0;
       next.disabled = boundedIndex === entries.length - 1;
+      previous.title = entries[boundedIndex - 1]?.title ?? 'First lesson';
+      next.title = entries[boundedIndex + 1]?.title ?? 'Last lesson';
+      previous.setAttribute('aria-label', `Previous lesson: ${previous.title}`);
+      next.setAttribute('aria-label', `Next lesson: ${next.title}`);
       if (sourceHost) sourceHost.replaceChildren();
       if (sourceDetails) { sourceDetails.hidden = true; sourceDetails.open = false; }
 
       try {
         const article = await fetchArticle(entry);
         if (token !== requestToken) return;
-        const visuals = entry.visualIds.map((visualId) => {
-          const extracted = extractLearningVisual(article, visualId);
-          if (!extracted) throw new Error(`No completed learning visual was found for ${visualId}`);
-          return extracted;
-        });
+        const visuals = entry.lesson.steps.map((step, stepIndex) => {
+              const extracted = extractVisualLessonStep(article, step, `review-${entry.slug}-${stepIndex}`);
+              if (!extracted) throw new Error(`No teaching asset was found for ${step.visualId}:${step.view}`);
+              return extracted;
+            });
         const figures = visuals.map((extracted) => {
           const figure = document.importNode(extracted.figure, true);
           absolutizeVisualLinks(figure, entry.href);
           return figure;
         });
         visualHost.replaceChildren(...figures);
-        enhanceCodingVisuals(visualHost);
         for (const extracted of visuals) {
           if (extracted.source && sourceHost && sourceDetails) {
             const note = document.importNode(extracted.source, true);
@@ -470,6 +569,8 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         if (token !== requestToken) return;
         stage.hidden = false;
         stage.setAttribute('aria-hidden', 'false');
+        enhanceVisualLesson(visualHost);
+        enhanceCodingVisuals(visualHost);
         renderExplanation(article, entry);
         setExplanation(explanationOpen, false);
         controls?.removeAttribute('hidden');
@@ -483,7 +584,8 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         else if (!window.location.hash) history.replaceState({ slug: entry.slug }, '', `#${encodeURIComponent(entry.slug)}`);
         if (announcer) announcer.textContent = `${entry.title}, visual ${boundedIndex + 1} of ${entries.length}`;
         if (options.focus) {
-          window.scrollTo({ top: 0, behavior: 'auto' });
+          if (explanationOpen && !desktopExplanation.matches) explanation?.scrollIntoView({ block: 'start', behavior: 'auto' });
+          else window.scrollTo({ top: 0, behavior: 'auto' });
           (explanationOpen ? explanationClose : title)?.focus({ preventScroll: true });
         }
         for (const adjacent of [entries[boundedIndex - 1], entries[boundedIndex + 1]]) {
@@ -519,6 +621,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
 
     previous?.addEventListener('click', () => void showEntry(currentIndex - 1, { push: true, focus: true }), listenerOptions);
     next?.addEventListener('click', () => void showEntry(currentIndex + 1, { push: true, focus: true }), listenerOptions);
+    indexSearch?.addEventListener('input', filterIndex, listenerOptions);
+    indexClear?.addEventListener('click', () => {
+      if (!indexSearch) return;
+      indexSearch.value = '';
+      filterIndex();
+      indexSearch.focus();
+    }, listenerOptions);
     [...contentsEntries, ...reviewIndexEntries].forEach((link) => link.addEventListener('click', (event) => {
       const slug = link.dataset.reviewContentEntry ?? link.dataset.reviewIndexEntry;
       const index = entries.findIndex((entry) => entry.slug === slug);
@@ -529,7 +638,9 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     }, listenerOptions));
     contentsDetails?.addEventListener('toggle', () => {
       if (!contentsDetails.open) return;
-      root.querySelector<HTMLAnchorElement>('[data-review-content-entry][aria-current="page"]')?.scrollIntoView({ block: 'nearest' });
+      const panel = contentsDetails.querySelector<HTMLElement>('.review-contents-panel');
+      const current = contentsDetails.querySelector<HTMLElement>('[data-review-content-entry][aria-current="page"]');
+      if (panel && current) panel.scrollTop = Math.max(0, current.offsetTop - panel.clientHeight * .3);
     }, listenerOptions);
     window.addEventListener('scroll', () => {
       if (contentsDetails?.open) contentsDetails.open = false;
@@ -551,6 +662,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     document.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
       if (document.querySelector('dialog[open]')) return;
+      if (!window.location.hash || document.querySelector('[data-site-menu][open]')) return;
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
       if (event.target instanceof HTMLElement && event.target.isContentEditable) return;
       if (event.key === 'Escape' && contentsDetails?.open) {
@@ -563,15 +675,28 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       if (event.key === 'ArrowLeft' && currentIndex > 0) { event.preventDefault(); void showEntry(currentIndex - 1, { push: true, focus: true }); }
       if (event.key === 'ArrowRight' && currentIndex < entries.length - 1) { event.preventDefault(); void showEntry(currentIndex + 1, { push: true, focus: true }); }
     }, listenerOptions);
-    stage?.addEventListener('touchstart', (event) => { touchStartX = event.changedTouches[0]?.clientX; }, { passive: true, signal: lifecycle.signal });
+    stage?.addEventListener('touchstart', (event) => {
+      touchStart = undefined;
+      if (event.touches.length !== 1) return;
+      if (event.target instanceof Element) {
+        if (event.target.closest('a, button, input, select, textarea, summary')) return;
+        const canvas = event.target.closest<HTMLElement>('.visual-lesson-canvas, .visual-scroll');
+        if (canvas && canvas.scrollWidth > canvas.clientWidth) return;
+      }
+      const touch = event.changedTouches[0];
+      if (touch) touchStart = { x: touch.clientX, y: touch.clientY };
+    }, { passive: true, signal: lifecycle.signal });
     stage?.addEventListener('touchend', (event) => {
-      if (touchStartX === undefined) return;
-      const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
-      touchStartX = undefined;
-      if (Math.abs(distance) < 60) return;
+      const start = touchStart;
+      touchStart = undefined;
+      const touch = event.changedTouches[0];
+      if (!start || !touch) return;
+      const distance = touch.clientX - start.x;
+      if (Math.abs(distance) < 60 || Math.abs(distance) <= Math.abs(touch.clientY - start.y)) return;
       if (distance > 0 && currentIndex > 0) void showEntry(currentIndex - 1, { push: true, focus: true });
       if (distance < 0 && currentIndex < entries.length - 1) void showEntry(currentIndex + 1, { push: true, focus: true });
     }, { passive: true, signal: lifecycle.signal });
+    stage?.addEventListener('touchcancel', () => { touchStart = undefined; }, { passive: true, signal: lifecycle.signal });
     document.addEventListener('astro:before-preparation', () => lifecycle.abort(), { once: true, signal: lifecycle.signal });
 
     syncRoute();
@@ -581,15 +706,15 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
 <style>
   .visual-review-mode {
     min-height: calc(100dvh - var(--header-height));
-    padding-bottom: 4.5rem;
-    background: var(--c-bg-tint);
+    padding-bottom: calc(var(--review-controls-height, 3.7rem) + .75rem);
+    background: var(--c-bg);
   }
   .review-toolbar {
     position: sticky;
     top: var(--header-height);
     z-index: 40;
     display: grid;
-    grid-template-columns: minmax(5rem, 1fr) minmax(0, 2fr) minmax(5rem, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 1rem;
     min-height: 3.2rem;
@@ -599,17 +724,17 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     backdrop-filter: blur(12px);
   }
   .review-toolbar[hidden] { display: none; }
-  .review-toolbar > a { color: var(--c-text-soft); font-size: .72rem; text-decoration: none; }
+  .review-toolbar > a { display: inline-flex; min-height: 44px; min-width: 44px; align-items: center; gap: .35rem; color: var(--c-text-soft); font-size: .82rem; text-decoration: none; }
   .review-toolbar > a:hover { color: var(--c-accent); }
   .review-toolbar p { min-width: 0; margin: 0; text-align: center; }
   .review-toolbar p span,
   .review-toolbar p strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .review-toolbar p span { color: var(--c-muted); font-size: .6rem; }
-  .review-toolbar p strong { margin-top: .05rem; color: var(--c-text); font-size: .76rem; }
+  .review-toolbar p span { color: var(--c-muted); font-size: .75rem; }
+  .review-toolbar p strong { margin-top: .05rem; color: var(--c-text); font-size: .84rem; }
   .review-toolbar-actions { position: relative; display: flex; min-width: 0; align-items: center; justify-content: flex-end; gap: .65rem; }
-  .review-progress-wrap { display: grid; justify-items: end; gap: .05rem; }
-  .review-progress-wrap span { color: var(--c-text-soft); font-family: var(--font-mono); font-size: .66rem; }
-  .review-progress-wrap small { color: var(--c-muted); font-size: .56rem; }
+  .review-progress-wrap { display: grid; flex-shrink: 0; justify-items: end; gap: .05rem; }
+  .review-progress-wrap span { color: var(--c-text-soft); font-family: var(--font-mono); font-size: .8rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .review-progress-wrap small { color: var(--c-muted); font-size: .75rem; }
   .review-contents-details { width: auto; }
   .review-contents-details > summary {
     display: grid;
@@ -618,6 +743,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     align-items: center;
     width: fit-content;
     min-width: 8rem;
+    min-height: 44px;
     margin-left: 0;
     padding: .5rem .65rem;
     border: 1px solid var(--c-rule);
@@ -627,7 +753,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     color: var(--c-text);
     cursor: pointer;
     font-family: var(--font-ui);
-    font-size: .68rem;
+    font-size: .82rem;
     font-weight: 650;
     list-style: none;
     backdrop-filter: blur(12px);
@@ -639,7 +765,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-contents-details > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); }
   .review-contents-details[open] > summary { border-color: var(--c-accent); }
   .review-contents-details[open] > summary::after { content: '−'; }
-  .review-contents-details > summary small { max-width: 11rem; overflow: hidden; color: var(--c-muted); font-size: .59rem; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+  .review-contents-details > summary small { max-width: 8rem; overflow: hidden; color: var(--c-muted); font-size: .75rem; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
   .review-contents-panel {
     position: absolute;
     top: calc(100% + .35rem);
@@ -651,7 +777,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     padding: .45rem;
     border: 1px solid var(--c-accent);
     border-radius: var(--radius);
-    background: color-mix(in srgb, var(--c-bg) 98%, transparent);
+    background: var(--c-bg);
     box-shadow: 0 .7rem 1.5rem color-mix(in srgb, var(--c-text) 10%, transparent);
     scrollbar-width: thin;
   }
@@ -668,7 +794,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     color: var(--c-text-soft);
     cursor: pointer;
     font-family: var(--font-ui);
-    font-size: .66rem;
+    font-size: .82rem;
     font-weight: 650;
     list-style: none;
   }
@@ -678,27 +804,35 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-contents-chapter[open] > summary::after { content: '−'; }
   .review-contents-volume > summary small,
   .review-contents-chapter > summary small { color: var(--c-muted); font-size: .56rem; font-weight: 400; }
-  .review-contents-volume[data-current='true'] > summary,
-  .review-contents-chapter[data-current='true'] > summary { color: var(--c-accent); }
+  .review-contents-volume[data-current] > summary,
+  .review-contents-chapter[data-current] > summary { color: var(--c-accent); }
   .review-contents-volume > ol,
   .review-contents-chapter > ol { margin: 0; padding: 0 0 .35rem; list-style: none; }
   .review-contents-chapter { margin-left: .4rem; border-left: 1px solid var(--c-rule); }
-  .review-contents-chapter > summary { padding-left: .65rem; font-size: .62rem; font-weight: 550; }
+  .review-contents-chapter > summary { padding-left: .65rem; font-size: .8rem; font-weight: 550; }
   .review-contents-chapter > ol { padding-left: .65rem; }
   .review-contents-chapter li { margin: 0; }
-  .review-contents-chapter a { display: block; padding: .3rem .45rem; border-left: 2px solid transparent; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .68rem; line-height: 1.3; text-decoration: none; }
+  .review-contents-chapter a { display: block; min-height: 44px; padding: .6rem .45rem; border-left: 2px solid transparent; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .86rem; line-height: 1.4; text-decoration: none; }
   .review-contents-chapter a:hover { color: var(--c-accent); background: var(--c-bg-tint); }
   .review-contents-chapter a[aria-current='page'] { border-left-color: var(--c-accent); background: var(--c-accent-soft); color: var(--c-text); font-weight: 650; }
-  .review-index { width: min(100%, 76rem); margin: 0 auto; padding: clamp(1.5rem, 4vw, 3.5rem) var(--gutter) 4.5rem; }
+  .review-index { width: min(100%, 70rem); margin: 0 auto; padding: 1.8rem var(--gutter) 3rem; }
   .review-index[hidden] { display: none; }
-  .review-index-header { display: flex; align-items: end; justify-content: space-between; gap: 2rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--c-rule); }
-  .review-index-header h1 { margin: .35rem 0 .55rem; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.05; }
-  .review-index-header p:not(.fallback-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .92rem; line-height: 1.55; }
+  .review-index-header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--c-rule); }
+  .review-index-header h1 { margin: .3rem 0 .4rem; font-size: 2rem; line-height: 1.15; letter-spacing: 0; }
+  .review-index-header p:not(.fallback-kicker) { margin: 0; color: var(--c-muted); font-family: var(--font-ui); font-size: .76rem; }
   .review-index-back { flex: 0 0 auto; color: var(--c-text-soft); font-size: .72rem; text-decoration: none; }
   .review-index-back:hover { color: var(--c-accent); }
+  .review-index-tools { display: flex; align-items: center; gap: 1rem; padding-top: 1rem; }
+  .review-index-search { flex: 1; min-width: 0; }
+  .review-index-search input { width: 100%; min-height: 2.6rem; padding: .55rem .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .82rem; }
+  .review-index-search input::placeholder { color: var(--c-muted); opacity: 1; }
+  .review-index-tools > p { flex: 0 0 auto; margin: 0; color: var(--c-muted); font-family: var(--font-mono); font-size: .68rem; font-variant-numeric: tabular-nums; }
+  .review-index-empty { padding: 2rem 0; }
+  .review-index-empty p { color: var(--c-text-soft); font-size: .9rem; }
+  .review-index-empty button { min-height: 2.4rem; padding: .5rem .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .76rem; cursor: pointer; }
   .review-index-list { margin-top: 1rem; }
-  .review-index-volume { border-bottom: 1px solid var(--c-rule); }
-  .review-index-volume > summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem .2rem; color: var(--c-text-soft); cursor: pointer; list-style: none; }
+  .review-index-volume { border-bottom: 1px solid var(--c-rule); scroll-margin-top: calc(var(--header-height) + .75rem); }
+  .review-index-volume > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: .8rem; padding: .9rem .2rem; color: var(--c-text-soft); cursor: pointer; list-style: none; }
   .review-index-volume > summary::-webkit-details-marker,
   .review-index-chapter > summary::-webkit-details-marker { display: none; }
   .review-index-volume > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); font-size: 1.1rem; }
@@ -708,26 +842,27 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-index-volume > summary strong { color: var(--c-text); font-size: 1.05rem; }
   .review-index-volume > summary > span:last-of-type { color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; }
   .review-index-chapters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--c-rule); }
-  .review-index-chapter { min-width: 0; padding: 1rem 1rem 1.15rem 0; border-bottom: 1px solid var(--c-rule); }
+  .review-index-chapter { min-width: 0; padding: 1rem 1rem 1.15rem 0; border-bottom: 1px solid var(--c-rule); scroll-margin-top: calc(var(--header-height) + .75rem); }
   .review-index-chapter:nth-child(even) { padding-right: 0; padding-left: 1rem; border-left: 1px solid var(--c-rule); }
-  .review-index-chapter > summary { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; color: var(--c-text-soft); cursor: pointer; list-style: none; }
+  .review-index-chapter > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: .5rem; min-height: 2rem; color: var(--c-text-soft); cursor: pointer; list-style: none; }
   .review-index-chapter > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); }
   .review-index-chapter[open] > summary::after { content: '−'; }
   .review-index-chapter > summary strong { font-size: .78rem; }
   .review-index-chapter > summary span { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; white-space: nowrap; }
   .review-index-chapter ol { margin: .65rem 0 0; padding: 0; list-style: none; }
   .review-index-chapter li { margin: 0; border-top: 1px solid color-mix(in srgb, var(--c-rule) 65%, transparent); }
-  .review-index-chapter a { display: flex; align-items: baseline; justify-content: space-between; gap: .65rem; padding: .45rem .35rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .76rem; line-height: 1.35; text-decoration: none; }
+  .review-index-chapter a { display: flex; min-height: 2.5rem; align-items: center; justify-content: space-between; gap: .65rem; padding: .5rem .35rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; text-decoration: none; }
   .review-index-chapter a span:last-child { flex: 0 0 auto; color: var(--c-muted); font-family: var(--font-ui); }
   .review-index-chapter a:hover { background: var(--c-accent-soft); color: var(--c-accent); }
   .review-workspace { width: min(100%, 96rem); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 0px; transition: grid-template-columns 360ms cubic-bezier(.2,.8,.2,1); }
   .review-workspace.is-explanation-open { grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem); }
-  .review-stage { min-width: 0; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding: clamp(.8rem, 2vw, 1.5rem) var(--gutter); }
+  .review-stage { min-width: 0; min-height: calc(100dvh - var(--header-height) - var(--review-toolbar-height, 3.2rem) - var(--review-controls-height, 3.7rem)); padding: .9rem var(--gutter); }
   .review-stage[hidden],
   .review-explanation[hidden],
   .review-bottom[hidden] { display: none; }
   .review-explanation {
     min-width: 0;
+    scroll-margin-top: .5rem;
     overflow: hidden;
     padding: 1rem 1.2rem 2.5rem;
     border-left: 1px solid var(--c-rule);
@@ -740,12 +875,14 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-workspace.is-explanation-open .review-explanation { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; }
   .review-explanation > header {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     padding-bottom: .7rem;
     border-bottom: 1px solid var(--c-rule);
   }
+  .review-explanation > header > div:first-child { flex: 1; min-width: 8rem; }
   .review-explanation > header > div:first-child > span,
   .review-explanation > header > div:first-child > strong { display: block; }
   .review-explanation > header > div:first-child > span { color: var(--c-accent); font-size: .62rem; font-weight: 700; text-transform: uppercase; }
@@ -753,7 +890,8 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .explanation-actions { display: flex; flex: 0 0 auto; align-items: center; gap: .5rem; }
   .explanation-actions a,
   .explanation-actions button { color: var(--c-text-soft); font-family: var(--font-ui); font-size: .65rem; }
-  .explanation-actions button { padding: .3rem .45rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); cursor: pointer; }
+  .explanation-actions a { display: inline-flex; min-height: 44px; align-items: center; gap: .25rem; font-size: .82rem; }
+  .explanation-actions button { display: grid; width: 44px; height: 44px; padding: 0; place-items: center; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); font-size: 1.25rem; cursor: pointer; }
   .review-explanation-body { padding-top: .8rem; font-family: var(--font-reading); font-size: .9rem; line-height: 1.6; }
   .review-explanation-body :global(.learning-figure),
   .review-explanation-body :global(.diagram-source) { display: none; }
@@ -789,7 +927,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     color: var(--c-text-soft);
     cursor: pointer;
     font-family: var(--font-ui);
-    font-size: .72rem;
+    font-size: .84rem;
     font-weight: 600;
   }
   .review-bottom button:first-child { justify-self: start; }
@@ -809,13 +947,16 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   :global(.review-error span) { color: var(--c-muted); font-size: .75rem; }
 
   @media (max-width: 720px) {
-    .review-index-header { align-items: flex-start; flex-direction: column; gap: 1rem; }
+    .review-index-header { align-items: flex-start; flex-direction: column; gap: .65rem; }
+    .review-index-volume > summary { grid-template-columns: minmax(0, 1fr) auto; }
+    .review-index-volume > summary > span:last-of-type { grid-column: 1; grid-row: 2; }
+    .review-index-volume > summary::after { grid-column: 2; grid-row: 1 / 3; }
     .review-index-chapters { display: block; }
     .review-index-chapter,
     .review-index-chapter:nth-child(even) { padding: .9rem 0 1rem; border-left: 0; }
     .review-workspace { display: block; transition: none; }
     .review-stage { max-height: none; overflow: visible; opacity: 1; transform: none; }
-    .review-workspace.is-explanation-open .review-stage { max-height: none; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding-top: clamp(.8rem, 2vw, 1.5rem); padding-bottom: clamp(.8rem, 2vw, 1.5rem); opacity: 1; transform: none; }
+    .review-workspace.is-explanation-open .review-stage { max-height: none; padding-top: .9rem; padding-bottom: .9rem; opacity: 1; transform: none; }
     .review-explanation { width: min(100%, 46rem); max-height: 0; margin: .2rem auto 0; padding: 0 var(--gutter); border-top: 1px solid var(--c-rule); border-left: 0; opacity: 0; transform: translateY(.4rem); transition: max-height 360ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), padding 360ms cubic-bezier(.2,.8,.2,1), visibility 0s linear 360ms; }
     .review-workspace.is-explanation-open .review-explanation { max-height: 10000px; padding: .8rem var(--gutter) 2rem; opacity: 1; transform: none; transition-delay: 0s; }
   }
@@ -826,7 +967,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     .review-progress-wrap small { display: none; }
     .review-stage { padding: .65rem var(--gutter) 1rem; }
     .review-bottom { grid-template-columns: auto minmax(0, 1fr) auto; gap: .35rem; padding-right: var(--gutter); padding-left: var(--gutter); }
-    .review-bottom button { min-width: 0; padding: .45rem .6rem; }
+    .review-bottom button { min-width: 44px; min-height: 44px; padding: .45rem .6rem; }
     .review-bottom .explanation-toggle { min-width: 0; overflow-wrap: anywhere; }
     .review-bottom button:first-child > span:last-child,
     .review-bottom button:last-child > span:first-child { display: none; }
@@ -838,11 +979,23 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     .review-contents-details > summary small { display: none; }
   }
   @media print {
+    :global(body:has([data-visual-review-mode])) { display: block; min-height: 0; }
+    :global(body:has([data-visual-review-mode]) > header),
+    .visual-review-mode :global([data-email-form]),
+    .review-index,
     .review-toolbar,
     .review-bottom,
     .review-fallback,
     .review-explanation { display: none !important; }
     .visual-review-mode { min-height: 0; padding-bottom: 0; background: #fff; }
+    .review-workspace { display: block; }
     .review-stage { min-height: 0; padding: 0; }
+    .review-stage :global(.visual-review-card--deck) { padding: 0; border: 0; break-inside: auto; }
+    .review-stage :global(.visual-review-overline) { display: none; }
+    .review-stage :global(.visual-review-head) { break-after: avoid; }
+    .review-stage :global(.visual-lesson-step) { display: block !important; break-inside: auto; }
+    .review-stage :global(.visual-lesson-step .coding-visual),
+    .review-stage :global(.visual-lesson-step .coding-trace) { display: block; }
+    .review-stage :global(.coding-trace-frame) { break-inside: avoid; }
   }
 </style>

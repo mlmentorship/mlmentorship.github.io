@@ -566,8 +566,8 @@ function shrinkage(model) {
       const maximum = coordinate ? 2.4 : .24;
       const position = (value) => 36 + value / maximum * 288;
       const vertical = top + 44 + coordinate * 88;
-      const result = phase ? coordinate ? '5/3' : '1/12' : number(after);
-      body += text(20, vertical, coordinate ? 'Large coefficient' : 'Small; x10 view', { width: 170, weight: 700 })
+      const result = number(after);
+      body += text(20, vertical, coordinate ? 'Large coefficient' : 'Small coefficient', { width: 170, weight: 700 })
         + text(340, vertical, `${number(before)} to ${result}`, { width: 145, anchor: 'end', weight: 700, tone });
       const baseline = vertical + 28;
       body += `<g data-proof-shrink="${penalty},${coordinate}" data-proof-before="${before}" data-proof-after="${after}" data-proof-scale="${288 / maximum}"><rect x="36" y="${baseline - 6}" width="${position(before) - 36}" height="12" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1.5;stroke-dasharray:3 3"></rect><rect x="36" y="${baseline - 6}" width="${position(after) - 36}" height="12" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>${line(36, baseline + 10, 324, baseline + 10)}${circle(position(before), baseline, 5, 'neutral')}${circle(position(after), baseline, 6, tone, true)}<path d="M${position(before)} ${baseline - 17}H${position(after)}m6-4-6 4 6 4" style="fill:none;stroke:${color(tone)};stroke-width:1.75"></path></g>`
@@ -1209,10 +1209,12 @@ for (const [identity, model] of Object.entries(visualArguments)) {
   else model.composition = { bars: 'endpoint', parts: 'whole-and-share', population: 'counted-cohorts', matrix: 'cells', timeline: 'shared-clock', connections: 'directed-routes', areas: 'conserved-mass', intervals: 'repeat-versus-condition', suppression: 'overlapping-candidates', topology: 'counterexample-graph', shrinkage: 'threshold-versus-scale' }[model.kind];
 }
 
+export const visualDrawingTools = { text, line, circle, color, fill, number, escape };
+
 export function renderVisualArgument(identity) {
   const model = visualArguments[identity];
   assert(model, `No visual argument for ${identity}`);
-  const drawing = renderMentalPicture(identity, model, { text, line, circle, color, fill, number, escape }) ?? renderers[model.kind](model);
+  const drawing = renderMentalPicture(identity, model, visualDrawingTools) ?? renderers[model.kind](model);
   assert(drawing.height > 0 && !/NaN|undefined|Infinity/.test(drawing.body), identity);
   const premise = mentalPictures[identity]?.headline ?? model.premise;
   const conclusion = mentalPictures[identity]?.caption ?? model.conclusion;
@@ -1221,12 +1223,33 @@ export function renderVisualArgument(identity) {
 
 export function renderArgumentCaption(identity) {
   const picture = mentalPictures[identity];
-  const prediction = picture ? ` <br><strong>${escape(picture.prediction)}</strong>` : '';
+  const prediction = picture ? ` <strong>${escape(picture.prediction)}</strong>` : '';
   return `<strong>Read it this way:</strong> <span data-proof-caption="${identity}">${escape(picture?.caption ?? visualArguments[identity].conclusion)}${prediction}</span>`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { parseFragment } = await import('parse5');
+  const formula = /[=\u00d7\u00f7\u2211\u221a\u2260\u2264\u2265^]|(?<!-)[<>](?!-)|(?:^|\s)\/\s*\d|\b(?:\d+(?:\.\d+)?|[A-Za-z])\s*\/\s*(?:\d|[A-Za-z])|\d\s*[+*]\s*\d|\b\d+(?:\.\d+)?\s*x\s*\d|\bx\s*\.?\d|\b[A-Za-z]\s*[+*]\s*[A-Za-z]|\b[A-Za-z]\s+x\s+[A-Za-z]\b|\b[A-Za-z]\s*-\s*\d|\b[A-Za-z]\s+-\s+[A-Za-z]\b|\b[A-Za-z]\s*\u2212\s*(?:\d|[A-Za-z]\b)|\b(?:log|exp|sigmoid|softmax|sqrt|min|max|sin|cos|tanh|abs|norm|ReLU|count|Beta|Gamma|Normal|Bernoulli|Binomial|Poisson|[FfHpqPQ])\s*\(|[\u03b1-\u03c9\u0394\u03a3]|^\s*[+*]\s*$/u;
+  const readableText = node => node.nodeName === '#text' ? node.value : (node.childNodes ?? []).map(readableText).join(' ');
+  const paragraphCount = node => (node.nodeName === 'p' ? 1 : 0) + (node.childNodes ?? []).reduce((count, child) => count + paragraphCount(child), 0);
+  assert(formula.test('99 / 1098 = 9.016%'));
+  assert(formula.test('/ 16'));
+  assert(formula.test('next_start<previous_end'));
+  assert(formula.test('count(6)'));
+  assert(formula.test('p x p'));
+  assert(formula.test('Beta(3,2)'));
+  assert(formula.test('q(z|x)'));
+  assert(formula.test('Z - 2'));
+  assert(formula.test('x-2'));
+  assert(formula.test('x - y'));
+  assert(formula.test('1-H(0.1)'));
+  assert(formula.test('H(p)'));
+  assert(!formula.test('If x doubles'));
+  assert(!formula.test('A x EOS'));
+  assert(!formula.test('2->1'));
+  assert(!formula.test('B-C cycle'));
+  assert(!formula.test('X-ray image'));
+  assert(!formula.test('Make the value ten times larger'));
   assert.deepEqual(Object.keys(visualArguments).sort(), Object.keys(figureTakeaways).sort(), 'Every exact illustration identity needs an authored composition');
   assert.equal(Object.keys(visualArguments).length, 408);
   assert.equal(Object.values(visualArguments).filter(model => model.coding).length, Object.keys(codingQuestionVisuals).length);
@@ -1234,6 +1257,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   assert.deepEqual(Object.keys(curveLandmarks).sort(), Object.keys(visualArguments).filter(identity => visualArguments[identity].kind === 'curve').sort(), 'Every curve needs an individually selected observation');
   for (const [identity, model] of Object.entries(visualArguments)) {
     assert(model.composition, `${identity}: explicit visual composition required`);
+    assert(!formula.test(figureTakeaways[identity]), `${identity}: visible figure title must not require a formula`);
     const rendered = renderVisualArgument(identity);
     assert.equal(rendered, renderVisualArgument(identity), `${identity}: nondeterminism`);
     assert(!/data-frame-key|data-motion-key|<script/.test(rendered));
@@ -1243,6 +1267,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     assert.equal(nodes.filter((node) => node.nodeName === 'svg').length, 1);
     assert(nodes.some((node) => node.nodeName === 'title'));
     assert(nodes.some((node) => node.nodeName === 'desc'));
+    for (const node of nodes.filter(node => ['title', 'desc', 'text'].includes(node.nodeName))) {
+      const label = readableText(node).replace(/\s+/g, ' ').trim();
+      assert(!formula.test(label), `${identity}: primary pictures must explain the mechanism without formulas: ${label}`);
+    }
+    const captionSource = renderArgumentCaption(identity);
+    const captionRoot = parseFragment(captionSource);
+    const caption = readableText(captionRoot).replace(/\s+/g, ' ').trim().replace(/^Read it this way:\s*/, '');
+    assert(!formula.test(caption), `${identity}: primary caption must not require a formula`);
+    assert(caption.split(/\s+/).filter(Boolean).length <= 80, `${identity}: primary explanation and prediction must fit one short paragraph`);
+    assert(paragraphCount(captionRoot) <= 1 && !/<br\b/.test(captionSource), `${identity}: primary caption must remain one paragraph`);
     if (mentalPictures[identity]) {
       const legacy = renderers[model.kind](model);
       nodes.length = 0;

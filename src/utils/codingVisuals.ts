@@ -104,6 +104,12 @@ function setFrame(
   if (announce && status) status.textContent = `Step ${boundedIndex + 1} of ${frames.length}: ${activeLabel}. ${activeNote}`;
 }
 
+export function stopCodingVisuals(root: ParentNode): void {
+  const visuals = [...root.querySelectorAll<HTMLElement>('[data-coding-visual]')];
+  if (root instanceof HTMLElement && root.matches('[data-coding-visual]')) visuals.unshift(root);
+  visuals.forEach(visual => visual.dispatchEvent(new Event('visual-lesson-hidden')));
+}
+
 export function enhanceCodingVisuals(root: ParentNode = document): void {
   bindLifecycle();
   pruneDetachedObservers();
@@ -133,7 +139,7 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
       stopTimer(timer);
       timer = undefined;
       visual.dataset.codingPlaying = 'false';
-      playLabel.textContent = currentStep === frames.length - 1 ? 'Replay trace' : 'Play trace';
+      playLabel.textContent = reducedMotion ? 'Next step' : currentStep === frames.length - 1 ? 'Replay trace' : 'Play trace';
       play.setAttribute('aria-label', playLabel.textContent);
       play.querySelector('[aria-hidden="true"]')?.replaceChildren(document.createTextNode('>'));
     };
@@ -141,6 +147,7 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
       currentStep = Math.max(0, Math.min(frames.length - 1, index));
       setFrame(visual, frames, frameButtons, progress, status, previous, next, currentStep, announce);
     };
+    visual.addEventListener('visual-lesson-hidden', stop);
     const tick = () => {
       if (!document.contains(visual)) {
         stop();

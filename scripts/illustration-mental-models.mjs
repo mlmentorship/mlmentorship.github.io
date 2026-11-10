@@ -30,27 +30,34 @@ export const mentalPictures = {
     operation: 'crossed-spiral-boundary', grid: [[1, 2, 3]],
     review: 'Boundary tokens omit the consumed one-row object. Sweep all three positions once and show top moving beyond the unchanged bottom before the opposite sweep is considered.',
     prediction: 'Which already-emitted values would be duplicated if the bottom sweep ignored top exceeding bottom?',
+    plainLabels: { 'Guard 1 <= 0 fails. Skip the bottom sweep; all three cells were already emitted.': 'Top has passed bottom; no cells remain to sweep.' },
   },
   'binary-precision-and-recall-state': {
     operation: 'select-denominator',
     review: 'A confusion table hides the membership in each denominator. Reuse the same eight true-positive identities while selecting actual positives for recall and predicted positives for precision.',
     prediction: 'Which thirty-two cases enter the precision denominator but not the recall denominator?',
+    plainLabels: { '8 / 10': '8 of 10', '8 / 40': '8 of 40' },
+    caption: 'Recall selects the actual positives and asks how many were found. Precision selects the predicted positives and asks how many were correct. Both selections contain the same eight hits, but their extra members differ. Misses lower recall; false alarms lower precision.',
   },
   'causal-attention-state': {
     operation: 'causal-weight-products', query: 1, values: [1, 2, 100],
-    review: 'Zero table entries can be mistaken for missing inputs. Keep the large future value present but send it through its exactly zero weight before combining contributions.',
+    review: 'Multiplications require the reader to calculate the mask instead of seeing it. Keep the future input present behind a closed path, merge only the readable contributions, and show unchanged output when the future grows.',
     prediction: 'If the future scalar grows from one hundred to one thousand, does its masked contribution change?',
-    caption: 'At query one, weights .4,.6,0 act on illustrative scalar values 1,2,100. Products .4,1.2,0 sum to 1.6. The future value stays present but contributes zero.',
+    caption: 'The current query mixes information from earlier and current positions. Its future input is present, but its path is closed. Make that future value ten times larger: the blocked path still adds nothing, so the output stays unchanged.',
   },
   'counting-bits-state': {
     operation: 'halved-popcount-reuse', value: 13,
     review: 'A shifted token row omits ownership of the reused result. Preserve the three high bits as six and route the separated low bit into the final count addition.',
     prediction: 'Which count is reused after dropping the low one bit of binary 1101?',
+    plainLabels: { 'Two reused set bits + low one = three.': 'Reuse two high set bits; count the low one too.', 'count(6)': 'Two high bits' },
+    caption: 'Dropping the low bit leaves a smaller number whose count is already known. The unchanged high bits reuse that count. Only the removed low bit can add one more. Work upward from zero instead of recounting every full word.',
   },
   'cross-entropy-from-logits-state': {
     operation: 'shared-normalizer-target', logits: [2, 0],
-    review: 'Two subtraction rows hide one shared normalizer. Fork the same log-normalizer into two target-specific subtraction routes instead of implying separate logits or separate normalizers.',
+    review: 'Keep one normalized prediction distribution when the target changes. Select different target probabilities and compare their computed losses on one scale without symbolic subtraction.',
     prediction: 'With logits fixed, which quantity changes when the target changes from class zero to class one?',
+    headline: 'The declared target selects a probability, not a new prediction',
+    caption: 'Turn the two logits into one shared probability distribution. The declared target selects which probability is scored. A likely target has small loss; an unlikely target has larger loss. Changing only the target does not recompute the probabilities. Batch loss averages the per-example losses. This example keeps logits fixed and changes only the label.',
   },
   'mini-batches-state': {
     operation: 'bounded-batch-membership', count: 7, size: 3,
@@ -61,11 +68,15 @@ export const mentalPictures = {
     operation: 'xor-range-pairing', count: 3, observed: [3, 0, 1],
     review: 'Range/input rows hide cancellation identity. Align equal range and observation terms in pairs, leaving expected value two as the only unpaired term.',
     prediction: 'Does reordering the observed values change which expected term remains unpaired?',
+    caption: 'Match each observed value with its copy in the complete expected range. Paired copies cancel. The unpaired value is the missing number, regardless of observation order.',
   },
   'number-of-1-bits-state': {
     operation: 'clear-lowest-one', value: 12,
     review: 'Binary strings omit the exact bit removed each pass. Keep four bit positions fixed and mark the lowest remaining one before it disappears in the next snapshot.',
     prediction: 'Does an empty low position require an extra clearing pass?',
+    plainLabels: { '12 & 11 = 8': 'Lowest one cleared: 12 becomes 8', '8 & 7 = 0': 'Final one cleared: 8 becomes 0' },
+    headline: 'Each pass clears one set bit; empty positions need no pass',
+    caption: 'The lowest set bit disappears each pass. Binary 1100 becomes 1000, then 0000. Two passes count two set bits, not four bit positions. Empty positions need no clearing pass.',
   },
   'pad-variable-length-sequences-state': {
     operation: 'length-owned-mask', sequences: [[0, 7], [4]], padding: 0,
@@ -76,11 +87,14 @@ export const mentalPictures = {
     operation: 'distance-dot-identity', points: [[1, 2], [3, 2]],
     review: 'Norm/dot tokens hide the displacement they equal. Put both vectors in the same plane, measure their two-unit gap, then reconcile squared distance four with the row-norm identity.',
     prediction: 'If both points move upward together, does their displacement change even though their individual norms change?',
+    plainLabels: { '5 + 13 - 2 x 7 = 4': 'Squared length of the gap: 4' },
+    caption: 'Distance measures the gap between points, not their individual positions relative to the origin. The norm-and-dot shortcut computes that same squared gap without building every pairwise difference vector. Moving both points together leaves the gap unchanged.',
   },
   'product-of-array-except-self-state': {
     operation: 'excluded-zero-product', values: [2, 0, 4], index: 1,
     review: 'Prefix/suffix rows obscure the zero counterexample. Cross only the current middle zero out of the selected factors and combine the two surviving nonzero sides into eight.',
     prediction: 'Why is the output at the zero position nonzero while the other two outputs are zero?',
+    plainLabels: { 'Strictly left two x strictly right four = eight.': 'Only the left and right factors contribute: eight.' },
   },
   'reverse-bits-state': {
     operation: 'fixed-width-bit-mirror', width: 32, value: 1,
@@ -91,6 +105,7 @@ export const mentalPictures = {
     operation: 'stable-shift-invariance', logits: [1000, 1001],
     review: 'Probability shares alone hide the overflow-avoiding transformation. Carry both large logits through the same maximum subtraction before creating their unchanged normalized shares.',
     prediction: 'Does adding another thousand to both original logits change their shifted difference or their probability shares?',
+    plainLabels: { 'Stable exponents: exp(-1) and exp(0)': 'Exponentiate the small shifted values', 'The common exp(1001) factor cancels before numeric exponentiation.': 'Remove the common scale before exponentiation.' },
   },
   'subarray-sum-equals-k-state': {
     operation: 'query-before-insert', mode: 'prefix', values: [0], target: 0,
@@ -101,6 +116,7 @@ export const mentalPictures = {
     operation: 'xor-carry-trace', states: [[5, 3], [6, 2], [4, 4], [0, 8], [8, 0]],
     review: 'Decimal pairs hide the carried bit overlap. Preserve the low four positions for provisional sum and shifted carry separately through every simultaneous update.',
     prediction: 'At the four-and-four snapshot, why does XOR become zero while the carry moves to eight?',
+    caption: 'At every row, provisional sum and carry together preserve the total. XOR resolves positions without overlapping ones; overlapping ones become carry in the next position. Repeat until no carry remains.',
   },
   'two-sum-state': {
     operation: 'query-before-insert', mode: 'complement', values: [3, 3], target: 6,
@@ -111,11 +127,14 @@ export const mentalPictures = {
     operation: 'nested-repeat-payload', inner: 'b', innerCount: 3, prefix: 'a', outerCount: 2,
     review: 'Completed strings hide nested ownership. Enclose the three inner b copies inside one outer a-plus-bbb payload, then duplicate the completed payload as a whole.',
     prediction: 'Would repeating the outer a before resolving its inner b group produce the same payload?',
+    plainLabels: { 'Completed payload: a + bbb = abbb': 'Completed inner payload: abbb' },
   },
   'encode-and-decode-strings-state': {
-    operation: 'length-delimited-payload', payload: 'a#b', separator: '#',
-    review: 'Length and payload rows hide the exact span. Keep all encoded characters in one lane and enclose exactly three payload characters, including their internal separator-looking symbol.',
-    prediction: 'Which hash is the length separator, and which hash must remain inside the decoded string?',
+    operation: 'length-delimited-payload', payloads: ['a#b', '', 'z'], separator: '#',
+    review: 'Trace three successive length headers, including an interior hash and a zero-length payload. Preserve the empty output entry, advance beyond its header, and distinguish Python-character lengths from byte framing.',
+    prediction: 'Does the zero-length record advance past its header?',
+    headline: 'Count the payload, preserve empty entries, and resume at the next header',
+    caption: 'Read the decimal length, skip its header delimiter, then consume exactly that many Python characters. The interior hash belongs to a#b. The zero-length record consumes no payload but emits an empty list entry; its header still advances the cursor. An empty stream has no records, unlike 0#. Repeat from the next header. A byte protocol needs byte lengths instead.',
   },
   'implement-trie-state': {
     operation: 'trie-prefix-terminal', word: 'apple', prefix: 'app',
@@ -123,9 +142,11 @@ export const mentalPictures = {
     prediction: 'Does inserting app require replacing the existing apple path or deleting its terminal flag?',
   },
   'design-add-and-search-words-state': {
-    operation: 'wildcard-terminal-search', word: 'bad',
-    review: 'A matching path is not a successful search without a terminal node. Compare the prefix-only ba stop with b.d continuing through the stored a child to terminal d.',
+    operation: 'wildcard-branch-and-terminal', words: ['bake', 'bed'], pattern: 'b.d',
+    review: 'Show both children at the wildcard. The a branch cannot match the final d, while the e branch completes bed; preserve the separate ba prefix failure and require a terminal node at the exact pattern length.',
     prediction: 'Why is the existing ba path insufficient while b.d reaches a stored word?',
+    headline: 'Wildcards try child alternatives; a complete match must end at a terminal node',
+    caption: 'Literals follow matching trie edges. A dot tries each child for one character. Here a cannot satisfy the final d; e reaches bed. A full pattern matches only at a stored word\'s terminal node. Prefix ba exists but is not a word.',
   },
   'word-search-ii-state': {
     operation: 'emit-and-continue-trie', words: ['a', 'ab'], board: ['a', 'b'],
@@ -152,12 +173,15 @@ export const mentalPictures = {
     title: 'An equal endpoint touches; a strictly earlier start overlaps',
     review: 'A comparison table does not show the interiors. Put both interval tracks on one shared time ruler and preserve the empty intersection at equality.',
     prediction: 'Which positive-length overlap appears when the next start moves from ten to nine?',
+    plainLabels: { 'Start 10 >= kept end 10: next fits': 'Next begins as the kept meeting ends: fits', 'Start 9 < kept end 10: overlap': 'Next begins before the kept meeting ends: overlap' },
+    caption: 'Intervals may touch without overlap. A meeting conflicts only when its start lies before the kept meeting’s finish. Compare interiors on the shared time ruler; equality leaves no positive-length intersection.',
   },
   'non-overlapping-intervals-state': {
     operation: 'next-interval-fit', cases: [{ kept: [1, 3], next: [3, 4] }, { kept: [1, 5], next: [3, 4] }],
     title: 'An earlier retained finish leaves the next interval available',
     review: 'Yes/no cells hide the opportunity preserved by the exchange. Keep the next interval fixed while extending the retained finish from three to five.',
     prediction: 'Which future interval becomes impossible if the retained finish moves from three to five?',
+    plainLabels: { 'Start 3 >= kept end 3: next fits': 'Next begins as the kept interval ends: fits', 'Start 3 < kept end 5: overlap': 'Next begins before the kept interval ends: overlap' },
   },
   'insert-interval-state': {
     operation: 'interval-stage-union',
@@ -204,6 +228,7 @@ export const mentalPictures = {
     title: 'The saved room peak survives a smaller final active heap',
     review: 'Final and peak bars hide the occupancy history. Count the actual meetings at three ordered checkpoints and retain the two-room peak after occupancy returns to one.',
     prediction: 'Can the smaller occupancy at the last checkpoint retroactively eliminate the earlier need for two rooms?',
+    caption: 'Near the middle checkpoint, two meeting intervals overlap. Later only one remains active, but the earlier overlap still requires two rooms. Removing finished meetings changes the current occupancy, not the saved peak.',
   },
   'longest-repeating-character-replacement-state': {
     operation: 'replacement-window-witness', windows: ['AABA', 'ABBA'], budget: 1,
@@ -219,6 +244,8 @@ export const mentalPictures = {
     operation: 'nondecreasing-window-boundary', string: 'abba', previousLeft: 2, previousOccurrence: 0,
     review: 'Timestamp dots hide the reopened duplicate. Draw the rejected left-one window containing both b copies beside the retained left-two window.',
     prediction: 'Which repeated character reenters if the final a moves the left boundary backward to one?',
+    plainLabels: { 'Wrong left = old-a index + one = 1': 'Rejected: move the left boundary back to 1', 'Keep left = max(2,1) = 2': 'Keep the left boundary at 2' },
+    caption: 'The last repeated a lies before the current window. Moving the boundary back to that old occurrence would bring a duplicate b inside. Keep the boundary where it is; a stale occurrence cannot reopen discarded positions.',
   },
   'jump-game-state': {
     operation: 'reachable-jump-frontier', values: [1, 0, 9],
@@ -231,9 +258,12 @@ export const mentalPictures = {
     prediction: 'Does rejecting two as a new run start remove two from the existing one-to-three run?',
   },
   'daily-temperatures-state': {
-    operation: 'temperature-versus-index', temperatures: [70, 68, 69, 80],
-    review: 'Subtraction tokens conflate temperature and time. Put temperatures on the vertical axis and daily positions on the horizontal axis so a ten-degree rise and three-day wait occupy different dimensions.',
+    operation: 'waiting-stack-and-distance', temperatures: [70, 68, 69, 80],
+    review: 'Keep unresolved indices in a nonincreasing temperature stack. Trace the exact first-warmer pops and stored distances before retaining the independent day-versus-degree counterfactual.',
     prediction: 'If the warmer day were ninety degrees at the same index three, would the waiting time change?',
+    plainLabels: { 'Horizontal index difference: 3 - 0 = 3 days': 'Three days to the warmer reading', 'Vertical temperature difference: 80 - 70 = 10 degrees, not the waiting time.': 'Ten degrees warmer; still a three-day wait.' },
+    headline: 'A warmer arrival resolves only colder waiting indices; answers measure index distance',
+    caption: 'Keep waiting indices in nonincreasing temperature order. A warmer day pops colder entries and records their index distance. Day two resolves day one, not day zero. Day three resolves the remaining colder days. Equal temperatures do not qualify. Unresolved entries get zero after the scan. A higher reading on the same day changes degrees, not waiting time.',
   },
   'count-number-of-nice-subarrays-state': {
     operation: 'nested-start-membership', values: [2, 2, 2, 1, 1, 1], exact: 3,
@@ -259,10 +289,12 @@ export const mentalPictures = {
     footer: 'Both lengths are three; their per-character inventories differ.',
   },
   'group-anagrams-state': {
-    operation: 'character-copy-counts', words: ['ab', 'ba', 'aa'], mode: 'groups', expectedGroups: 2,
-    review: 'Signature strings can feel arbitrary. Put copies from all three words into shared a/b bins so ab and ba coincide while aa occupies a different inventory.',
-    prediction: 'Would changing the order of letters within aa move it into the ab/ba group?',
-    footer: 'ab and ba share one inventory; aa supplies a second group.',
+    operation: 'anagram-bucket-trace', words: ['ab', 'ba', 'aab', 'abb', 'ab', '', ''],
+    expectedGroups: [['ab', 'ba', 'ab'], ['aab'], ['abb'], ['', '']],
+    review: 'Count fresh complete keys, then append actual occurrences to their matching buckets. Expose repeated words, empty words and unequal multiplicities rather than only pairwise anagram equality.',
+    prediction: 'Would equal lengths merge aab and abb?',
+    headline: 'Count each word afresh, freeze the complete key, and append every occurrence',
+    caption: 'Fresh character counts describe one word, not the consumed prefix. Freeze all twenty-six slots, including zeros, into an exact dictionary key. Here ab, ba and repeated ab share one bucket; aab and abb differ despite equal lengths and character sets. Empty words share the zero key. Append every occurrence in input order. Hash collisions do not establish key equality. Different alphabets require a different key; normalization changes equality too.',
   },
   'contains-duplicate-state': {
     operation: 'set-entry-collapse', values: [1, 2, 1, 3],
@@ -273,6 +305,7 @@ export const mentalPictures = {
     operation: 'coin-predecessor', amount: 3, coins: [2, 3], costs: [0, 4, 1, 1],
     review: 'Candidate arithmetic hides the predecessor boundary. Route amount three to amount one and amount zero, preserving the unreachable sentinel on the first route.',
     prediction: 'Does an arithmetic candidate through unreachable amount one become a valid solution merely by adding one coin?',
+    plainLabels: { 'Unreachable sentinel 4 + one = 5: reject': 'Sentinel means unreachable: reject this route', 'Base cost 0 + one coin = 1: keep': 'Reachable base: one coin completes the amount' },
   },
   'combination-sum-iv-state': {
     operation: 'last-step-paths', target: 4, expected: [3, 2],
@@ -280,20 +313,26 @@ export const mentalPictures = {
     prediction: 'Do 1,1,2 and 2,1,1 belong to the same final-value group?',
   },
   'decode-ways-state': {
-    operation: 'decimal-pair-gate', pairs: ['10', '01', '27'],
-    review: 'Validity cells hide digit order. Preserve the two-character strings at the gate so zero in the second position differs from an illegal leading zero.',
+    operation: 'parse-predecessors-and-validity', pairs: ['10', '01', '27'], digits: '226',
+    review: 'Enumerate actual tokenizations and partition them by final one- or two-digit token. Remove the final token to expose the counted prefix, then retain ordered validity gates for invalid endings.',
     prediction: 'Why is ten accepted while zero-one is not, even though both contain a zero?',
+    plainLabels: { '+': '\u2713' },
+    headline: 'Add disjoint parse groups only when their final token is valid',
+    caption: 'Count parses by their final valid token. For 226, two parses end in 6 and one ends in 26. Removing that final token leaves an already-counted shorter prefix. The groups are disjoint, so add their counts. Invalid final tokens contribute nothing. Preserve both preceding prefix counts; the empty prefix supplies one way to start.',
   },
   'edit-distance-state': {
-    operation: 'edit-diagonal-cost', pairs: [['a', 'b'], ['a', 'a']],
-    review: 'A diagonal token is not the operation. Pass the empty-prefix cost through a mismatch toll of one and a matching toll of zero.',
-    prediction: 'If the two characters match, which edit is paid by inheriting the diagonal?',
+    operation: 'edit-diagonal-cost', first: 'cat', second: 'cut',
+    review: 'Compute the full prefix grid, identify insertion/deletion/replacement predecessors of ca into cu, compare their paid costs, and carry the selected one through the final matching t. Preserve empty borders and the previous/current-row invariant.',
+    prediction: 'Does matching t require another replacement?',
+    headline: 'Price every final edit from solved prefixes; keep the cheapest and copy matches',
+    caption: 'Each cell prices possible final edits from solved prefix states. At ca into cu, insertion and deletion each cost two; replacement costs one. The final matching t copies that diagonal without another edit. Empty-prefix borders count insertions or deletions. Keep the previous row intact while building the current row, then commit the completed row. These unit-cost Python-character edits exclude transposition and automatic normalization.',
   },
   'house-robber-ii-state': {
-    operation: 'circular-endpoint-cases', values: [2, 3, 2],
-    review: 'A two-case matrix omits the circular edge that forbids taking both endpoints. Draw that edge, then the two linear cases with opposite endpoints excluded.',
-    prediction: 'Why must the two case answers be maximized rather than added?',
-    caption: 'These circular houses have values 2,3,2. Excluding either endpoint gives a linear problem. Each case scores three; adding the case answers would select the same middle house twice.',
+    operation: 'circular-cover-trace', values: [1, 2, 3, 1], changed: [2, 3, 2],
+    review: 'Compute both endpoint-excluding prefix traces and feasible original-index witnesses. Prove coverage and overlap separately; compare a changed circle against the invalid endpoint-taking line.',
+    prediction: 'Can overlapping case answers be added?',
+    headline: 'Cover the circle with two endpoint-excluding lines; choose one best feasible result',
+    caption: 'Every circular plan omits at least one endpoint, so the two lines cover all valid plans. Each line also forbids the wraparound conflict. Here their prefix optima end at four and three; choose four. Plans omitting both endpoints appear twice, so adding is wrong. Reset prefix states between passes. For two, three, two, the circle scores three while the unrestricted line scores four. Saved scalar totals do not retain a selected plan.',
   },
   'longest-increasing-path-in-a-matrix-state': {
     operation: 'shared-increasing-suffix', grid: [[1, 3, 4], [0, 2, 0]], starts: [[0, 0], [1, 1]], suffix: [[0, 1], [0, 2]],
@@ -320,6 +359,7 @@ export const mentalPictures = {
     operation: 'binary-choice-leaves', values: [1, 2],
     review: 'A decision matrix can hide excluded branches. Enumerate every binary decision path and connect both include and exclude outcomes to their actual subset memberships.',
     prediction: 'Which two decisions produce the empty subset rather than skipping the decision process?',
+    plainLabels: { '+': '\u2713' },
   },
   'unique-paths-state': {
     operation: 'grid-final-move', rows: 3, columns: 3,
@@ -354,6 +394,7 @@ export const mentalPictures = {
     caption: 'Each node swaps its child links. Root one keeps its value, while nodes two and four move together. Descendant links also mirror; this is not merely a value swap.',
   },
   'validate-binary-search-tree-state': {
+      plainLabels: { 'Required 5 < node < 10; 12 lies outside.': 'Strictly between five and ten; twelve lies outside.' },
     operation: 'inherited-ancestor-bound', tree: { '': 10, L: 5, LR: 12 }, lower: 5, upper: 10, value: 12,
     review: 'A local/global comparison table hides the inherited region. Enclose the ancestor-left subtree and put twelve outside its allowed five-to-ten interval.',
     prediction: 'Why does satisfying parent five still fail the upper bound inherited from ancestor ten?',
@@ -375,13 +416,14 @@ export const mentalPictures = {
   },
   'remove-nth-node-from-end-state': {
     operation: 'linked-chain-frames', title: 'The dummy link can skip the head just like any other target',
-    rows: [{ label: 'Before: D is the dummy predecessor; n = 3', chain: ['D', 1, 2, 3, 'null'] }, { label: 'After D.next skips one; return head two', chain: ['D', 2, 3, 'null'] }],
+    rows: [{ label: 'Before: D precedes the third node from the end', chain: ['D', 1, 2, 3, 'null'] }, { label: 'After D.next skips one; return head two', chain: ['D', 2, 3, 'null'] }],
     review: 'Before/after tokens hide the actual pointer splice. Include the dummy and terminated chain so deleting the head changes the same predecessor-next link as an interior deletion.',
     prediction: 'Which next link changes when the removed node is the original head?',
+    caption: 'The dummy node gives even the head a predecessor. After locating the target, redirect the predecessor’s next link around it. Here that one splice makes the second node the new head. The same operation works when the target is inside the list.',
   },
   'reverse-linked-list-state': {
     operation: 'linked-chain-frames', title: 'Save the suffix reference before redirecting the current link',
-    rows: [{ label: 'Original chain; save next = two', chain: [1, 2, 3, 'null'] }, { label: 'Redirect one toward the processed prefix', chain: [1, 'null'] }, { label: 'The saved two still reaches the unprocessed suffix', chain: [2, 3, 'null'] }],
+    rows: [{ label: 'Original chain; save the reference to two', chain: [1, 2, 3, 'null'] }, { label: 'Redirect one toward the processed prefix', chain: [1, 'null'] }, { label: 'The saved two still reaches the unprocessed suffix', chain: [2, 3, 'null'] }],
     review: 'A saved-next token does not show what it protects. Draw the processed and remaining chains separately after the old one-to-two link is overwritten.',
     prediction: 'Without saving two first, which reference would still reach the unprocessed suffix after one points to null?',
   },
@@ -426,6 +468,7 @@ export const mentalPictures = {
     operation: 'child-return-join', mode: 'depth', children: [2, 4], expected: 5,
     review: 'Arithmetic tokens hide the mutually exclusive paths. Merge child depth packets with max, then add this one parent rather than adding both child paths.',
     prediction: 'Why does adding two and four count nodes from two different root-to-leaf routes?',
+    plainLabels: { 'One parent + max(2,4) = 5.': 'One parent extends the longer child route to five.' },
   },
   'binary-tree-level-order-traversal-state': {
     operation: 'frozen-queue-level',
@@ -437,6 +480,7 @@ export const mentalPictures = {
     operation: 'branching-return', root: 10, gains: [4, 6],
     review: 'Two sums do not expose their different path contracts. Draw a complete path using both children separately from the one-child route that can continue through the parent.',
     prediction: 'Can the caller extend the twenty-point two-child path through another parent without revisiting this node?',
+    plainLabels: { 'Complete: 4 + 10 + 6 = 20': 'Complete path through both children: 20', 'Return 10 + max(4,6) = 16, not 20.': 'Extendable path through one child: 16' },
   },
   'clone-graph-state': {
     operation: 'clone-identity-boundary', labels: ['A', 'B'],
@@ -444,21 +488,26 @@ export const mentalPictures = {
     prediction: 'If B-prime links to original A instead, which enclosure does that supposed clone leave?',
   },
   'construct-tree-from-preorder-and-inorder-traversal-state': {
-    operation: 'root-membership-split', preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7],
-    review: 'Token partitions omit the cross-traversal identity match. Connect preorder root three to its inorder position and enclose the actual left and right memberships.',
+    operation: 'range-owned-root-consumption', preorder: [3, 9, 20, 15, 7], inorder: [9, 3, 15, 20, 7],
+    review: 'Retain the cross-traversal root match, then trace the shared preorder cursor through exact inorder child ranges, construct the five-node tree, and reject an out-of-range root despite identical value sets.',
     prediction: 'Can preorder position alone determine how many of these nodes belong to the left subtree?',
+    incompatible: [3, 20, 9, 15, 7],
+    headline: 'Consume preorder roots inside their exact inorder ranges, left child before right',
+    caption: 'With distinct values, preorder picks each next root. Its position in the current inorder range separates child membership. Consume the entire left range before the right, advancing one shared preorder cursor. A root outside its assigned range makes the traversals incompatible, even if their value sets match. The worked range trace constructs all five nodes.',
   },
   'course-schedule-state': {
     operation: 'empty-ready-counterexample',
     review: 'Two empty-queue cells hide the unprocessed cycle. Show a completed chain beside an emitted isolated A with B and C still blocking each other.',
     prediction: 'When the ready queue is empty but B and C still wait on each other, have all three courses completed?',
+    plainLabels: { 'Emitted 3/3: success': 'All 3 courses emitted: success', 'Emitted 1/3: cycle, not success': 'Only 1 of 3 emitted: blocked by cycle' },
     caption: 'An empty ready queue occurs after both a completed three-course chain and a blocked B-C cycle. Success additionally requires emitting every course.',
   },
   'graph-valid-tree-state': {
-    operation: 'component-membership', labels: ['A', 'B', 'C', 'D'], edges: [[0, 1], [1, 2], [2, 0]], expected: 2,
-    review: 'A triangle and orphan need their joint accounting exposed. Process the closing third edge without merging D so n-1 edges visibly coexist with a cycle and two components.',
-    prediction: 'Does the third edge make isolated D reachable from the triangle?',
-    footer: 'Three edges for four nodes still leave a cycle and isolated D.',
+    operation: 'tree-reachability-proof', edges: [[0, 1], [0, 2], [1, 3], [1, 4]], nodes: 5,
+    review: 'Connect the exact edge-count gate with the actual mark-on-push DFS discovery trace and distinguish an undirected reverse edge from cycle evidence.',
+    prediction: 'Does a previously discovered neighbor alone prove an undirected cycle?',
+    headline: 'Require the exact tree edge count and reach every declared vertex',
+    caption: 'Use both edge count and reachability. The five-node example has four edges and DFS discovers every node. Mark on push; discovered is not fully expanded. Seeing the reverse of an undirected edge is not cycle evidence by itself. A triangle plus an isolate passes the count but fails connectivity. Forests relax connectivity, not acyclicity. Keep isolated vertices in the explicit universe; directed trees need a different proof.',
   },
   'number-of-connected-components-state': {
     operation: 'component-membership', labels: [0, 1, 2, 3], edges: [[0, 1], [2, 3], [1, 0]], expected: 2,
@@ -484,10 +533,11 @@ export const mentalPictures = {
     prediction: 'Why can the value three be rejected without comparing it directly with seven?',
   },
   'find-minimum-in-rotated-sorted-array-state': {
-    operation: 'candidate-cut', values: [3, 4, 1, 2], minimum: true,
-    stages: [{ label: 'Rotated candidates; rightmost value two', keep: [0, 1, 2, 3] }, { label: 'Middle four exceeds right two: discard its prefix', keep: [2, 3] }, { label: 'Middle one is below right two: keep that middle', keep: [2] }],
-    review: 'Ledger rows omit the asymmetric inclusive bound. Preserve the middle-one identity through the second cut instead of discarding both compared positions.',
-    prediction: 'What happens to the answer if the low-side comparison uses right = middle - 1?',
+    operation: 'rotated-minimum-retention', values: [6, 7, 8, 1, 2, 3, 4, 5],
+    review: 'Keep the actual first-midpoint minimum through every inclusive interval and test the duplicate-equality contract separately.',
+    prediction: 'When midpoint and right values are equal, can the entire half be discarded?',
+    headline: 'Shrink an inclusive minimum interval without discarding a possible midpoint answer',
+    caption: 'Compare the midpoint with the retained right endpoint. A larger midpoint excludes its prefix; a smaller one may be the minimum, so keep it. The first midpoint here is already the answer. Return its value, not the rotation index. Distinct inputs shrink logarithmically. Duplicates make equality ambiguous: discard only one equal endpoint, preserving a witness. All-equal input can require linear work. Do not modify the source array.',
   },
   'search-in-rotated-sorted-array-state': {
     operation: 'candidate-cut', values: [4, 5, 6, 7, 0, 1, 2], target: 0,
@@ -499,13 +549,16 @@ export const mentalPictures = {
     operation: 'shorter-wall-bound', lower: 2, widths: [3, 2],
     review: 'Arithmetic tokens omit the physical upper bound. Keep the short wall fixed while narrowing the floor; even an arbitrarily tall replacement cannot raise the water above two.',
     prediction: 'Can keeping the short wall and reducing width ever beat the current area six?',
+    plainLabels: { 'height <= 2': 'Water capped at height 2' },
   },
   'koko-eating-bananas-state': {
     operation: 'ceiling-hours', piles: [3, 6, 7, 11], speeds: [3, 4], hours: 8, expected: [10, 8],
+    plainLabels: { '1 + 2 + 3 + 4 = 10 hours; deadline 8': 'Ten occupied hours miss the eight-hour deadline', '1 + 2 + 2 + 3 = 8 hours; deadline 8': 'Eight occupied hours meet the deadline' },
     review: 'Total-hour bars hide ceiling division. Partition each pile into full-hour boxes, retaining a partially filled final box as one whole hour.',
     prediction: 'At speed four, does the last three-banana remainder of pile eleven cost zero hours or one?',
   },
   'split-array-largest-sum-state': {
+      caption: 'Fill each group until the next item would exceed the capacity. At seventeen, the final two items need separate groups. At eighteen, they fit together and only two groups are needed. Search for the first capacity whose group count meets the limit.',
     operation: 'greedy-capacity', values: [7, 2, 5, 10, 8], capacities: [17, 18], allowed: 2, expected: [3, 2],
     review: 'Group-count bars do not show the capacity predicate. Pack the same ordered items into bounded rows so ten and eight visibly fit together only at eighteen.',
     prediction: 'Which cut disappears when capacity rises from seventeen to eighteen?',
@@ -514,11 +567,13 @@ export const mentalPictures = {
     operation: 'retained-min-heap', entries: [[7, 7], [2, 2], [9, 9], [4, 4]], count: 3, rootAnswer: true,
     review: 'A sorted list disguises the heap boundary. Draw the actual retained min-heap separately from the discarded global minimum; its root is the weakest surviving top-three value.',
     prediction: 'Why is the answer four rather than the smallest observed value two?',
+    caption: 'The heap keeps only the three largest values seen so far. Its root is the weakest survivor and sets the admission boundary for a new value. That root is the third-largest value, even when a smaller discarded value exists outside the heap.',
   },
   'top-k-frequent-elements-state': {
     operation: 'frequency-buckets', entries: [[9, 3], [1, 5], [8, 4]], count: 2,
     review: 'Value-frequency tokens hide the bucket coordinate and scan. Place each distinct value once in its frequency bucket, then stop descending after the two higher buckets supply the answer.',
     prediction: 'If nine becomes ninety without changing its frequency, does it enter the retained top two?',
+    caption: 'Values occupy buckets according to how often they appear, not how large their names are. Scan from the highest frequency and stop after two values have been retained. Renaming a value cannot move its frequency bucket.',
   },
   'longest-increasing-subsequence-state': {
     operation: 'tails-versus-witness', values: [3, 5, 7, 2],
@@ -526,9 +581,11 @@ export const mentalPictures = {
     prediction: 'Why can tail two at input index three not precede tail five at input index one in an actual subsequence?',
   },
   'find-median-from-data-stream-state': {
-    operation: 'heap-order-gate', cases: [[5, 1], [1, 5]],
-    review: 'Yes/no cells obscure the second heap invariant. Place both heap extrema on one number line while keeping their equal sizes explicit; the reversed case crosses the lower/upper boundary.',
-    prediction: 'Can equal heap sizes alone guarantee that every lower-half value precedes every upper-half value?',
+    operation: 'stream-median-boundaries', values: [5, 2, 10, 4],
+    review: 'Expose completed insertion roots and the two distinct repair obligations; a median is read only after order and lower-size conditions both hold.',
+    prediction: 'After pushing ten, do acceptable heap sizes alone permit a median query?',
+    headline: 'Read the median only after both heap ordering and size repair are complete',
+    caption: 'Maintain ordered lower and upper halves, with lower equal in size or one larger. Completed roots give the odd middle or even midpoint. Pushing ten breaks order; the next transfer breaks size balance. Finish both repairs before reading. Heaps are not sorted arrays. Keep all inserted values; repeats count and deletion is absent. Float medians can round or overflow; exact fractions or another quantile change the output contract.',
   },
   'top-k-scores-state': {
     operation: 'subset-rank-order', scores: [.2, .9, .4, .8], selected: [3, 1],
@@ -541,19 +598,24 @@ export const mentalPictures = {
     prediction: 'After removing the final two-step move, how many stairs remain in every path of that group?',
   },
   'course-schedule-ii-state': {
-    operation: 'prerequisite-counter',
-    review: 'Unmet-count tokens omit the edges that supply the decrements. Preserve both parent identities and release course three only after both have emitted.',
+    operation: 'emission-order-witness', courses: [0, 1, 2, 3], edges: [[0, 1], [0, 2], [1, 3], [2, 3]],
+    review: 'Keep the four-course graph and exact ready/order snapshots. Save each dequeued identity, release three only after both parents, and reject a cyclic prefix rather than returning an incomplete witness.',
     prediction: 'If prerequisite two never emits, can emitting prerequisite one twice make course three ready?',
+    headline: 'Append eligible courses to a saved order; return it only when every course appears',
+    caption: 'Dequeue a ready course, append it to the order, and remove its outgoing requirements. Here zero releases one and two; three waits for both. Ready membership and saved order are separate state. Each course appears once, before its dependents. Different eligible choices can give another valid order. If a cycle leaves an incomplete prefix, return failure rather than that prefix.',
   },
   'house-robber-state': {
-    operation: 'nonadjacent-choice', values: [2, 7, 9, 3],
-    review: 'Profit bars hide which prefix taking the last house may reuse. Draw the actual selected houses in both branches so the adjacent exclusion remains visible.',
-    prediction: 'Why would adding the last three to the saved eleven select adjacent houses?',
+    operation: 'prefix-compatible-choice', values: [2, 7, 9, 3, 1],
+    review: 'Compute every saved prefix dependency before committing it, then expose actual skip/take witnesses and a premature-shift counterexample. Distinguish the optimum of a prefix from a commitment to its last house.',
+    prediction: 'May taking three extend eleven?',
+    headline: 'Read both old prefix optima before committing the better skip or compatible take',
+    caption: 'Both totals are prefix optima, not promises to select their last houses. Skip preserves the previous optimum; take extends the prefix before the neighbor. Read both old values before shifting. The five prefix results are two, seven, eleven, eleven and twelve. At three, skip keeps eleven; compatible take gives ten. An early shift incorrectly gives fourteen using adjacent houses. Empty and negative-only inputs permit zero. Recovering indices requires history; changing exclusion distance changes the dependency.',
   },
   'longest-common-subsequence-state': {
     operation: 'conditional-diagonal',
     review: 'A highlighted cell alone does not identify its predecessor. Connect the matching B cell to the shorter-prefix diagonal it extends.',
     prediction: 'If the last characters differ, is the diagonal-plus-one transition still permitted?',
+    plainLabels: { 'AB versus ACB: matching B uses diagonal one + one = two.': 'Matching B extends the shorter-prefix subsequence to two.' },
   },
   'combination-sum-state': {
     operation: 'ordered-choice-path', paths: [[0, 0, 1], [1, 0, 0]], strict: false,
@@ -565,54 +627,85 @@ export const mentalPictures = {
     review: 'The result-only cohorts hide the base rate. Preserve cohort identity through unequal selection and normalization.',
     prediction: 'If disease prevalence rises, which input cohort changes before the test acts?',
     population: [100, 99900], rates: [.99, .01], peoplePerMark: 100,
+    plainLabels: { '99 / 1098 = 9.016%': 'About 9% diseased' },
+    caption: 'The test keeps most diseased people but a small fraction of a much larger healthy group. Those healthy positives outnumber diseased positives. Positive results now become the whole. Only about one in eleven belongs to the diseased group.',
   },
   'ab-test-mde-sample-size': {
-    operation: 'square-spread',
-    review: 'Sample-budget bars do not show why the factor is squared. Turn doubled noise width into four equal variance tiles.',
+    operation: 'experiment-and-power',
+    review: 'Power alone does not tell the experiment story. Preserve assigned units through two observed groups, expose interference and delayed-readout boundaries, then connect doubled noise width to four sample budgets.',
     prediction: 'Tripling noise requires how many baseline sample budgets under the same assumptions?',
-    noise: [1, 2],
+    noise: [1, 2], assignments: [0, 1, 1, 0, 0, 1, 1, 0], outcomes: [1, 0, 1, 0, 0, 1, 1, 0],
+    headline: 'Randomize, commit the readout, and budget for noise and delayed effects',
+    caption: 'Randomize comparable units and compare observed outcomes, not chosen winners. Keep assignment consistent and choose the readout before looking. Spillovers or delayed responses can invalidate a simple early comparison. With effect and error targets fixed, samples scale with variance. Doubled noise width covers four variance tiles, requiring four baseline sample budgets.',
   },
   'attention-keys-choose-values-contribute': {
-    operation: 'weighted-values',
-    review: 'Endpoint bars omit the multiplication. Let weight set width and scalar value set height so contribution is area.',
+    operation: 'query-weighted-values',
+    review: 'Compare actual query/key directions before normalizing their matches; then conserve the weighted value tiles. Match strength and carried value must stay distinct.',
     prediction: 'What becomes of the second contribution if its value is zero but its weight stays unchanged?',
     weights: [.8, .2], values: [1, 10], unit: .2, normalized: true,
+    query: [1, 0], keys: [[Math.log(4), 0], [0, 1]],
+    caption: 'Query–key matches divide attention among attached values. Width shows assigned weight; height shows value. A weaker match can carry a larger value and contribute more. Changing a value does not change its key’s match. Each head repeats this operation with different learned projections. A causal mask closes future routes.',
   },
   'class-imbalance-sampling-prior': {
-    operation: 'biased-sample', review: 'A deployment-only population omits the sampling intervention. Pull a balanced batch out of the unchanged imbalanced world.',
+    operation: 'sampling-and-error-costs', review: 'Keep deployment prevalence fixed through balanced sampling, then hold two thresholds fixed while changing miss cost to reverse their decision ranking.',
     prediction: 'Does drawing equal class counts change the deployment base rate?', counts: [10, 990], batch: [10, 10],
+    policies: [{ name: 'Strict', hits: 5, alarms: 5 }, { name: 'Broad', hits: 8, alarms: 30 }], missCosts: [1, 10],
+    headline: 'Training balance and deployment error costs answer different questions',
+    caption: 'Balancing a batch changes training exposure, not the deployment base rate. Weighting changes the price of errors; synthetic examples do not create new label evidence. In this fixed population, the broader threshold makes more alarms but misses fewer positives. Making misses ten times costlier reverses the cheaper threshold. Choose using label quality, error costs, and held-out deployment metrics, not class counts alone.',
   },
   'confusion-matrix-denominators': {
     operation: 'select-denominator', review: 'A table hides membership. Select two different subsets of the same cases while preserving the eight shared hits.',
     prediction: 'Which extra cases enter precision but not recall?',
+    plainLabels: { '8 / 10': '8 of 10', '8 / 40': '8 of 40' },
   },
   'calibration-reliability-gap': {
-    operation: 'forecast-count', review: 'Observed outcomes alone omit the forecast. Compare the expected aggregate count with the actual aggregate count on one scale.',
-    prediction: 'If 80 cases were positive, would this bin still show the same calibration gap?', expected: 80, observed: 60, total: 100,
+    operation: 'forecast-and-temperature', review: 'Retain forecast-versus-observed counts, then soften three named-event logits on a shared probability ruler. Preserve ranking while one probability crosses a separate action threshold.',
+    prediction: 'Which case crosses the 70% action threshold?', expected: 80, observed: 60, total: 100,
+    probabilities: [.8, .6, .2], temperature: 2, threshold: .7,
+    headline: 'Calibration checks event frequencies; temperature can change actions without changing ranking',
+    caption: 'For this event, 80% forecasts should produce about 80 positives per hundred; here there are 60. Temperature scaling moves probabilities toward half without changing their order. In the separate example, case A crosses a 70% action threshold although ranking stays unchanged. Fit temperature on held-out data and recheck reliability; ranking or accuracy alone does not prove calibration.',
   },
   'contextual-bandit-partial-feedback-support': {
-    operation: 'logged-support', review: 'A missing value needs a missing path, not another ledger entry. Give the zero-probability action no route to an observed reward.',
+    operation: 'context-choice-and-feedback', review: 'Change context while comparing reward estimates and uncertainty. Follow one exploratory action to its sole observed reward and updated estimate, then retain the zero-support offline-evaluation boundary.',
     prediction: 'Can multiplying observed A and B records reveal C rewards?', actions: ['A', 'B', 'C'], probabilities: [.6, .4, 0],
+    contexts: [
+      { name: 'Context 1', means: [.6, .3], ranges: [[.55, .65], [.1, .9]] },
+      { name: 'Context 2', means: [.2, .7], ranges: [[.15, .25], [.65, .75]] },
+    ], observations: 10, reward: 1,
+    headline: 'Context and uncertainty guide choices; only the chosen action supplies feedback',
+    caption: 'Context changes expected rewards. Greedy choice follows the larger estimate; exploration can try an uncertain action. Here it chooses B, observes only B\'s reward, and updates B\'s estimate. The ranges and choice are illustrative, not fitted confidence bounds. Offline evaluation also needs logging support. An action never chosen has unknown reward, not zero reward.',
   },
   'continuous-batching-reuses-finished-slot': {
-    operation: 'replace-slot', review: 'Ledger rows obscure persistence. Keep A in the same slot while B exits and C enters the released slot.',
+    operation: 'slot-reuse-and-admission', review: 'Retain A while a completed slot receives a ready request, then expose unfinished prefill and inadequate KV as separate reasons an empty row cannot authorize decoding or allocation.',
     prediction: 'Must A finish before C can occupy B’s released slot?',
+    promptTokens: 8, tokenBudget: 4, decodeTokens: 2, requiredBlocks: 3, freeBlocks: 2,
+    headline: 'Reuse finished slots only when prompt readiness and resource budgets permit',
+    caption: 'At iteration boundaries, keep continuing requests\' state and reuse finished slots. The top case assumes C is ready and fits. With an eight-token prompt and two tokens left per iteration, C needs four prefill chunks before decoding. Three required KV blocks cannot fit into two free blocks, even with an empty row. Admission must satisfy readiness, token work, and KV limits.',
   },
   'fixed-budget-ranking-funnel': {
-    operation: 'nested-cohorts', review: 'Three bars do not show survivors. Reuse candidate positions through two filters, with one tile representing 100 candidates.',
-    prediction: 'Can final scoring recover a candidate removed upstream?', counts: [10000, 1000, 100], unit: 100, labels: ['Retrieved', 'Shortlist', 'Scored'], ending: 'Only survivors receive expensive scoring.',
+    operation: 'traffic-budget-and-evidence', review: 'Use the actual core assumptions to convert users into request volume and a full-scope unit ceiling. Preserve the actual ten-thousand/two-hundred/twenty funnel, compare unchanged unit cost under doubled traffic, and keep quality/latency evidence independent from cost feasibility.',
+    prediction: 'Does a cheaper route alone qualify shipment?', counts: [10000, 200, 20], unit: 20, labels: ['Retrieved', 'Shortlist', 'Scored'],
+    users: 20000000, requestsPerUser: 5, days: 365, peakFactor: 5, budget: 3000000, proposedUnitCost: .06, changedUnitCost: .04,
+    headline: 'Traffic sets the cost ceiling; cheaper scoring still needs quality and latency evidence',
+    caption: 'Assumptions turn users into requests and budget into a unit ceiling. Filter before expensive scoring; lost recall stays lost. At unchanged unit cost, doubled traffic doubles annual spend. A cheaper route can recover cost feasibility only. Measure quality, freshness and end-to-end tail latency under peak load. Include scoped overhead and fallback costs.',
   },
   'agent-safety-authority-loop': {
-    operation: 'bounded-capacity', review: 'An overflow result omits the proposal being inserted. Preserve the committed prefix and expose the ten-unit excess at the wall.',
+    operation: 'reserve-dispatch-and-reconcile', review: 'Use the twenty-account core case: reserve twelve atomically before dispatch, hold the second twelve, retain unknown effects after timeout, and settle reserved impact into observed impact without reopening consumed capacity. Monitor agreement is not an outcome read.',
     prediction: 'Does refusing the proposal reverse the committed effects?', mode: 'accumulate', committed: 60, proposed: 50, capacity: 100,
+    accountLimit: 20, request: 12,
+    headline: 'Reserve before effects; reconcile authoritative outcomes before restoring action',
+    caption: 'Authorization comes first; safety cannot expand it. Atomically reserve capacity before dispatch. Twelve reserved accounts leave eight of twenty slots, so the second twelve cannot pass unchanged. Timeout means unknown effects: retain the reservation and reduce authority. Monitor agreement cannot establish absence. Reconcile authoritative outcomes under the idempotency contract before further action. Confirmed effects still consume budget.',
   },
   'disagreement-evidence-commit-loop': {
-    operation: 'bounded-capacity', review: 'Memory is a physical admission boundary. Align both cache choices with the same eight-slot wall and leave the ninth unit outside.',
-    prediction: 'Can a speed advantage make the ninth memory unit fit?', mode: 'choose', labels: ['Cache A', 'Cache B'], required: [9, 6], available: [8, 8], unit: 'GB',
+    operation: 'evidence-owner-commit-reopen', review: 'Use the actual A/B latency, cost and processing-region fixture. Separate shared evidence and non-negotiable gates from the decision owner, permitted follow-through and new independently verified evidence that can reopen B without scripting a narrator victory.',
+    prediction: 'Does cheaper B override the region requirement?', latencies: [80, 60], costs: [100000, 70000], approved: [true, false], latencyLimit: 100,
+    headline: 'Compare evidence, respect hard constraints, then commit through the decision owner',
+    caption: 'Represent both positions against shared goals. Both options meet the latency limit; cheaper B fails the required region gate. The owner selects a permitted option. Follow it responsibly and observe agreed revisit conditions. New verified approval could reopen B; it is not presumed. Escalate prohibited actions rather than treating commitment as authorization. Neither victory nor a third option is required.',
   },
   'reasoning-admission-and-capacity': {
     operation: 'bounded-capacity', review: 'Yes/no tokens hide independent resources. Make compute and KV separate banks whose gates must both pass.',
     prediction: 'Can two free compute units supply the missing KV page?', mode: 'all', labels: ['Compute', 'KV pages'], required: [4, 6], available: [6, 5], unit: 'units',
+    plainLabels: { 'Compute: 4 / 6 units': 'Compute needs 4; 6 available', 'KV pages: 6 / 5 units': 'KV needs 6 pages; 5 available' },
   },
   'ecosystem-serving-stages': {
     operation: 'nested-cohorts', review: 'Flat groups hide nested selection. Retain the same 100 candidate identities through eligibility and exposure filters.',
@@ -621,35 +714,40 @@ export const mentalPictures = {
   'backprop-forward-reverse-trace': {
     operation: 'arithmetic-paths', review: 'A final pair of gradients hides the cached multipliers. Fork the upstream signal through the other forward input.',
     prediction: 'If x doubles while the upstream signal stays fixed, which parameter gradient doubles?',
-    paths: [{ label: 'Forward: a times x', inputs: [3, 2], operator: 'multiply', result: 6 }, { label: 'To a: upstream times cached x', inputs: [4, 2], operator: 'multiply', result: 8 }, { label: 'To x: upstream times cached a', inputs: [4, 3], operator: 'multiply', result: 12 }],
+    paths: [{ label: 'Forward prediction', inputs: [3, 2], operator: 'multiply', result: 6 }, { label: 'Gradient to the coefficient', inputs: [4, 2], operator: 'multiply', result: 8 }, { label: 'Gradient to the input', inputs: [4, 3], operator: 'multiply', result: 12 }],
+    caption: 'The backward signal is scaled by how strongly each input affected the forward prediction. The same incoming signal can therefore produce different gradients. A larger cached input strengthens the coefficient gradient.',
   },
   'logistic-gradient-cancellation': {
     operation: 'arithmetic-paths', review: 'Cancellation should leave a visible surviving route. Trace a concrete positive-label gradient through the sigmoid and then the input.',
     prediction: 'If the input is zero, can the weight receive this nonzero logit gradient?',
-    paths: [{ label: 'Positive label: p = 0.2', inputs: [-5, .16], operator: 'multiply', result: -.8 }, { label: 'The weight still receives x = 3', inputs: [-.8, 3], operator: 'multiply', result: -2.4 }],
-    caption: 'For a positive label, the two logit-gradient factors multiply to -0.8. The weight still needs the input factor. At x=3, its gradient is -2.4.',
+    paths: [{ label: 'Positive-label prediction: probability 0.2', inputs: [-5, .16], operator: 'multiply', result: -.8 }, { label: 'The weight still depends on input magnitude', inputs: [-.8, 3], operator: 'multiply', result: -2.4 }],
+    caption: 'Cross-entropy assigns larger loss to less likely observed labels. Maximizing label likelihood therefore minimizes this loss. The corrective signal survives the sigmoid\'s small slope. Input magnitude then scales the weight gradient. A zero input closes that final route even when the prediction needs correction.',
   },
   'ece-weighted-bin-contributions': {
-    operation: 'weighted-values', review: 'Equal results hide different causes. Make bin share and gap orthogonal dimensions of equal contribution areas.',
-    prediction: 'What happens if only the first bin doubles in size?', weights: [.1, .4], values: [.4, .1], unit: .01, widthUnit: .1, heightUnit: .1,
-    widthLabel: 'bin share', heightLabel: 'gap', totalLabel: 'Shown contributions',
+    operation: 'bin-confidence-outcome-and-weight', review: 'Construct each actual bin gap from average predicted-class confidence and observed correctness. Turn its share and gap into countable contribution tiles, include all hundred predictions, then replace ten A cases with ten C cases while keeping total count, bin definitions and within-bin rates fixed.',
+    prediction: 'Can bin C gain predictions without changing the total denominator?', counts: [50, 40, 10], changedCounts: [40, 40, 20], confidence: [.3, .7, .9], accuracy: [.2, .6, .5],
+    headline: 'Confidence gaps count in proportion to the predictions in each bin',
+    caption: 'Compare average confidence with observed correctness within each bin. Weight their absolute gap by the bin\'s share of all predictions. Replacing ten A cases with ten C cases keeps one hundred total but raises ECE from thirteen to sixteen points when bin rates stay fixed. One aggregate can hide different bin errors; sample ECE is not proof of population calibration.',
   },
   'gradient-magnitude-through-depth': {
     operation: 'gain-cascade', review: 'Power curves conceal local repetition. Pass the same unit signal through ten identical gates and let its width compound.',
     prediction: 'Is depth alone sufficient to say whether this signal grows?', gains: [.8, 1.2], count: 10,
   },
   'loss-estimation-vs-decision': {
-    operation: 'weighted-values', review: 'A probability is not an action. Show error probability multiplying error cost and choose between the resulting areas.',
-    prediction: 'Would the same score choose the same action if false-positive cost fell to one?',
-    weights: [.2, .8], values: [10, 1], unit: .2, normalized: true, combine: false, widthLabel: 'error chance', heightLabel: 'error cost', verdict: 'Negative action costs less',
+    operation: 'estimation-and-decision', review: 'Keep the stipulated zero/zero/nine population while comparing constant fits and both objective values. Separate robust-location contamination assumptions from genuine tails, then use the actual nine/one action costs and unchanged calibrated probability to demonstrate threshold-only reversal.',
+    prediction: 'Must the probability model change when only false-positive cost falls to one?', outcomes: [0, 0, 9], probability: .8, falsePositive: 9, falseNegative: 1,
+    headline: 'Choose the estimation target first; choose the action from suitable probabilities and actual costs',
+    caption: 'Squared loss selects mean three; absolute loss selects median zero for the same population. Neither target is universally better. Robust location requires a contamination assumption, not automatic deletion of a genuine tail. Separately, a suitable calibrated probability can stay fixed while changed action costs reverse the decision. Validate thresholds, recall and volume. Weighted or focal scores are not automatically calibrated probabilities.',
   },
   'lstm-coordinate-gated-state-update': {
     operation: 'weighted-values', review: 'The two gates are independent valves, not a normalized mixture. Preserve the old-state and candidate contributions until they merge.',
     prediction: 'If the input gate closes, which contribution remains?', weights: [.8, .5], values: [2, 3], expected: [1.6, 1.5], unit: .1, widthLabel: 'gate', heightLabel: 'state',
   },
   'gradient-boosting-residual-update': {
-    operation: 'residual-step', review: 'A ledger obscures distance. Put prediction and target on one ruler, then move only one tenth of the residual.',
-    prediction: 'Does the new tree add the full target or a fraction of what remains?', predictionValue: 7, targetValue: 10, shrinkage: .1,
+    operation: 'residual-step', review: 'Use the actual four-point half-squared-loss fixture. Derive signed negative gradients, fit the stump, scale its correction and recompute loss. Then change shrinkage and objective separately so regression residuals are not mistaken for universal boosting targets.',
+    prediction: 'Does logistic boosting reuse the regression gaps?', targets: [2, 2, 8, 8], initial: 5, shrinkage: .5,
+    headline: 'Fit current negative loss gradients, shrink the new learner, and recompute the objective',
+    caption: 'Boosting fits negative gradients of the current loss, not the original labels again. Half-squared loss gives signed residuals; this stump fits minus three and three. Shrinkage halves those corrections, reducing training loss from eighteen to 4.5. Smaller steps change the update, not the first fitted stump. Logistic loss uses probability residuals and updates logits. Newton leaf weights also depend on curvature and regularization. Training improvement is not held-out generalization.',
   },
   'logit-odds-probability-map': {
     operation: 'linked-scales', review: 'Three number rows hide spacing. Connect the same candidates through equally spaced logits, multiplicative odds, and compressed probabilities.',
@@ -657,91 +755,127 @@ export const mentalPictures = {
   },
   'adversarial-threat-set-boundary': {
     operation: 'geometric-action', mode: 'threat', review: 'A line between points hides the allowance. Draw both decision regions and the permitted horizontal interval around the original point.',
-    prediction: 'Can an allowance of 0.2 cross the boundary from x=0.3?', allowance: .5,
+    prediction: 'Can a movement allowance of 0.2 cross a boundary 0.3 units away?', allowance: .5,
   },
   'estimator-error-reference-points': {
     operation: 'geometric-action', mode: 'spread', review: 'One estimate does not illustrate repeated sampling. Add an explicit four-outcome experiment with separate truth, mean, and spread.',
     prediction: 'If all four estimates move together, does their spread around their own mean change?', outcomes: [[2, -1], [2, 1], [4, -1], [4, 1]],
-    caption: 'This illustrative estimator has four equally likely outcomes. Its mean is (3,0), one unit from truth (2,0). Squared spread around its mean is 2. Mean squared error is 3.',
+    plainLabels: { 'Mean squared error: 1 + 2 = 3': 'Average squared error: 3' },
+    caption: 'Each dot is an estimate from a different possible sample. The cloud center is displaced from the fixed truth: that displacement is bias. The cloud spread is variance. Moving the whole cloud changes bias without changing its spread. Tightening the cloud reduces variance without fixing its center.',
   },
   'determinant-signed-area-collapse': {
-    operation: 'geometric-action', mode: 'orientation', review: 'A filled polygon cannot explain sign. Trace both column orders around the same parallelogram.',
+    operation: 'unit-area-mass-and-collapse', review: 'Use the actual two-point-two-five-area map, conserve sixteen mass marks from the unit square, reverse column order without changing area/density, then align the columns to collapse distinct inputs onto one dimension.',
     prediction: 'Does reversing the column order change the floor area?',
+    columns: [[2, .5], [.5, 1.25]], collapsed: [[2, 1], [1, .5]],
+    headline: 'Columns scale signed area; fixed mass spreads out, while aligned columns collapse a dimension',
+    caption: 'Columns send the square edges into a parallelogram. Unit area becomes 2.25, while probability mass stays fixed and density falls. Swapping column order reverses orientation, not unsigned area or density. Aligned columns send the square onto a line: area vanishes and distinct inputs can share an output. That collapsed map has no unique inverse or ordinary two-dimensional density.',
   },
   'spectral-theorem-change-basis': {
-    operation: 'geometric-action', mode: 'stretch', review: 'A token multiplication does not show independent axes. Stretch the actual coordinate displacements by different eigenvalues.',
-    prediction: 'Does scaling the first eigen-coordinate require mixing it with the second?', input: [3, 1], gains: [2, 3],
+    operation: 'eigenbasis-change-and-return', review: 'Use the actual symmetric matrix and input. Preserve the arrow length while viewing it in the perpendicular diagonal basis, triple only its first component, return to the original axes, then erase the first component with a zero eigenvalue.',
+    prediction: 'Does changing coordinates alone stretch the input arrow?', matrix: [[2, 1], [1, 2]], input: [2, 1], gains: [3, 1],
+    headline: 'Change the viewing axes, stretch independent components, then return to the original axes',
+    caption: 'A symmetric map has perpendicular directions it only stretches. Viewing the input along those directions changes its coordinates, not its length. Here the first component triples while the second stays fixed. Return to the original axes to obtain five, four. A zero scale erases its component; a negative scale reverses it. Independent components do not mix during scaling.',
   },
   'embedding-normalization-metric-equivalence': {
-    operation: 'geometric-action', mode: 'normalize', review: 'Ranking bars hide angle and length. Pull candidates onto a unit circle and compare their query-axis projections.',
-    prediction: 'After normalization, can increasing only A’s original length improve its cosine?', candidates: [[10, 10], [1, 0]],
+    operation: 'raw-and-normalized-vectors', review: 'Keep the actual query, A and B identities through raw geometry and a clearly enlarged unit-circle view. Draw the original projections, preserve both directions under normalization, and connect the normalized A point to the same query anchor.',
+    prediction: 'After normalization, can increasing only A\'s original length improve its cosine?', query: [1, 0], candidates: [[10, 10], [1, 0]],
+    headline: 'Length can win a raw match; normalization compares directions on the unit circle',
+    caption: 'Raw A has a larger projection along the query because it is long. Normalization preserves each direction but puts both candidates on the unit circle. Aligned B then wins; its point coincides with the query. On this circle, greater projection also means shorter query distance. The normalized chart uses a fivefold zoom; circle radius remains one. Lengthening A alone cannot move its normalized point.',
   },
   'uncertainty-within-between-models': {
     operation: 'geometric-action', mode: 'mixture-spread', review: 'Mean markers hide each model’s outcomes. Separate within-model displacement from movement between model centers.',
     prediction: 'Can individually concentrated models form a wide mixture?', means: [1, 4], within: .4,
-    caption: 'Each model has two equally likely outcomes. Both lie 0.4 from that model mean. Within-model variance is 0.16. Between-model variance is 2.25. Their sum is 2.41.',
+    caption: 'Each model produces a tight cluster, but their centers disagree. The inner spread captures uncertainty within a model. The gap between centers adds uncertainty between models. Combining predictions keeps both sources of spread. Tighter individual clusters therefore cannot remove disagreement between their centers.',
   },
   'covariance-centered-product-signs': {
-    operation: 'geometric-action', mode: 'centered-products', review: 'A sign table hides joint deviations. Put observations in the four centered quadrants and on the zero-contribution axis.',
-    prediction: 'Which sign changes if only the centered x deviation changes sign?',
+    operation: 'population-moments-and-dependence', review: 'Use the actual four-outcome population, center on its means and shade signed deviation products. Retain marginal probabilities while independently pairing coordinates, standardize the original and rescaled population, then draw the curved zero-covariance dependence example.',
+    prediction: 'Does multiplying Y\'s units by one hundred change its correlation?', outcomes: [[-1, -1], [-1, 1], [1, 1], [1, 3]],
+    headline: 'Center the population to see spread, co-movement and the limits of correlation',
+    caption: 'Expectation locates the mean. Variance measures squared spread around it. Covariance averages signed products of joint deviations; same-side points add and opposite-side points subtract. Their pairing changes the spread of a sum even when marginal spreads stay fixed. Changing units alters covariance, not standardized correlation. A curved deterministic relationship can have zero covariance. None of these associations proves causation.',
   },
   'global-norm-clipping-radial-projection': {
-    operation: 'geometric-action', mode: 'clip', review: 'Two vectors do not expose the constraint. Add the norm boundary and pull the original point inward along its existing ray.',
-    prediction: 'Does clipping rotate this gradient toward an axis?', radius: 2,
+    operation: 'gradient-norm-and-step-contract', review: 'Use the actual six/eight gradient and radius-five constraint, contrast global radial projection with value clipping, and separately compute SGD displacement. Preserve finiteness, unique-parameter aggregation, mixed-precision order and the absence of a general adaptive-update bound.',
+    prediction: 'Does value clipping satisfy the same radius-five constraint?', gradient: [6, 8], radius: 5, rate: .1, lossScale: 100,
+    headline: 'Cap the finite global gradient along one ray; do not confuse it with an optimizer-step bound',
+    caption: 'Global clipping scales every included gradient by one factor, preserving direction and capping its norm. This fixture becomes three and four; SGD moves by norm 0.5. Value clipping gives two fives and changes direction. Aggregate unique parameter coordinates, not replicated copies. Finish accumulation and synchronization, unscale, check finiteness, then clip before stepping. Adaptive optimizers need a separate update-norm check. Clipping does not repair nonfinite gradients.',
   },
   'ols-orthogonal-projection': {
     operation: 'geometric-action', mode: 'projection', review: 'A right-angle symbol states optimality without demonstrating it. Add a feasible rail and a longer competing fit-to-observation tether.',
     prediction: 'Can another coefficient representation change the same projected prediction?', competitor: [1, 0],
+    caption: 'The model can place its prediction only on the feasible rail. Dropping the observation straight onto that rail gives the shortest remaining gap. Moving along the rail makes that gap longer. Different coefficients may describe the same point, but cannot create a closer prediction off the rail.',
   },
   'matrix-columns-define-map': {
     operation: 'geometric-action', mode: 'cancel', review: 'Origin vectors obscure head-to-tail cancellation. Send one nonzero contribution out and the other back to the origin.',
     prediction: 'Can a nonzero coefficient vector disappear under dependent columns?',
   },
   'point-in-time-availability-boundary': {
-    operation: 'event-clock', mode: 'availability', review: 'Isolated timestamp dots hide the unavailable interval. Carry one record from event to availability across the prediction boundary.',
+    operation: 'leakage-boundaries', mode: 'availability', review: 'Keep the availability clock, then conserve related records across a split, fit preprocessing on training inputs alone, and block test-result feedback into pipeline choice.',
     prediction: 'Can a later-arriving record be used because its event happened earlier?',
+    groups: [[1, 3], [5, 7], [9, 11]], trainingGroups: [0, 1],
+    headline: 'Availability, training-only fitting, and untouched evaluation are separate leakage boundaries',
+    caption: 'Use only features available at prediction time. Keep related entities and future periods out of the training side. Fit preprocessing on training data alone. Validation may guide choices; an untouched test set checks the chosen pipeline. Feeding test outcomes back into selection leaks evaluation evidence. The noon example shows why an earlier event can still arrive too late.',
   },
   'multimodal-stale-frame-gate': {
-    operation: 'event-clock', mode: 'age', review: 'Age bars do not show identity. Carry the same stamped frame through transport and measure both ages from the same question.',
-    caption: 'Capture age, not arrival delay, determines freshness.',
-    prediction: 'Can fast delivery refresh an old capture?', ages: [4.3, .1],
+    operation: 'current-evidence-and-audible-stop', mode: 'age', review: 'Retain the old capture/arrival distinction, qualify the requested keyframe with clock uncertainty and independent authority gates, then measure server cancellation and actual playback stops from the same speech onset.',
+    headline: 'Fresh authorized capture supports grounding; actual playback stop measures interruption',
+    caption: 'Require fresh, authorized capture evidence. Measure interruption through actual playback stop, not server cancellation.',
+    prediction: 'Which stop matters?', ages: [4.3, .1],
+    capture: 14.4, arrival: 14.45, uncertainty: .018, changedUncertainty: .48, limit: .5,
+    epoch: 'E', activeEpoch: 'E', consent: true, clockMapped: true,
+    speech: 1000, serverCancelled: 1050, queuedStopped: 1900, localStopped: 1150,
   },
   'video-ecosystem-delayed-effects': {
     operation: 'event-clock', mode: 'delayed-effect', review: 'One event list hides two response speeds. Split viewer and creator lanes across the short-experiment stop boundary.',
     prediction: 'Can the early readout rule out an effect whose observation lies after the test?',
   },
   'decision-threshold-action-regions': {
-    operation: 'policy-bands', review: 'One policy map can look universal. Keep one score fixed while changing the declared action regions.',
+    operation: 'error-prices-and-review-capacity', review: 'Compare probability-times-error-price areas for allow versus block at one calibrated probability. Raise only miss price to reverse the cheaper action, then expose one review slot for two cases.',
     prediction: 'Does a fixed score contain a policy-independent action?', score: .85, policies: [[.2, .8], [.4, .9]],
-    caption: 'The same score can fall in different policy regions. Here, 0.85 means block under A and review under B. Thresholds require a declared policy.',
+    missPrices: [1, 5], alarmPrice: 10,
+    headline: 'Probability stays fixed; error prices and review capacity determine actions',
+    caption: 'Use calibrated probabilities to compare expected error costs. At probability 0.85, a cheap miss favors allowing; making misses five times costlier favors blocking. The prediction stays fixed while error prices change. Review or abstention is a separate option, constrained by available capacity. Two uncertain cases cannot both enter one review slot. Uncalibrated scores do not justify these probability-based costs.',
   },
   'fixed-capacity-portfolio-guardrails': {
     operation: 'budget-transfer', review: 'The transfer should be countable and the protected accounts visible. Reassign six identified budget units while retaining the other 94.',
     prediction: 'Which account gives up the six points, and which two accounts do not move?',
   },
   'adamw-decoupled-shrinkage': {
-    operation: 'decay-bypass', review: 'Equal result bars omit the route. Put coupled decay through the preconditioner and let direct decay visibly bypass it.',
-    prediction: 'Which route changes when only the frozen preconditioner changes?', scales: [1, 10], base: .001,
+    operation: 'adam-memory-and-scale', review: 'The main Adam lesson must show its moment update, not only decay. Carry the actual two-step buffers forward, preserve the zero-gradient update, compare direction-memory removal and epsilon, then retain the separate decay routes.',
+    prediction: 'Does zero current gradient clear the second-coordinate direction buffer?', scales: [1, 10], base: .001,
+    gradients: [[2, 4], [2, 0]], beta1: .5, beta2: .5, learningRate: .1, epsilon: 0, tinyGradient: 1e-9, tinyEpsilon: 1e-8,
+    headline: 'Adam carries direction, rescales coordinates, and keeps decay separate',
+    plainLabels: { '/ 1': 'same', '/ 10': 'tenth' },
+    caption: 'Both buffers blend history: direction and raw squared gradients. Startup correction compensates for zero initialization; root-size then rescales each direction. A vanished gradient can leave an update because saved direction remains. Removing directional memory stops it. Epsilon limits cancellation for tiny gradients. Direct AdamW decay bypasses this route.',
   },
   'regularization-diagnose-and-target': {
     operation: 'coefficient-restraint', review: 'Replace the diagnostic table with exact coefficient motion. Enlarge the weak coordinate so stopping at zero differs visibly from scaling.',
     prediction: 'Which L1 coefficient returns when the threshold falls below 0.1?',
+    caption: 'For this quadratic fit, L1 moves coefficients a fixed distance toward zero and stops there. Small coefficients can disappear. L2 shrinks each coefficient by the same proportion, leaving both nonzero here. The magnified small-coefficient ruler makes those different motions visible.',
   },
   'cold-start-signal-handoff': {
     operation: 'density-update', review: 'A final density hides evidence weighting. Keep the prior, show the three observations, and reshape the whole density rather than declaring a point estimate.',
     prediction: 'Do three observations make every probability except 0.6 impossible?', successes: 2, failures: 1,
+    plainLabels: { 'Multiply by p x p x (1-p), then normalize': 'Combine evidence; reshape uncertainty' },
+    caption: 'Begin with an even spread of possible success rates. Success favors higher rates; failure favors lower ones. After two successes and one failure, the average becomes 60%, but many rates remain possible. Only shown outcomes count: missing exposure is not failure. Bounded exploration gathers evidence without treating the estimate as certainty.',
   },
   'dropout-inverted-expectation': {
-    operation: 'random-branch', review: 'Arithmetic does not distinguish a draw from its expectation. Branch one activation into two alternative realizations and reunite only their weighted average.',
+    operation: 'dropout-mode-and-shared-mask', review: 'Retain exclusive training branches, add the unmasked evaluation identity, use the actual squared-output counterexample to separate activation expectation from network averaging, and keep a channel-shared mask distinct from independent position masks.',
     prediction: 'Does one pass return the mean of the two branches?', input: 4, keep: .5,
+    plainLabels: { '0.5 x 0 + 0.5 x 8 = 4': 'Average across passes returns to 4' },
+    headline: 'Random masking preserves activation expectation; evaluation is identity, not exact nonlinear averaging',
+    caption: 'Training randomly drops or enlarges an activation; its expectation matches the input, not each draw. Standard evaluation uses no mask or extra scaling. A later nonlinear operation can break equality with averaged training predictions. Sharing one channel mask moves every spatial position together; independent masks need not. Gradient recording and train/eval mode are separate controls.',
   },
   'gmm-soft-responsibility': {
-    operation: 'split-observation', review: 'A stacked percentage hides observation identity. Divide one unit of observation mass between two updates without duplicating it.',
-    prediction: 'If both branches received a full observation, how much total mass would be counted?', fractions: [.7, .3],
+    operation: 'split-observation', review: 'Compute posterior responsibilities from actual Gaussian densities and mixture priors, preserve one unit of mass per point, and perform one weighted mean/variance/mixture update. Show that the next E-step changes after fitting rather than duplicating observations or treating soft labels as fixed.',
+    prediction: 'Do three points become six observations during fitting?', points: [0, 2, 4], means: [0, 4], variances: [4, 4], priors: [.5, .5],
+    headline: 'Normalize component evidence per point, then refit with fractional observation mass',
+    caption: 'Choose a component by its mixture weight, then draw from that Gaussian. For observed data, combine each component\'s density and prior, then normalize across components. Each point still supplies one unit of mass. EM uses these fractional weights to refit component means, covariances, and mixture weights, then recomputes responsibilities. Soft assignment differs from nearest-center clustering. Covariance restrictions, held-out fit, initialization, and collapse prevention remain separate choices.',
   },
   'mutual-information-noisy-channel-budget': {
-    operation: 'binary-channel', review: 'An information budget hides conditional dependence. Route fair input bits mostly straight through, with thin crossover paths for flips.',
+    operation: 'observation-uncertainty', review: 'Retain the fair-bit conditional paths, then partition the same one-bit uncertainty into residual and removed shares. Equalize both outgoing paths to preserve fair marginals while removing all predictive value.',
     prediction: 'If both outgoing paths became equally likely, would the input still predict the output?', flip: .1,
+    caption: 'Fair input has one bit of uncertainty. A noisy output removes only some: 0.531 bits here, while 0.469 remain. Equal marginal frequencies do not imply independence; the conditional paths matter. Making both outgoing paths equally likely removes predictive value. Dependence does not establish causation.',
+    plainLabels: { 'Input: 50/50': 'Equal input shares', 'Output: 50/50': 'Equal output shares' },
   },
   'clt-data-vs-sample-means': {
     operation: 'average-distribution', review: 'Two densities omit averaging itself. Gather ten skewed observations into one mean while retaining the original source density.',
@@ -749,31 +883,43 @@ export const mentalPictures = {
     caption: 'The original exponential population stays unchanged. Ten independent observations produce one mean. Here, its exact Gamma density is narrower. Its population variance is one tenth.',
   },
   'cnn-spatial-channel-pyramid': {
-    operation: 'channel-pooling', review: 'Shape tokens obscure the reduction axes. Collapse each actual spatial map into its own output while preserving channel color and identity.',
+    operation: 'convolution-and-pooling', review: 'Reuse one local filter across overlapping image patches, then distinguish spatial reduction from channel identity in a separate pooling example.',
     prediction: 'How many outputs remain when only the spatial axes are averaged?', channels: 3, side: 4,
+    image: [[1, 2, 3], [4, 5, 6]], kernel: [1, 0, 0, -1],
+    headline: 'Reuse local filter weights; pooling removes space, not channels',
+    plainLabels: { '/ 16': 'mean' },
+    caption: 'Each filter reuses its learned weights across local patches, producing one spatial channel. This filter keeps top-left and subtracts bottom-right. Neighboring patches may reuse source pixels. More positions do not require more filter weights. In the separate pooling example, each channel collapses to one number. Averaging spatial positions does not merge channels, and the lost spatial arrangement cannot be recovered from those means.',
   },
   'exponential-family-sufficient-stat-moment-match': {
-    operation: 'sufficient-compression', review: 'A sum ledger hides what is discarded. Permute the observed bits, then compress both orders into the same count pair.',
-    prediction: 'Can the Bernoulli likelihood distinguish these two orders under the stated independent model?', outcomes: [1, 0, 1, 1, 0], permutation: [1, 0, 3, 4, 2],
+    operation: 'sufficient-compression', review: 'Retain the same Bernoulli likelihood under permutation, then compare observed and model-expected sufficient counts on one scale. Connect normalized natural-parameter tilting to the interior moment condition and explicitly reject a finite interior natural-parameter fit for all-success data.',
+    prediction: 'Does all-success data give a finite natural parameter?', outcomes: [1, 0, 1, 1, 0], permutation: [1, 0, 3, 4, 2],
+    headline: 'Compress sufficient counts, normalize the model, and match moments only where an interior fit exists',
+    caption: 'Natural parameters tilt weights; the log-partition function normalizes probabilities. Under this independent Bernoulli model, order is discarded but three successes and five trials remain. An interior maximum-likelihood fit matches the model\'s expected count to three. All-success data instead pushes the fit to probability one, requiring an unbounded natural parameter. Sufficient statistics depend on the assumed family; different models can require different summaries.',
   },
   'fp16-bf16-bit-budget': {
-    operation: 'bit-reassignment', review: 'One format alone hides the tradeoff. Reassign three of the same sixteen physical bit slots from fraction to exponent.',
-    prediction: 'Can this fixed-size layout add exponent bits without taking them from another field?', formats: [[1, 5, 10], [1, 8, 7]],
+    operation: 'bit-reassignment', review: 'Keep both sixteen-bit layouts, then apply their actual near-one spacing, nearest-even rounding and finite exponent limits. Separate scaled integer rounding from saturation and accumulation precision rather than equating a larger exponent budget with smaller-update fidelity.',
+    prediction: 'Does wider range preserve smaller updates?', formats: [[1, 5, 10], [1, 8, 7]], value: 1.003, large: 70000,
+    headline: 'Spend bits on range or resolution; distinguish rounding, overflow, and scaled-integer saturation',
+    caption: 'Both sixteen-bit formats trade exponent range against fraction resolution. Near one, BF16 spacing is eight times wider: 1.003 rounds to one, while FP16 keeps about 1.00293. At 70000, FP16 overflows but BF16 remains finite and inexact. Accumulation precision is separate. Scaled INT8 instead maps values to bounded integer codes; finer scale improves local resolution but narrows range. Saturation is not rounding noise.',
   },
   'label-smoothing-finite-confidence-optimum': {
     operation: 'target-redistribution', review: 'A two-part bar hides where the uniform mass goes. Spread ten of one hundred target units across all five classes, including the true one.',
     prediction: 'Does the true class also receive its share of the uniform mass?', classes: 5, retained: 90, redistributed: 10,
+    plainLabels: { '90 + 2 = 92 for the true class': 'True class keeps its mass and receives a share too' },
+    caption: 'Most target mass stays with the true class. The redistributed mass is spread equally across every class, including the true one. The target therefore prefers the true class without demanding total certainty. The smaller classes remain possible rather than receiving zero target mass.',
   },
   'capacity-regimes-double-descent': {
-    operation: 'interpolation-freedom', review: 'An error curve can become another memorized shape. Pin two continuous fits to the same observations and expose their unconstrained between-point disagreement.',
-    prediction: 'Do the three observed pins determine the prediction halfway between them?',
-    headline: 'Two perfect training fits disagree between observed points',
-    caption: 'Both curves pass through the three observed points. One shared deformation parameter changes predictions between observations. Training fit alone cannot choose between them. The derivation shows a possible double-descent regime.',
-    gains: [0, 2], observed: [0, 1, 2], probe: .5,
+    operation: 'interpolation-freedom', review: 'Two perfect fits only show underdetermination. Compare two possible noisy samples in nested one-, five-, and thirty-seven-feature families. Distinguish mean displacement from sample spread, and demonstrate second descent under an explicit minimum-coefficient-norm fit.',
+    prediction: 'Which fit confines noise while still matching every observed pin?',
+    headline: 'Repeated samples reveal bias, variance, and a possible second descent',
+    caption: 'Noise moves an observed pin while truth stays fixed. At the probe, the center’s offset from truth is bias; the fits’ spread is variance. Rigid fits stay biased; interpolation spreads noise broadly. Extra local modes let a minimum-norm fit confine distortion and reduce variance again. This depends on feature geometry and the fit rule, not parameter count alone.',
+    observed: [0, .5, 1, 1.5, 2], probe: .25, noise: .8, localModes: 32,
   },
   'mle-bernoulli-parameter-sweep': {
     operation: 'likelihood-candidates', review: 'A final peak hides what is held fixed. Pass the same five outcomes through three candidate probabilities and multiply their evidence factors.',
     prediction: 'Why do the two failures penalize the 0.9 candidate?', outcomes: [1, 0, 1, 1, 0], candidates: [.2, .6, .9],
+    plainLabels: { 'p=0.2': 'Chance 0.2', 'p=0.6': 'Chance 0.6', 'p=0.9': 'Chance 0.9' },
+    caption: 'Each candidate probability must explain the same observed successes and failures. A high success probability favors the successes but makes the failures surprising. Combining all five observations favors the candidate matching their balance, not the candidate most confident about success.',
   },
   'activation-gradient-regions': {
     operation: 'local-slope', review: 'Derivative curves do not show what a local slope measures. Draw forward responses and equal input nudges whose vertical changes differ.',
@@ -785,18 +931,24 @@ export const mentalPictures = {
     totalLabel: 'A chance node combines both possible outcomes.',
   },
   'belief-propagation-branch-summary': {
-    operation: 'weighted-values', review: 'Show marginalization as gathering both weighted hidden-state contributions, rather than choosing a hidden state.',
-    prediction: 'What contribution disappears if the second hidden state is wrongly discarded?', weights: [.3, .7], values: [2, .5], expected: [.6, .35], normalized: true, widthUnit: .1, heightUnit: .5, unit: .05,
+    operation: 'tree-message-and-sum', review: 'Put the conserved hidden-state contributions inside a factor-message route. Exclude the recipient reply, compute both target-state weights, and normalize the outgoing message rather than claiming a final marginal.',
+    prediction: 'Which incoming branch must the outgoing message exclude?', weights: [.3, .7], values: [2, .5], expected: [.6, .35], normalized: true, widthUnit: .1, heightUnit: .5, unit: .05,
+    otherValues: [.5, 2], recipientReply: [100, 1],
+    headline: 'Exclude the recipient branch, sum hidden states, then normalize the outgoing message',
     totalLabel: 'The message is a sum, before later normalization.',
+    caption: 'Send toward X using evidence from other branches. Exclude X\'s returning message. For each X state, sum all weighted hidden-state contributions, then normalize the outgoing weights. Choosing only one hidden state loses evidence. This outgoing message is not X\'s final belief. Tree passes avoid revisiting evidence; cycles need iteration and may not converge.',
   },
   'content-profile-scores-new-item': {
     operation: 'weighted-values', review: 'A dot-product ledger hides feature alignment. Give the two aligned coordinate products their own equal-scale areas.',
     prediction: 'Can swapping the item coordinates change the match score?', weights: [2, 1], values: [1, 3], expected: [2, 3], widthUnit: 1, heightUnit: 1, unit: 1, widthLabel: 'interest', heightLabel: 'item feature',
   },
   'ring-attention-fixed-query-kv-cycle': {
-    operation: 'weighted-values', review: 'Equal local averages obscure unequal evidence. Weight each local answer by its share of the combined normalizer.',
+    operation: 'rotate-kv-and-normalize', review: 'Keep both queries on their devices while two KV blocks exchange positions. Each query visits every block once; then retain the unequal-normalizer contribution calculation for Q0.',
     prediction: 'Why is the answer not the equal average six?', weights: [.2, .8], values: [2, 10], expected: [.4, 8], normalized: true, widthUnit: .2, heightUnit: 2, unit: .4,
     totalLabel: 'Normalizers 2 and 8 supply these unequal weights.',
+    blocks: ['A', 'B'], normalizers: [2, 8],
+    headline: 'Keep queries local, rotate KV blocks, and merge one shared normalization',
+    caption: 'Each query stays on its device while every KV block rotates past it. Accumulate weighted values with one running normalization; do not average separately normalized block answers. For Q0, the second block carries four times the normalization weight, so the combined answer is 8.4, not 6. Blocking future tokens changes eligible contributions, not the need to share normalization.',
   },
   'pca-rank-one-projection': {
     operation: 'geometric-action', mode: 'projection', review: 'Make the retained line a physical constraint. Drop the observation onto it and retain the discarded perpendicular tether.',
@@ -805,14 +957,19 @@ export const mentalPictures = {
   'relu-second-moment-through-depth': {
     operation: 'gain-cascade', review: 'Initialization is a repeated moment multiplier, not a promise of universal stability. Carry the second moment through ten layers.',
     prediction: 'Can repeatedly losing half the second moment preserve its initial scale?', gains: [.5, 1], count: 10,
+    headline: 'Compensating for ReLU can preserve the second moment through depth',
+    plainLabels: { 'The same signal passes every local gate': 'Second-moment scale crosses each layer', 'Every gate multiplies by 0.5': 'Uncompensated: lose half per layer', 'Every gate multiplies by 1': 'Compensated: keep the scale', 'Ten gates can shrink or amplify.': 'Uncompensated loss compounds.' },
+    caption: 'For symmetric, zero-centered inputs, ReLU discards half the expected squared signal. Equal halving at each layer compounds. Wider layers need smaller initial weights; ReLU’s lost half needs compensating weight scale. This preserves the expected second moment under independence assumptions, not every activation or gradient in a trained network.',
   },
   'importance-weights-effective-sample-size': {
     operation: 'weighted-draws', review: 'Repeated weight is easily mistaken for repeated evidence. Keep exactly five observation identities while enlarging their influence areas.',
     prediction: 'Does enlarging the first draw create another independent observation?', weights: [6, 1, 1, 1, 1],
+    plainLabels: { 'ESS = 10 squared / 40 = 2.5': 'Effective independent sample size: 2.5' },
   },
   'position-bias-inverse-examination-weight': {
     operation: 'weighted-draws', review: 'Keep one observed click visibly singular while its inverse-examination contribution expands to five units.',
     prediction: 'Does a weight of five mean that five clicks were observed?', weights: [5], examination: .2,
+    plainLabels: { 'Examination 0.2: weight = 5': 'One-in-five examination enlarges its weight to five' },
   },
   'flow-local-volume-density': {
     operation: 'mass-expansion', review: 'Trace four persistent probability marks through a doubled domain. Expand space without multiplying observations or mass.',
@@ -829,22 +986,30 @@ export const mentalPictures = {
   'scaling-fixed-compute-allocation': {
     operation: 'rectangle-exchange', review: 'A hyperbola hides the conserved resource. Reshape the same eight compute tiles by exchanging parameter and token axes.',
     prediction: 'Can both dimensions double while these eight tiles stay fixed?', shapes: [[2, 4], [4, 2]], labels: ['parameters', 'tokens'],
+    plainLabels: { '2 parameters x 4 tokens': '2 parameter units, 4 token units', '4 parameters x 2 tokens': '4 parameter units, 2 token units' },
   },
   'residual-add-gradient-split': {
     operation: 'copied-gradient', review: 'At addition, an adjoint is copied, not divided like probability mass. Follow full upstream sensitivity into both routes before their input contributions add.',
     prediction: 'Does the identity path receive only half of the upstream gradient?', upstream: 2.2, derivative: .1,
+    plainLabels: { '2.2 + 0.22 = 2.42': 'Both input routes contribute: total 2.42', 'x 1': 'same', 'x 0.1': 'tenth' },
   },
   'potential-shaping-cancels-backtracking': {
     operation: 'potential-loop', review: 'Show the return trip undoing the same potential gain. A closed physical loop makes the cancellation memorable.',
     prediction: 'Can cycling between these two states accumulate undiscounted potential reward?', potentials: [2, 5, 2],
+    plainLabels: { 'Undiscounted loop reward: +3 - 3 = 0': 'Returning repays the gain: no net loop reward' },
   },
   'gae-residual-weight-trace': {
     operation: 'backward-fold', review: 'The weighted sum hides its time direction. Pull the future accumulator backward, decay it, then add the current residual.',
     prediction: 'Which residual crosses two decay boundaries before reaching the first time step?', residuals: [1, 2, -1], decay: .8,
+    plainLabels: { '-1 + 0.8 x 0': 'Terminal step has no future contribution', '2 + 0.8 x -1': 'Combine this residual with the weakened future', '1 + 0.8 x 1.2': 'Combine the first residual with the weakened future', 'x .8': '80%' },
+    caption: 'Start at the end and carry its residual backward. Each boundary weakens what comes from the future; each earlier step contributes its own residual. Distant effects cross more boundaries and therefore receive less weight.',
   },
   'bert-mlm-selection-and-corruption': {
-    operation: 'target-corruption', review: 'Target membership and visible replacement are different sets. Keep token identities through selection and show unchanged targets inside the selected group.',
+    operation: 'bidirectional-target-corruption', review: 'Show context on both sides feeding a masked position, compare its illustrative prediction with the original target, then preserve the separate selection/corruption inventories.',
     prediction: 'Can an unchanged visible token still contribute a prediction loss?', total: 1000, counts: [120, 15, 15, 850], unit: 5,
+    tokens: ['the', 'cat', 'sat'], selected: 1, candidates: ['cat', 'dog', 'mat'], probabilities: [.7, .2, .1],
+    headline: 'Predict original tokens from both sides; selected targets survive corruption',
+    caption: 'BERT predicts selected original tokens from corrupted input, using context on both sides. Here the target remains cat when its input becomes MASK. The prediction distribution is illustrative, not a trained result. Selection and corruption differ: unchanged selected tokens still contribute loss. After pretraining, fine-tune the encoder for a downstream task; this is not left-to-right generation.',
   },
   'bootstrap-resampling-unit': {
     operation: 'cluster-resample', review: 'User identities must carry their paired events. Duplicate an entire selected user cluster, not unrelated event rows.',
@@ -853,18 +1018,27 @@ export const mentalPictures = {
   'bptt-detach-cuts-gradient-not-state': {
     operation: 'gradient-boundary', review: 'A table cannot distinguish forward transport from reverse sensitivity. Let the hidden value cross a wall while the returning gradient stops.',
     prediction: 'Does stopping the gradient reset the hidden value to zero?', value: 2,
+    plainLabels: { 'h=2': 'state 2' },
   },
   'ctc-blank-preserves-repeat': {
-    operation: 'alignment-collapse', review: 'The blank is a separator before it is deleted. Track the two surviving a identities across both ordered transformations.',
+    operation: 'ctc-collapse-and-marginalize', review: 'Retain ordered repeat merging and blank deletion, then enumerate every compatible four-frame path and add their probabilities instead of selecting one alignment.',
     prediction: 'Would deleting the blank before merging leave the same number of a outputs?', path: ['a', 'a', '_', 'a'],
+    alphabet: ['a', '_'], transcript: 'aa',
+    headline: 'CTC adds every compatible alignment; blanks preserve repeated outputs',
+    caption: 'Merge adjacent repeats before removing blanks. A blank separates two surviving a outputs. Training adds the weights of every alignment that collapses to the transcript, rather than choosing one. Here five paths produce aa. Their combined chance exceeds one path\'s chance. All sixteen paths are equally likely only in this toy; learned frame probabilities generally differ.',
   },
   'im2col-patches-become-columns': {
-    operation: 'patch-columns', review: 'The matrix alone hides overlap. Select two neighboring patches from one image and preserve each pixel identity in the resulting columns.',
+    operation: 'patch-product-and-backward', review: 'Retain source-to-column identity, apply one actual filter row to both columns, then scatter both shared-pixel gradients back to one original location rather than averaging copies.',
     prediction: 'Why do the middle image pixels appear in both output columns?', image: [[1, 2, 3], [4, 5, 6]],
+    kernel: [1, 2, 3, 4], outputGradients: [1, 1],
+    headline: 'Unfold patches, apply one filter row, then accumulate gradients at shared source pixels',
+    caption: 'Unfold patches into columns and apply the same filter row to every column. This filter gives 37 and 47. During backward computation, repeated entries send gradients to the original pixel. Shared pixel 2 receives 2 and 1, giving 3 rather than an average. Explicit columns cost extra storage; an implicit kernel can generate the same entries as needed.',
   },
   'gqa-eight-queries-two-kv-groups': {
-    operation: 'shared-memory', review: 'A list can imply merged outputs. Fan eight distinct queries out from two shared KV stores and retain eight distinct result identities.',
-    prediction: 'Does sharing two KV groups reduce eight query outputs to two?', groups: 2, perGroup: 4,
+    operation: 'shared-memory', review: 'Retain all eight query/output identities and add equal-dimension cache accounting for MHA, GQA and MQA. Two scalar queries must produce different softmax outputs from the same cached keys/values; qualify physical copies, quality, conversion and latency.',
+    prediction: 'Does sharing two KV groups reduce eight query outputs to two?', groups: 2, perGroup: 4, layers: 32, tokens: 1024, headWidth: 64, elementBytes: 2,
+    headline: 'Share key/value stores, not query outputs; compare cache bytes at fixed dimensions',
+    caption: 'GQA shares key/value projections while retaining every query head and its separate output. Hold layers, lengths, head width and dtype fixed when comparing cache bytes. MQA shares one store; MHA keeps all stores. Different queries can weight shared values differently. Cache savings do not establish equal compute or latency savings. Materialized repeats can undo storage savings; quality and conversion require validation.',
   },
   'multi-head-attention-split-recombine': {
     operation: 'feature-partition', review: 'Splitting boxes can accidentally split time. Cut the feature columns while keeping every token row in each head, then reassemble them.',
@@ -879,33 +1053,46 @@ export const mentalPictures = {
     prediction: 'Does reusing the earlier keys remove them from the newest query?', pairs: 4,
   },
   'attention-causal-mask-row': {
-    operation: 'causal-frontier', review: 'Zeros in a row look like ordinary small weights. Put an explicit time barrier before future positions and stop their contribution routes.',
-    prediction: 'Can a future key contribute a tiny positive amount through this mask?', weights: [.2, .3, .5, 0, 0], query: 2,
+    operation: 'causal-frontier', review: 'Compute scaled dot-product scores, apply a Boolean allowed-key mask before stable key-axis softmax and weight actual values. Preserve the time barrier and derive its weights rather than stipulating them. Change future keys/values and separately show why zeroed logits and fully masked rows need care.',
+    prediction: 'Can a future key contribute a tiny positive amount through this mask?', query: 2, queryVector: [1, 1, 1, 1], keys: [[0, 0, 0, 0], [.5, .5, .5, .5], [1, 1, 1, 1], [9, 9, 9, 9], [10, 10, 10, 10]], values: [2, 4, 8, 100, 1000],
+    headline: 'Scale scores, block disallowed keys before normalization, then sum their weighted values',
+    caption: 'Each query scores keys and normalizes only allowed positions before combining their values. Boolean true means allowed. Causal future scores become negative infinity, giving zero weight even if future values grow. Zeroing logits instead leaves positive softmax weight. Normalize across keys, not queries. Tensor axes and output width stay intact. Fully masked rows need an explicit policy; stable softmax and suitable precision remain necessary.',
   },
   'mixup-cutmix-input-target-coupling': {
     operation: 'clipped-image-mass', review: 'The target must follow the pixels actually inserted. Clip a sampled rectangle at the image edge and count only its thirty visible pixels.',
     prediction: 'Should the target use the sampled 42 pixels or the realized 30?', side: 10, patch: [5, 2, 7, 6],
+    plainLabels: { '30 inserted pixels / 100 = 0.3': 'Inserted pixels occupy 30% of the image', 'Sampled 7 x 6; realized 5 x 6': 'Sampled 42 pixels; 30 remain inside the image' },
     caption: 'The sampled patch extends beyond the image. Clipping leaves 30 of 100 pixels. Its target weight is 0.3. The retained base contributes 0.7.',
   },
   'pruning-shape-versus-zeros': {
     operation: 'remove-structure', review: 'Count physical matrix slots before and after removal. Zeroing values keeps nine slots; deleting a row leaves six.',
     prediction: 'Does filling a channel with zeros change the dense matrix shape?', values: [[1, 0, 2], [0, 0, 0], [3, 0, 4]], removed: 1,
+    plainLabels: { 'Only zero the values: still 3 x 3': 'Zeroed values: all nine slots remain', 'Remove the whole zero channel: 2 x 3': 'Channel removed: six slots remain' },
+    caption: 'Setting values to zero leaves the dense matrix’s slots and shape unchanged. Removing the whole zero channel removes its slots too. Sparsity in stored values and a smaller dense structure are different changes; only the latter directly reduces this matrix’s shape.',
   },
   'domain-adaptation-shift-assumptions': {
-    operation: 'relabel-population', review: 'Input matching is insufficient when labels flip. Keep the same four input identities while changing only their class colors.',
-    prediction: 'Can a method checking only the input counts detect this reversed rule?', inputs: [0, 0, 1, 1], labels: [[0, 0, 1, 1], [1, 1, 0, 0]],
+    operation: 'relabel-population', review: 'Show why stable within-bin errors produce a different target risk under a changed mixture, and why that reweighting fails when conditional errors change or source support is absent.',
+    prediction: 'Would the same weights repair a changed within-bin error rate?', inputs: [0, 0, 1, 1], labels: [[0, 0, 1, 1], [1, 1, 0, 0]],
+    sourceMass: [.8, .2], targetMass: [.2, .8], errors: [.1, .4], changedErrors: [.1, .7],
+    plainLabels: { 'y=0': 'class 0', 'y=1': 'class 1' },
+    headline: 'Reweight a changed input mixture only while its conditional error rule still holds',
+    caption: 'Stable within-bin errors give sixteen source mistakes but thirty-four target mistakes per hundred. With shared support, reweighting source bins reproduces that target risk; it does not prove the rule stayed fixed. The lower scene keeps input frequencies unchanged while reversing labels: input matching cannot reveal that conditional change. Absent source support cannot be repaired by invented weights.',
   },
   'grpo-group-relative-signal': {
     operation: 'centered-group', review: 'Success markers alone imply useful preference. Subtract the shared group level from each equally rewarded output and show every residual vanish.',
     prediction: 'Which output receives a positive centered preference when all rewards equal one?', rewards: [1, 1, 1, 1],
   },
   'normalization-shared-statistics': {
-    operation: 'axis-pooling', review: 'The mean table hides the pooling axis. Encircle rows and then columns of the same four values before computing the two different summaries.',
-    prediction: 'Would exchanging the two samples change which features share a BatchNorm mean?', values: [[1, 3], [5, 7]],
+    operation: 'normalization-and-companions', review: 'Keep the exact row/column pooling example, then change only its companion row to alter BatchNorm outputs while preserving LayerNorm. Contrast RMS scaling and saved-statistics evaluation.',
+    prediction: 'Do the first example\'s LayerNorm outputs change?', values: [[1, 3], [5, 7]], companion: [-3, -1], evaluationValue: 9,
+    headline: 'Changing a companion changes shared normalization, not per-example normalization',
+    caption: 'Normalization gathers a chosen group, subtracts its mean, and rescales its spread. BatchNorm shares columns across examples; LayerNorm works within one example. Moving only the companion flips this first example\'s BatchNorm outputs, not its LayerNorm outputs. RMSNorm rescales without centering. At evaluation, BatchNorm uses saved statistics. This toy omits epsilon and learned rescaling.',
   },
   'streaming-metrics-counts-before-f1': {
     operation: 'count-pooling', review: 'Metric averaging loses the observation denominator. Concatenate the three categories of case identities before computing one nonlinear ratio.',
     prediction: 'Why does the one-case shard not receive half the pooled denominator?', shards: [[8, 2, 2], [1, 0, 0]],
+    plainLabels: { 'F1 = 18 / 22 = 0.8182': 'Pooled F1: about 0.818' },
+    caption: 'Combine the underlying hits, misses, and false alarms before computing the score. A small shard contributes fewer cases, not an equal vote. Averaging shard scores loses those denominators and can change the result. Pooling counts preserves every case’s contribution.',
   },
   'kmeans-assign-then-update': {
     operation: 'assigned-centers', review: 'Move each center to the balance point of its assigned observations, while keeping the assignment colors fixed.',
@@ -914,15 +1101,17 @@ export const mentalPictures = {
   'lora-zero-impact-first-gradient': {
     operation: 'arithmetic-paths', review: 'A zero output does not sever every sensitivity route. Compare the factor that vanishes in each initial derivative.',
     prediction: 'Which factor has a nonzero first gradient despite the zero adapter output?', paths: [
-      { label: 'Forward: B times Ax', inputs: [0, 2], operator: 'multiply', result: 0 },
-      { label: 'B sensitivity: upstream times Ax', inputs: [3, 2], operator: 'multiply', result: 6 },
-      { label: 'A sensitivity: upstream times Bx', inputs: [3, 0], operator: 'multiply', result: 0 },
+      { label: 'Adapter output starts at zero', inputs: [0, 2], operator: 'multiply', result: 0 },
+      { label: 'Gradient to the initially zero factor', inputs: [3, 2], operator: 'multiply', result: 6 },
+      { label: 'Gradient to the other factor', inputs: [3, 0], operator: 'multiply', result: 0 },
     ],
+    caption: 'The adapter starts with no effect on predictions. Yet changing its zero factor would expose the other factor, so that route receives a gradient. The reverse route remains blocked by the factor that is still zero.',
   },
   'gp-conditioning-local-uncertainty': {
-    operation: 'uncertainty-pin', review: 'A single standard-deviation curve hides the constrained prediction envelope. Pin the whole symmetric band at the observed input and let it reopen with distance.',
-    prediction: 'Does one noiseless observation eliminate uncertainty everywhere?',
-    caption: 'The noiseless observation pins uncertainty at zero. The symmetric band shows plus or minus one posterior standard deviation. This unit RBF example reopens away from the observed input.',
+    operation: 'gp-mean-noise-envelope', review: 'Condition the mean and latent covariance of one explicit unit-RBF observation, then change observation noise on identical axes. Separate latent-function uncertainty from future-observation noise and show that changing the observed value changes the mean, not the fixed-kernel covariance.',
+    prediction: 'Does a noisy observation pin latent uncertainty to zero?', observed: 1, noise: 1,
+    headline: 'Kernel covariance controls the mean response and uncertainty reduction; observation noise prevents an exact pin',
+    caption: 'A GP conditions a joint Gaussian using its kernel and observation noise. This unit-RBF example bends the mean toward one observation and reduces latent uncertainty where kernel similarity is high. Noiseless evidence pins that input; noisy evidence leaves uncertainty. Future observations also add their own noise. Changing the observed value changes the mean, not fixed-kernel covariance. These bands are model-conditional, not automatic calibration. Kernel choice and exact-inference scaling matter.',
   },
   'distillation-temperature-dark-knowledge': {
     operation: 'soften-mass', review: 'A rounded table does not expose redistributed probability. Recompute exact softmax masses and transfer width from the winner to both alternatives.',
@@ -934,17 +1123,23 @@ export const mentalPictures = {
     caption: 'This illustrative game has values 0, 2, 1, and 6 for empty, A, B, and both. Order changes marginal credit. Averaging both orders gives A 3.5 and B 2.5.',
   },
   'decoding-fixed-count-adaptive-mass': {
-    operation: 'mass-cutoffs', review: 'A stacked mass bar does not expose membership. Keep one hundred probability units and select the same token identities under two different rules.',
+    operation: 'token-filter-and-sequence', review: 'Preserve named tokens through temperature, cutoff membership and renormalization. Append one sampled token to the prefix, then distinguish next-step selection from the post\'s two-token sequence comparison.',
     prediction: 'Why must the 0.8 cutoff include a third token?', counts: [45, 25, 15, 10, 5], selected: [2, 3],
+    tokens: ['A', 'B', 'C', 'D', 'E'], temperature: 2, samplePosition: .9, firstChoices: [.6, .4], continuations: [.5, .9],
+    headline: 'Filter named tokens, renormalize, and distinguish a local choice from a complete sequence',
+    caption: 'Temperature changes probabilities before filtering; order matters. Top-k keeps a fixed count; top-p includes the crossing token. Renormalize retained tokens, then sample and append one. Repeat from the new prefix until EOS or the budget. Greedy picks locally; beams compare scored prefixes but may prune the best sequence. The toy shows why a weaker first token can win overall. Probability is not truth.',
   },
   'forward-backward-viterbi-chain-objectives': {
-    operation: 'joint-paths', review: 'Separate most-probable marginals can imply a most-probable path. Show the four complete-path masses and pool them along each time axis.',
+    operation: 'joint-paths', review: 'Retain the complete-path mass counterexample, then explicitly sum and maximize the same incoming terms, retain predecessor identities and backtrack. Show what backward messages condition on and retain exact float32 short-rare versus long-common underflow controls.',
     prediction: 'Is the path AB formed by the marginal winners the largest single path?', masses: [.35, .3, .05, .3],
+    headline: 'Sum paths for state marginals; keep maxima and backpointers for one complete path',
+    caption: 'Forward messages sum incoming path mass; backward messages supply remaining evidence. Normalize their product for state marginals. Viterbi keeps the largest incoming mass and a predecessor per state, then backtracks one complete path. Marginal winners can disagree with that path. Use log space or tracked scaling; impossible evidence has no normalized posterior.',
   },
   'learning-rate-range-to-schedule': {
-    operation: 'iterative-step', review: 'A sweep curve hides the local stability mechanism. Run three update gains from the same quadratic coordinate and show contraction, oscillation, or growth.',
-    prediction: 'Does crossing the minimum necessarily mean the iterations diverge?', rates: [.1, .9, 1.1], steps: 3,
-    caption: 'For loss x squared, the update multiplies x by one minus twice the learning rate. These three-step fixtures contract, oscillate, or grow. A range test still requires observed task evidence.',
+    operation: 'iterative-step', review: 'Use the actual loss curvature ten and rates 0.1/0.2/0.25, showing coordinates and losses rather than a different bowl. Double curvature as a separate control, then compute the specified warmup/cosine checkpoints and distinguish a disposable sweep from a controlled full-schedule trial.',
+    prediction: 'Does finite oscillation at rate 0.2 establish progress?', rates: [.1, .2, .25], steps: 2, gradientScale: 10,
+    headline: 'Check the actual update and loss, then test a complete schedule from a clean starting state',
+    caption: 'One plain-SGD rate reaches the minimum. Another oscillates without progress; the third grows the error. Finite coordinates do not prove improvement. Doubling curvature changes which rate is stable. A disposable range test proposes candidates, not independent full-run comparisons. Restore model, optimizer and schedule state before testing the intended warmup and decay at a controlled budget. Optimizer, reduction and gradient scale matter; these bounds are not universal.',
   },
   'l1-l2-first-contact-geometry': {
     operation: 'constraint-contact', review: 'Endpoints alone do not show why one coordinate disappears. Project the same target onto an actual diamond and circle with equal geometric scales.',
@@ -953,35 +1148,42 @@ export const mentalPictures = {
   'q-learning-off-policy-backup': {
     operation: 'arithmetic-paths', review: 'The behavior and backup choices should be different operations. Keep the sampled value two visible while the maximizing target route selects five.',
     prediction: 'Does the backup use the behavior action simply because it was sampled?', paths: [
-      { label: 'Backup chooses max; behavior chose two', inputs: [2, 5], operator: 'maximum', result: 5 },
-      { label: 'Discount the selected next value', inputs: [.9, 5], operator: 'multiply', result: 4.5 },
-      { label: 'Add the immediate reward', inputs: [1, 4.5], operator: 'add', result: 5.5 },
+      { label: 'Backup selects five; behavior sampled two', inputs: [2, 5], operator: 'maximum', result: 5 },
+      { label: 'Discount the selected next value', inputs: [5, .9], operator: 'multiply', result: 4.5 },
+      { label: 'Combine with the immediate reward', inputs: [1, 4.5], operator: 'add', result: 5.5 },
     ],
+    caption: 'Behavior may explore a lower-valued next action. The learning target instead selects the best estimated next action, discounts its value, and combines it with immediate reward. Exploration and backup therefore follow different paths.',
   },
   'autograd-shared-node-accumulate-then-propagate': {
     operation: 'arithmetic-paths', review: 'Propagating a partial contribution early loses the shared-node sum. Make accumulation precede the local derivative gate.',
     prediction: 'What contribution is missing if the first branch propagates before the second arrives?', paths: [
       { label: 'Collect both incoming contributions', inputs: [12, 2], operator: 'add', result: 14 },
-      { label: 'Then propagate through du/dx = 3', inputs: [14, 3], operator: 'multiply', result: 42 },
+      { label: 'Scale the collected signal once', inputs: [14, 3], operator: 'multiply', result: 42 },
     ],
+    caption: 'Two downstream branches depend on the same earlier value. Both contributions must arrive before the combined signal travels farther backward. Forwarding the first contribution alone would lose the influence of the second branch.',
   },
   'reparameterization-gradient-path': {
     operation: 'fixed-noise', review: 'The noise must remain external while the transformation moves. Pin one epsilon draw and move only the location parameter on the output ruler.',
     prediction: 'Is another noise sample needed to differentiate this one transformation?', epsilon: -1, sigma: .5, means: [2, 3],
+    plainLabels: { 'e=-1': 'noise -1' },
     caption: 'One fixed noise draw is minus one. With scale 0.5, changing the mean from two to three moves the sample from 1.5 to 2.5. Gradients follow the deterministic transformation.',
   },
   'fp16-loss-scaling-ledger': {
     operation: 'scale-before-round', review: 'Rounding is an irreversible threshold, not a reversible algebraic step. Compare scaling before the representation floor with multiplying a zero afterward.',
     prediction: 'Can multiplying the already rounded zero recover the original gradient?', exponent: -30, scaleExponent: 20,
-    caption: 'The gradient is two to the minus thirty. FP16 rounds it to zero. First scale by 2^20, giving 2^-10. Unscaling then recovers the original value.',
+    plainLabels: { '2^-30': 'tiny', '2^-10': 'scaled', 'Divide by 2^20 before the step: recover 2^-30.': 'Restore the original scale before the update.' },
+    caption: 'The unscaled gradient is too small for this representation and rounds to zero. Enlarge it before that boundary so it survives, then restore its original scale for the update. Enlarging the already rounded zero cannot recover the lost information.',
   },
   'ranking-metrics-per-rank-credit': {
     operation: 'rank-credit', review: 'Equal final values hide different collection rules. Follow the same relevance identities and show one metric stopping at the first hit.',
     prediction: 'Which metric can change if a later relevant item moves?', relevant: [false, true, false, true],
+    plainLabels: { '1/2': '1 of 2', '2/4': '2 of 4' },
+    caption: 'Both metrics see the same relevant results. Reciprocal rank stops collecting credit at the first hit. Average precision also collects credit from later hits, using precision at each hit’s position. Equal final scores here do not make their collection rules interchangeable.',
   },
   'lambdarank-swap-impact-weight': {
     operation: 'rank-displacement', review: 'A bar comparison hides rank location. Move the same relevant item through two equal-distance swaps on a fixed discount ladder.',
     prediction: 'Does moving by one rank cost the same near the top and near the bottom?', moves: [[1, 2], [9, 10]],
+    caption: 'The same relevant result moves one position in both comparisons. Near the top, that move loses much more discounted credit. The bottom move has a smaller effect. Pairwise training weights should reflect this unequal impact, not just how many ranks moved.',
   },
   'quantization-scale-granularity': {
     operation: 'quantization-ruler', review: 'The outlier changes representable spacing, not the original small values. Snap the same two signs onto coarse and fine rulers.',
@@ -992,8 +1194,10 @@ export const mentalPictures = {
     prediction: 'Is the ratio forbidden from reaching 1.6 when its objective contribution plateaus?', probes: [.6, 1.6],
   },
   'd-separation-conditioning-switch': {
-    operation: 'conditioning-paths', review: 'A truth table hides the graph motif. Draw chain and collider directions before marking how observing their middle changes connectivity.',
+    operation: 'conditioning-paths', review: 'Keep chain/collider directions and their conditioning switch, then normalize the lesson actual four OR input pairs. Show explaining away, a copied descendant, a non-collider transition and a nonfaithful active-path control without making causal claims.',
     prediction: 'Does observing the middle node always block the path?',
+    headline: 'Conditioning blocks a non-collider but can open a collider; normalized cases show the difference',
+    caption: 'A conditioned chain middle blocks its path. Conditioning on a collider or its descendant can open a path instead. Four equally likely OR inputs become three surviving cases, each with one third of the conditional mass. Learning the other parent changes the first parent’s chance: explaining away. Open paths permit association, not guarantees under every parameterization. All paths and the conditioning set matter; causal claims need additional assumptions.',
   },
   'causal-confounding-dag': {
     operation: 'confounding-intervention', review: 'Association is a surviving common-cause route. Compare observational assignment with an intervention that cuts the assignment edge without changing the outcome edge.',
@@ -1001,13 +1205,18 @@ export const mentalPictures = {
     caption: 'Prior engagement affects messages and churn in this graph. An intervention cuts engagement’s assignment arrow into messages. Association alone does not establish a messages-to-churn effect.',
   },
   'actor-critic-two-objective-flow': {
-    operation: 'actor-critic-routes', review: 'Differentiate shared features from the detached advantage target. Show both head gradients reaching the trunk while the actor-to-advantage route stops.',
+    operation: 'actor-critic-routes', review: 'Start with the actor action distribution and critic value baseline, compare realized return against that baseline, then distinguish shared-feature gradients from the stopped advantage-target route.',
     prediction: 'Does stopping the advantage route also stop the actor from updating shared features?',
+    probabilities: [.75, .25], baseline: 2, realizedReturn: 3,
+    headline: 'Actor chooses actions; critic supplies a baseline; both train shared features',
+    caption: 'The actor chooses actions; the critic estimates the state’s expected return. Compare the realized return with that baseline to form an advantage. Better-than-baseline outcomes encourage the chosen action; worse ones discourage it. Both losses train shared features, but advantage-target differentiation is stopped.',
   },
   'explain-backprop-one-loss-all-gradients': {
-    operation: 'reverse-fanout', review: 'One scalar objective should initiate one reverse flow. Follow a shared sensitivity into two parameter derivatives rather than restarting from the loss.',
-    prediction: 'Does each parameter require a separate complete reverse traversal?',
-    caption: 'This illustrative graph uses u=a+3b and loss 2u. One backward flow gives shared sensitivity two, then parameter gradients two and six. Shared contributions accumulate before propagation.',
+    operation: 'reverse-fanout', review: 'Trace the lesson’s actual shared-input graph forward, retain its cached values, then accumulate both multiplication uses and the addition bypass at the same input in one reverse sweep.',
+    prediction: 'If the input becomes three, which three contributions make its gradient seven?',
+    input: 2,
+    headline: 'Save the forward graph; sum every reverse route into a reused input',
+    caption: 'Forward reuses input two twice in multiplication and once in addition, saving product four and loss six. One reverse seed flows through these saved operations. Multiplication contributes two for each use; addition contributes one. All three routes meet at the same input, giving gradient five. One reverse sweep computes the scalar loss’s gradients; it does not apply an optimizer update.',
   },
   'pre-norm-decoder-residual-stream': {
     operation: 'forward-bypass', review: 'The normalized branch must not replace the raw stream. Carry one unchanged input along a bypass and add the learned correction at the end.',
@@ -1015,24 +1224,34 @@ export const mentalPictures = {
     caption: 'The original residual stream bypasses normalization. The learned branch reads normalized input, then adds its correction back to the unchanged stream. Setting the correction to zero preserves the input.',
   },
   'diffusion-training-sampling-asymmetry': {
-    operation: 'dependent-generation', review: 'A training example samples one time; generation requires the predecessor result. Compare an independent sampled-time loss with a dependent reverse chain.',
-    prediction: 'Can the second reverse transition run without the first transition’s output?',
+    operation: 'dependent-generation', review: 'Construct the actual noisy scalar from independent sampled noise, keep the target out of the model input, and distinguish a converted clean estimate from a declared reverse transition.',
+    prediction: 'Would exact noise recover two, and would that alone define the next state?',
+    clean: 2, retainedVariance: .64, noise: -1, predictedNoise: -.5,
+    headline: 'Corrupt once to train a noise predictor; generate through dependent reverse updates',
+    caption: 'At one sampled time, retained signal and independent noise form the input. The model sees this input and time, not target noise. Its prediction determines training error and a clean estimate. Generation instead repeatedly uses the previous state, denoiser output, sampler coefficients and any declared transition noise. A clean estimate is not a sampling update.',
   },
   'hmm-hidden-chain-local-emissions': {
     operation: 'hidden-emissions', review: 'Keep the horizontal dependency in the hidden state lane and make every observed emission a local vertical child.',
     prediction: 'Does a direct arrow between neighboring observations belong in this HMM?',
+    caption: 'Hidden states transmit dependence through time; each observation depends on its same-time state. Emissions are conditionally independent given the hidden path, not generally independent after hidden states are marginalized. More observations can revise beliefs about earlier hidden states through that chain. Likelihood sums over paths; Viterbi selects one path; Baum-Welch learns parameters from posterior expected counts. These are different tasks under the same model assumptions.',
   },
   'em-lower-bound-climb': {
-    operation: 'bound-climb', review: 'A pair of curves can hide the monotonicity mechanism. Mark their contact, climb the supporting bound, and then read the higher true objective.',
-    prediction: 'Why is the true objective at the new bound maximum no lower than the old objective?', current: .5, next: .25,
+    operation: 'coin-posteriors-and-fixed-bound', review: 'Compute both exact two-toss posterior responsibilities, conserve group memberships into expected heads and tosses, update each coin and mixture weight with the correct denominator, then draw the actual frozen-posterior likelihood bound along this parameter update.',
+    prediction: 'Which state stays fixed during M?', current: .5, next: .25,
+    initialWeights: [.5, .5], headProbabilities: [.75, .25], heads: [2, 1], tosses: 2,
+    headline: 'Posterior memberships feed expected-count updates; improving their fixed bound raises likelihood',
+    caption: 'E fixes parameters and splits each group membership by its posterior. M freezes those memberships and updates expected group counts, heads and tosses. Tosses, not groups, normalize head chances. Exact E makes the likelihood bound touch; improving that fixed bound cannot lower observed likelihood. Repeat with new posteriors. Approximate updates need separate guarantees; this is neither global optimality nor component identification.',
   },
   'kge-antisymmetry-score-swap': {
     operation: 'complex-turn', review: 'A sign ledger does not reveal the orientation change. Multiply unit complex factors as quarter-turns and expose the real-axis endpoint after swapping.',
     prediction: 'Why does conjugating the swapped head reverse the rotation?', factors: [[1, 1, 0], [0, 1, -1]],
+    caption: 'These unit complex factors act like quarter-turns. Swapping head and tail reverses the conjugated rotation. The same relation then gives opposite real-axis scores, so this representation can distinguish direction.',
   },
   'bandit-three-selection-rules': {
-    operation: 'uncertainty-choice', review: 'The decision must reflect the operation applied to each same arm. Compare mean locations, uncertainty bonuses, and one posterior draw on common rulers.',
-    prediction: 'Can the lower estimated mean win an uncertainty-aware choice?', values: [[.65, .6], [.67, .72], [.62, .75]],
+    operation: 'uncertainty-choice', review: 'Use all three actual bounded-reward estimates and pull counts. Derive epsilon-greedy assignment including its random leader branch, compute UCB bonuses, compare a declared posterior draw and update, then increase B evidence with a consistent new clock.',
+    prediction: 'Can more evidence return the UCB choice to the mean leader?', means: [.62, .55, .35], counts: [40, 4, 20], time: 64, bonus: .2, epsilon: .3, draws: [.58, .78, .31],
+    headline: 'Choose only eligible arms; distinguish random exploration, an uncertainty index, and a posterior draw',
+    caption: 'Exploration gathers information; exploitation favors the estimated leader. Epsilon-greedy includes that leader in its random branch. UCB adds a count-dependent bonus; Thompson sampling selects the largest posterior draw, then updates from observed reward. More evidence can shrink the bonus and reverse a choice. These selection rules do not provide universal guarantees. Eligibility comes first; drift, delayed outcomes and causal estimation need separate accounting.',
   },
   'crf-global-path-scoring': {
     operation: 'path-score-movement', review: 'The transition penalty is backward motion from the accumulated emission score. Follow complete paths rather than choosing each emission independently.',
@@ -1043,137 +1262,190 @@ export const mentalPictures = {
     prediction: 'Does matching the two norms resolve their opposing update directions?',
   },
   'fm-shared-embeddings-unseen-pair': {
-    operation: 'weighted-values', review: 'An unseen pair should reuse matching coordinate products, not acquire a fictional observation. Collect the two shared embedding contributions.',
-    prediction: 'Does estimating the interaction prove that this feature pair was observed?', weights: [1, 2], values: [3, 1], expected: [3, 2], widthUnit: 1, heightUnit: 1, unit: 1, widthLabel: 'A coordinate', heightLabel: 'B coordinate', totalLabel: 'Shared embeddings supply an estimated pair weight.',
+    operation: 'shared-feature-interactions', review: 'Use the actual three-feature fixture and its observed A-B/B-C support. Compute A-C from reused vectors without inventing co-occurrence, verify the sparse sum-square identity, and remove every pair involving deactivated B. Keep bias/main effects and score interpretation explicit.',
+    prediction: 'When B is inactive, which pair contribution remains?', vectors: [[1, 0], [.8, .2], [.6, .4]],
+    headline: 'Reuse feature vectors for active pairs; computable interactions are not observed or validated ones',
+    caption: 'Shared feature vectors make an unseen pair coefficient computable, not validated. Multiply each pair coefficient by both active input values, then add bias and linear effects. This toy has zero main effects. Sum-coordinate squares, remove self-terms, and halve to evaluate sparse interactions without enumerating every pair. Deactivating B leaves only A with C. Storage depends on the full vocabulary; computation depends on active features. The score is not automatically a probability.',
   },
   'mf-missing-rating-dot-product': {
     operation: 'weighted-values', review: 'Keep the missing rating distinct from a recorded value. Gather aligned user-item coordinate products into an explicitly estimated result.',
     prediction: 'Which observation would be required to call five a recorded rating?', weights: [1, 2], values: [3, 1], expected: [3, 2], widthUnit: 1, heightUnit: 1, unit: 1, widthLabel: 'user factor', heightLabel: 'item factor', totalLabel: 'Five is a prediction, not an observed rating.',
+    caption: 'Aligned user and item factors contribute to the predicted rating. Combining their contribution areas produces five even though no rating was recorded for this pair. The result estimates a missing observation; it does not turn the prediction into observed evidence.',
   },
   'attention-scaling-variance-trace': {
-    operation: 'variance-square', review: 'Dividing a standard deviation scales both dimensions of its variance square. Keep sixty-four independent unit contributions visible before shrinking.',
+    operation: 'variance-and-dependence', review: 'Retain the scale-to-area proof, then compare independent unit-variance terms with sixty-four copies of one random sign. Compute the surviving scaled variance on the same units instead of leaving changed dependence as a prose caveat.',
     prediction: 'Why does dividing the dot product by eight divide its variance by sixty-four?', deviations: [8, 1],
+    terms: 64, divisor: 8, signs: [1, -1],
+    headline: 'Rescaling remains valid; independence determines the starting variance',
+    caption: 'Dividing signal scale by eight divides variance by sixty-four. The square shows both dimensions shrinking. Independent unit-variance terms give the original result. If all sixty-four terms share one fluctuation, they grow together instead of canceling. The same division then leaves variance sixty-four, not one. Rescaling remains valid; independence determines the starting variance.',
   },
   'cross-entropy-confident-wrong-gradient': {
-    operation: 'saturated-gradient', review: 'Wrong confidence and saturation are separate mechanisms. Compare the full BCE sensitivity with squared error passing through the small sigmoid gate.',
+    operation: 'categorical-target-and-temperature', review: 'Keep predictions and target mass as separate normalized distributions, compute hard/smoothed/warmer logit gradients including the temperature chain factor, then retain the separate binary saturation comparison.',
     prediction: 'At predicted probability 0.01 for a positive label, which gradient remains large?', probability: .01,
-    caption: 'The positive label has predicted probability 0.01. Cross-entropy gives absolute logit gradient 0.99. Squared error also passes through the sigmoid slope, giving 0.019602. Confidence alone does not explain gradient size.',
+    probabilities: [.01, .49, .5], smoothing: .1, temperature: 2,
+    headline: 'Predictions share normalization; targets and temperature change the corrective signal',
+    caption: 'Normalize class predictions together. Targets specify which outcomes to reward. Smoothing spreads target mass, reducing extreme pushes. Temperature changes predictions and rescales the logit gradient. The separate binary example shows cross-entropy correcting confident errors while squared error\'s sigmoid gate nearly closes. These are specified toy settings.',
   },
   'factor-model-covariance-decomposition': {
-    operation: 'shared-factor-area', review: 'Off-diagonal dependence should be the same shared cause appearing in both assets. Build all four covariance products from one factor and distinguish independent diagonal noise.',
-    prediction: 'Can independent asset noise add an off-diagonal covariance term?', loadings: [1, 2],
+    operation: 'shared-factor-area', review: 'Use the actual two-feature loading, noise and observation fixture. Separate shared covariance from independent diagonal noise, weight the posterior by measurement precision and prior, then recompute rather than reuse the posterior after PPCA ties noise scales.',
+    prediction: 'Does tying the noise preserve the old posterior mean?', loadings: [2, 1], noise: [1, 4], observation: [2, 1],
+    headline: 'Share latent covariance, weight noisy measurements, and recompute when residual noise is tied',
+    caption: 'One Gaussian factor creates shared covariance. Independent measurement noise adds only diagonal variance. Factor analysis allows different noise scales; PPCA ties them. For this fixture, the noisier measurement contributes less posterior precision. The prior shrinks the inferred factor toward zero. Tying the noise changes the posterior; reusing the old estimate is invalid. The coordinate remains uncertain and is not a causal explanation.',
   },
   'gradient-accumulation-state-boundary': {
-    operation: 'parameter-version', review: 'Four passes should carry the same parameter version until the accumulated gradient crosses one optimizer boundary.',
-    prediction: 'Which microbatch in this accumulation cycle sees parameter version v1?', gradients: [1, 2, 3, 4],
+    operation: 'parameter-version', review: 'Use the actual equal-size mean gradients and correctly weighted buffer trajectory. Preserve fixed parameters through every backward call, then distinguish unequal target counts, partial-window denominators, and optimizer/scheduler clocks from microbatch clocks.',
+    prediction: 'Does every microbatch use v0?', gradients: [2, 4, 6, 8], unequal: [{ count: 3, gradient: 2 }, { count: 1, gradient: 8 }],
+    headline: 'Weight contributions by the intended denominator and advance parameters only at the update boundary',
+    caption: 'Hold parameters fixed while each microbatch contributes its weighted gradient. Equal sizes yield mean five, not sum twenty. Unequal sizes require example or valid-target weights; this window yields 3.5, not five. Flush partial windows using actual counts and clear the buffer. Finish synchronization and unscaling before clipping and stepping once. Advance optimizer and scheduler on their intended update clock. Batch-coupled operations can break large-batch equivalence.',
   },
   'als-alternating-independent-solves': {
     operation: 'frozen-factor', review: 'Alternation is a freeze-and-solve operation, not two moving factor tables. Hold one rank-one item vector while two independent user rows settle.',
     prediction: 'Which factor must stay fixed while these user rows are solved?', ratings: [[2, 4], [3, 6]], fixed: [1, 2],
-    caption: 'This rank-one fixture holds item factors (1,2) fixed. Independent user rows solve to two and three, reconstructing ratings (2,4) and (3,6). The next alternating stage may update item factors.',
+    plainLabels: { 'Fixed V = (1, 2)': 'Fixed item factors: 1 and 2' },
+    caption: 'Both user rows read the same fixed item factors. Each row adjusts its own factor independently of the other row. Once both row fits are finished, the item factors can be updated in the next stage.',
   },
   'optimizer-sharpness-reparameterization': {
-    operation: 'coordinate-relabel', review: 'Keep one physical scalar prediction while changing its ruler labels. The same displacement receives a smaller coordinate value and a larger coordinate curvature.',
-    prediction: 'Does relabeling a=2b alter the represented scalar prediction?', factor: 2,
+    operation: 'coordinate-relabel', review: 'Plot the same prediction loss with a common loss scale and common coordinate spacing. Changing coordinate units narrows the visible basin without changing the selected prediction or loss.',
+    prediction: 'If only the coordinate units change, do predictions change?', factor: 2,
+    plainLabels: { 'Coordinate b: a = 2b': 'Coordinate b: prediction is twice b', 'Same prediction a=2, b=1; same loss four.': 'Same prediction; same loss of four.' },
+    caption: 'Both plots use the same loss and coordinate scales. A smaller coordinate change now covers the same prediction change. The second basin looks steeper, yet matching predictions keep the same loss. Curvature depends on the coordinates, so sharpness alone cannot establish which optimizer generalizes better.',
   },
   'discrete-gradients-forward-backward-paths': {
-    operation: 'hard-forward-surrogate', review: 'The hard forward gate stays unchanged when a surrogate reverse route is declared. Draw both directions separately and name the surrogate explicitly.',
+    operation: 'three-discrete-gradient-paths', review: 'Show reward returning around a hard sample to its probability, a fully differentiable soft sample with fixed noise and changed temperature, then the unchanged hard gate with its separately declared reverse surrogate.',
     prediction: 'Does choosing a straight-through gradient smooth the actual forward threshold?', input: .2,
+    headline: 'Three training routes: bypass the hard sample, relax it, or borrow a backward rule',
+    caption: 'Score-function training returns sampled reward to the selection probability without differentiating through the hard choice. Its estimate is unbiased under the usual assumptions, but can vary greatly. An outcome-independent baseline can reduce that variance. Continuous relaxation sends gradients through a soft sample and smooth objective, changing the discrete problem at finite temperature. Straight-through keeps the hard forward choice but borrows a backward rule. That rule is not the hard derivative.',
   },
   'markov-chain-stationary-flow-ledger': {
     operation: 'balanced-reservoirs', review: 'Transition rates differ because reservoir masses differ. Draw unequal stationary stores with equal opposite mass flows.',
     prediction: 'Can the stationary distribution stay fixed while individual states continue moving?', masses: [2 / 3, 1 / 3], rates: [.2, .4],
+    plainLabels: { 'mass 2/3': 'two thirds', 'mass 1/3': 'one third', 'Each direction transfers 2/15 per step.': 'Equal amounts travel in opposite directions.' },
+    caption: 'The larger reservoir sends a smaller share; the smaller reservoir sends a larger share. Those transfers carry equal amounts in opposite directions. Each reservoir therefore receives exactly what it loses. The population stays stationary while individuals keep moving.',
   },
   'jacobian-transpose-pullback': {
     operation: 'weighted-jacobian', review: 'Each input column collects from every output. Give local derivatives height and upstream output sensitivities width before gathering each column.',
     prediction: 'Which input loses a contribution if only one output row is propagated?', jacobian: [[1, 2], [3, 4]], upstream: [2, 1],
+    plainLabels: { '2 x 1 = 2': '2 units', '2 x 2 = 4': '4 units', '1 x 3 = 3': '3 units', '1 x 4 = 4': '4 units' },
   },
   'perplexity-tokenizer-denominator': {
     operation: 'token-buckets', review: 'The same text occupies different numbers of token buckets. Hold total code length fixed and contrast per-token and per-character denominators.',
     prediction: 'Can equal total code length yield different perplexities under different tokenizations?', letters: ['a', 'b', 'c', 'd'], groups: [1, 2], bits: 4,
+    plainLabels: { 'Shared unit: four bits / four characters = one.': 'Both encodings use one bit per character.', '4 bits / 4 tokens; perplexity 2': 'Four bits across four tokens; perplexity two', '4 bits / 2 tokens; perplexity 4': 'Four bits across two tokens; perplexity four' },
     caption: 'Both tokenizations encode the same four characters using four illustrative bits. Four tokens give perplexity two; two tokens give perplexity four. Both use one bit per character.',
   },
   'positive-definite-boundedness': {
     operation: 'unbounded-valley', review: 'A flat line should be an escape route in parameter space. Draw the zero-loss center of an indefinitely extending sublevel strip.',
-    prediction: 'Can moving arbitrarily far along y increase x squared when x stays zero?',
+    prediction: 'Can traveling along the flat valley increase the loss?',
+    plainLabels: { 'At x=0, any y still gives zero loss.': 'The flat valley keeps zero loss at any distance.' },
+    caption: 'The surface bends across the valley but stays flat along it. Points can travel arbitrarily far down that flat direction without increasing loss. Nonnegative curvature therefore does not guarantee bounded regions of low loss.',
   },
   'precision-recall-f1-harmonic-penalty': {
     operation: 'reciprocal-rates', review: 'Show the reciprocal cost hidden in the harmonic mean. A weak rate creates a large contribution to the reciprocal denominator.',
     prediction: 'Which reciprocal term dominates when precision is 0.9 but recall is 0.1?', rates: [.9, .1],
+    plainLabels: { 'F1 = 2 / (1/0.9 + 1/0.1) = 0.18': 'Weak recall pulls F1 down to 0.18' },
+    caption: 'The reciprocal ruler turns a small rate into a large denominator contribution. Here low recall dominates that denominator, pulling F1 toward the weaker rate. Improving recall changes the combined score much more than improving the already strong precision.',
   },
   'distribution-observation-unit': {
     operation: 'event-count-wait', review: 'Use one event stream to define two different observations: count marks in a fixed window, or measure the gap to the next event.',
     prediction: 'Does the waiting-time ruler produce integer-valued observations?', waits: [.17, 1.42, 3.08],
+    plainLabels: { 'Count = 3, an integer-valued observation': 'Count three events in the fixed window' },
   },
   'random-forest-correlation-floor': {
     operation: 'shared-noise-floor', review: 'Correlated error is a retained common component. Average away private variance while keeping the same common tiles in every ensemble.',
     prediction: 'Which component remains even as the number of trees becomes very large?', trees: [1, 4, 16], common: .2, private: .8,
+    caption: 'Each tree has a shared error component and its own private error. Averaging more trees reduces the private part, but every tree repeats the shared part. The ensemble retains that common floor. Adding more correlated trees cannot average away an error they all share.',
   },
   'bm25-saturation-length-penalty': {
     operation: 'document-matches', review: 'Term frequency and length must describe actual documents. Preserve four highlighted matches while adding nonmatching words, then compare eight matches at the original length.',
     prediction: 'Do extra nonmatching words improve the same four-match score?', documents: [[4, 1], [8, 1], [4, 2]],
+    caption: 'More matching words increase the score, but repeated matches have diminishing returns. Adding unrelated words makes the same matches occupy a smaller share of the document and lowers their contribution. Raw match count alone cannot explain the ranking.',
   },
   'warmup-cosine-three-checkpoints': {
     operation: 'fixed-floor', review: 'Separate the persistent floor from the decaying headroom. The midpoint retains half of the 0.8 headroom, not half of the total one.',
     prediction: 'Why is the post-warmup midpoint 0.6 rather than 0.5?', floor: .2, phases: [0, .5, 1],
+    plainLabels: { 'Midpoint: floor 0.2 + half of 0.8 = 0.6': 'Midpoint keeps the floor and half the headroom: 0.6' },
   },
   'checkpoint-boundary-recompute-balance': {
     operation: 'saved-rebuilt-states', review: 'A minimum curve hides competing inventories. Count saved segment boundaries and the currently rebuilt segment on separate physical rails.',
     prediction: 'Why does saving fewer boundaries eventually require more concurrent rebuilt states?', layers: 16, segments: [1, 4, 8],
+    plainLabels: { '16 saved + 1 rebuilt = 17': '16 saved, 1 rebuilt: 17 total', '4 saved + 4 rebuilt = 8': '4 saved, 4 rebuilt: 8 total', '2 saved + 8 rebuilt = 10': '2 saved, 8 rebuilt: 10 total' },
+    caption: 'Long segments need few saved boundaries but more simultaneously rebuilt states. Short segments reverse that tradeoff. The middle choice minimizes their combined storage in this example. Neither inventory alone determines the peak.',
   },
   'intervals-two-randomness-models': {
     operation: 'repeat-or-condition', review: 'Keep truth fixed while repeated intervals move, then keep one dataset fixed while posterior uncertainty spans possible parameters.',
     prediction: 'Which panel repeats the data, and which conditions on one observed dataset?', successes: 3, failures: 2,
+    plainLabels: { 'Posterior Beta(4,3): uncertainty over probability': 'Uncertainty after one observed sample' },
+    caption: 'Repeated samples move intervals around a fixed true probability. Below, three successes and two failures reshape a uniform prior into uncertainty over possible probabilities. The lower panel keeps that one dataset fixed. The upper intervals are illustrative, not a measured coverage rate. Repeated-data coverage and uncertainty conditioned on observed evidence answer different questions.',
   },
   'kernel-trick-exact-shortcut': {
     operation: 'equal-kernel-area', review: 'The shortcut must end at the same quantity. Count thirty-six unit contributions through explicit features and through the compact square.',
     prediction: 'Does the compact route approximate the expanded feature result?', products: [4, 4, 8, 8, 8, 4], base: 6,
+    plainLabels: { 'Compact kernel: (coordinate dot 4 + 2) squared': 'Compact route: a six-by-six square', '36 = 36. No feature-expansion approximation.': 'Both routes contain exactly 36 units' },
+    caption: 'The expanded route builds several feature blocks. The compact route fills one square. Both contain exactly the same total contribution. The shortcut skips feature construction without approximating the answer.',
   },
   'kl-direction-candidate-ranking': {
     operation: 'averaging-population', review: 'The averaging distribution should be physically different. Keep P fixed in forward comparisons, then draw each candidate’s different population in reverse comparisons.',
     prediction: 'Which distribution supplies the averaging weights in reverse KL?', target: [.9, .1], candidates: [[.7, .3], [.99, .01]],
+    caption: 'The two comparisons ask different questions. Forward comparison averages mismatch across the target population; reverse comparison averages across each candidate population. Changing direction changes which outcomes dominate the comparison. The preferred candidate can therefore change even when the target stays fixed.',
   },
   'gcn-neighborhood-to-matrix-row': {
-    operation: 'neighborhood-messages', review: 'One node update gathers only its declared neighborhood. Add an isolated counterexample whose large feature must not leak into the aggregation.',
-    prediction: 'Can the isolated node’s value enter B without an edge?', features: [1, 2, 3, 100],
-    caption: 'This illustrative B update averages features from A, B, and C, giving two. Isolated D has value 100 but no message route. The exact weighting depends on the declared GCN.',
+    operation: 'neighborhood-messages', review: 'Compute the canonical symmetric-degree-normalized row with self-loops rather than substituting a uniform mean. Show row coefficients and feature contributions, shared transform and activation, then change an isolated feature and separately add its edge with degree recomputation.',
+    prediction: 'Can a larger isolated feature reach B without adding an edge?', features: [1, 2, 3, 100], projection: 2,
+    headline: 'Edges choose message routes; symmetric degrees weight them before a shared transform and activation',
+    caption: 'Self-loops retain each node. Canonical GCN weights use both endpoint degrees, so this row is not a plain mean. Its weighted feature sum passes through a shared learned transform and activation. Enlarging isolated D changes nothing at B. Adding an edge admits D and changes normalization for existing messages too. Repeated layers expand message paths; oversmoothing and bottlenecks can limit useful depth. Other GNN families use different aggregators.',
   },
   'gpu-roofline-batching-ridge': {
-    operation: 'bandwidth-ceiling', review: 'Arithmetic intensity is work per transferred byte. Keep bandwidth fixed while each byte supports one or two work units, and label the result as a ceiling.',
-    prediction: 'Does a doubled memory ceiling prove an observed throughput doubled?', intensities: [1, 2],
+    operation: 'bandwidth-ceiling', review: 'Use the actual 120-GFLOP/12-GB fixture at declared precision and memory boundary. Draw both roofs and their ridge, compare double-compute versus half-traffic lower bounds, then expose weight-only batching and a rejected on-chip tile fit without claiming measured speedup.',
+    prediction: 'Does doubling compute change this memory-limited lower bound?', work: 120, bytes: 12, compute: 20000, bandwidth: 100,
+    headline: 'Count work and traffic at the same boundary; the tighter roof limits the operation',
+    caption: 'This toy needs 120 GFLOPs and 12 GB across the declared memory boundary. Its traffic lower bound dominates compute. Doubling compute leaves that bound unchanged; halving traffic halves it, without proving achieved speedup. Arithmetic intensity and the ridge compare work per byte with hardware balance. Batching may reuse weights but adds other traffic, memory, and waiting. On-chip tiling must fit inputs and accumulators; registers and shared memory have separate limits.',
   },
   'z-loss-anchors-common-offset': {
     operation: 'normalizer-shift', review: 'A common offset expands every unnormalized mass by the same factor. Renormalize both into identical shares while their log-normalizers remain different.',
     prediction: 'Which quantity changes even when every softmax probability stays fixed?', logits: [0, 1], shift: 2,
+    plainLabels: { 'Add two to both logits: multiply raw mass by exp(2)': 'The same offset enlarges every unnormalized mass' },
+    caption: 'Before normalization, adding the same offset enlarges all masses together. Their shares remain unchanged after normalization. A penalty on the log-normalizer still sees the common scale, so it can change while predicted probabilities stay fixed.',
   },
   'batched-top-k-running-invariant': {
-    operation: 'retained-frontier', review: 'Keep candidate identities outside the retained frontier. A new eight can replace seven, but discarded three cannot later overtake it.',
-    prediction: 'Why is previously discarded three unnecessary when eight arrives?', values: [9, 3, 7, 2, 8], retained: [[9, 7], [9, 8]],
+    operation: 'retained-frontier', review: 'Use the actual cosine query/item fixture, add independent y-axis and zero-query controls, score two item blocks and preserve global item identities across local/running selection. Check full-matrix equality on the small fixture, the partial final block, zero scores and a declared display-only tie policy.',
+    prediction: 'Can an earlier discarded fixed score overtake the retained frontier later?', queries: [[1, 0], [0, 1], [0, 0]], items: [[1, 0], [0, 1], [-1, 0]], keep: 2, block: 2,
+    headline: 'Score bounded item blocks and merge per-query top-k with global item identities',
+    caption: 'Normalize rows, score one item block, and merge local candidates with per-query running top-k. Carry global item identities with scores. Discarded fixed-score items cannot overtake enough retained candidates. Process the final partial block at its actual size. Zero vectors score zero; ties need a policy for reproducibility. Blocking saves score memory, not exhaustive scoring work.',
   },
   'resnet-shortcut-shape-contract': {
     operation: 'shape-contract', review: 'Addition should be physically blocked by mismatched axes. Compare unmatched spatial/channel inventories with the projected shortcut that exactly matches the branch.',
     prediction: 'Does matching only the spatial dimensions make this residual addition valid?', input: [8, 8, 16], output: [4, 4, 32],
+    caption: 'Addition pairs entries at matching spatial and channel positions. Here neither set of positions aligns before the shortcut projection. Projecting the shortcut makes all positions match the learned branch. Matching height and width alone is insufficient if channel counts still differ.',
   },
   'linear-attention-two-escape-routes': {
-    operation: 'feature-summary', review: 'The kernel route stores sufficient feature sums before queries arrive. Work one exact positive-feature example, while retaining the distinct position-compression route in the derivation.',
-    prediction: 'Which sums can be retained without storing a query-by-position matrix?', features: [[1, 0], [0, 1], [1, 1]], values: [2, 4, 6], query: [1, 2],
-    caption: 'This positive-feature example stores S=(8,10) and z=(2,2). Query features (1,2) read 28/6. This is its declared kernel rule, not exact softmax. Position compression is a separate route.',
+    operation: 'feature-summary', review: 'One kernel example leaves the second escape route unexplained. Show feature-wise accumulation and query reuse separately from a declared projection that compresses three positions into two slots.',
+    prediction: 'Which route changes the similarity rule, and which merges position information?', features: [[1, 0], [0, 1], [1, 1]], values: [2, 4, 6], query: [1, 2], positionGroups: [[0], [1, 2]],
+    headline: 'Two routes avoid a full query-by-position matrix',
+    caption: 'The kernel route stores feature totals and counts for reuse. This query weights the second bank twice, pulling the average nearer its mean. That route changes the similarity rule. The compression route merges positions before queries arrive, losing some positional detail. Both avoid a full query-by-position matrix, but neither preserves ordinary softmax unchanged.',
   },
   'positional-relative-mechanisms': {
     operation: 'position-entry-point', review: 'Position can change coordinates before a dot product or change the score afterward. Draw the two routes with different entry points.',
     prediction: 'Does an ALiBi penalty rotate the stored query and key vectors?', distances: [0, 1, 2], slope: .5,
+    plainLabels: { 'q': 'query', 'k': 'key', 'd=0': 'distance 0', 'd=1': 'distance 1', 'd=2': 'distance 2' },
+    caption: 'RoPE changes query and key directions before their score is formed. ALiBi leaves those directions alone and applies a distance penalty to the score afterward. Both encode relative position, but at different entry points in the attention computation.',
   },
   'rnnt-two-axis-alignment-lattice': {
     operation: 'alignment-axes', review: 'Replace the state table with a traversable lattice. Two token moves share one time coordinate before blank moves advance audio time.',
     prediction: 'Does emitting a second token require advancing to another audio frame?', path: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],
   },
   'asr-alignment-decoder-choices': {
-    operation: 'alignment-axes', review: 'Keep the time coordinate visibly fixed across a token edge, then move it only across the blank edge.',
-    prediction: 'Which edge changes audio time rather than output position?', path: [[2, 1], [2, 2], [3, 2]],
+    operation: 'asr-decoder-contrast', review: 'Contrast CTC frame collapse with independent transducer clocks, show available versus future context, and keep word errors separate from delivery time.',
+    prediction: 'Which transition advances audio time?', path: [[2, 1], [2, 2], [3, 2]],
+    ctc: ['A', 'A', null, 'A', 'B'], transcript: ['we', 'saw', 'cats'], reference: ['we', 'saw', 'dogs'], delays: [250, 900],
+    headline: 'ASR needs an alignment rule, an audio-context boundary, and two separate quality checks',
+    plainLabels: { 'Token edges move output; blank edges move time': 'RNN-T: output and audio have separate clocks' },
+    caption: 'CTC merges adjacent frame-label repeats, then removes blanks. RNN-T can emit several tokens at one frame; a blank advances time. Full-audio attention can inspect later frames, so streaming needs restricted context. A wrong word measures text error; identical words arriving later measure delay. Neither metric proves the other.',
   },
   'roc-pr-same-operating-point': {
     operation: 'denominator-members', review: 'The rare-positive denominator must remain countable. Reuse the same nine hit identities in ten actual positives and 108 predicted positives.',
     prediction: 'Why can an approximately one-percent false-positive rate still give low precision?',
+    plainLabels: { 'Recall 9/10 = 0.9': 'Recall: 9 of 10 actual positives', 'Precision 9/108 = 0.08333': 'Precision: 9 of 108 predicted positives' },
+    caption: 'The same nine hits appear in both selected groups. They cover most actual positives, so recall is high. False alarms from a much larger negative population fill the predicted-positive group, making precision low. A small false-positive rate can therefore overwhelm a rare positive class.',
   },
   'rope-relative-rotation': {
     operation: 'common-rotation', review: 'Rotate both actual direction arrows together and retain their right angle. A shared rotation preserves their dot product, not every model output.',
@@ -1193,7 +1465,8 @@ export const mentalPictures = {
   },
   'momentum-alternating-components': {
     operation: 'velocity-fold', review: 'Persistent and alternating directions should drive the same recurrence. Track each retained velocity before adding the new gradient.',
-    prediction: 'Which sequence keeps reinforcing the same direction under beta 0.5?', gradients: [[1, 1, 1, 1], [1, -1, 1, -1]], beta: .5,
+    prediction: 'Which sequence reinforces the same direction when half the previous velocity is retained?', gradients: [[1, 1, 1, 1], [1, -1, 1, -1]], beta: .5,
+    caption: 'Each step keeps part of the previous velocity and adds the current gradient. Repeated gradients reinforce that retained motion. Alternating gradients push against it, so much of their movement cancels. Momentum favors persistence, not every large individual gradient.',
   },
   'same-mesh-axis-diagonal-gap': {
     operation: 'missing-cross-products', review: 'Make all four required block slots physical. Fill only diagonal products and leave cross terms empty rather than pretending addition creates them.',
@@ -1202,6 +1475,7 @@ export const mentalPictures = {
   'softmax-ce-logit-update': {
     operation: 'subtract-gradient', review: 'Negative sensitivity should move the true logit upward under descent. Draw actual before-and-after coordinates for all three logits.',
     prediction: 'Why does a negative gradient raise the true-class logit?', gradients: [-2 / 3, 1 / 3, 1 / 3], rate: .3,
+    caption: 'A negative gradient tells descent to move the true-class logit upward. The other logits move down. Lowering loss does not mean lowering every coordinate; the direction depends on the sign of its gradient.',
   },
   'sparse-attention-reach-patterns': {
     operation: 'two-hop-relay', review: 'One missing direct entry remains missing in one layer. Track B information into G, then into A on the next layer.',
@@ -1219,6 +1493,7 @@ export const mentalPictures = {
   'bpe-corpus-merge-trace': {
     operation: 'fixed-merge-order', review: 'The new word obeys a previously learned ordering. Retain character identity while consuming the three fixed merge instructions.',
     prediction: 'Does encoding lower relearn pair priorities from that single word?', stages: [['l', 'o', 'w', 'e', 'r'], ['lo', 'w', 'e', 'r'], ['low', 'e', 'r'], ['low', 'er']],
+    plainLabels: { 'Apply learned l + o merge': 'Apply the learned merge into lo', 'Apply learned lo + w merge': 'Apply the learned merge into low', 'Apply learned e + r merge': 'Apply the learned merge into er' },
   },
   'transformer-two-mixing-axes': {
     operation: 'mixing-axes', review: 'Rotate the connectivity emphasis without changing the token-feature grid. Attention connects token rows; feed-forward transformations connect features inside one row.',
@@ -1231,6 +1506,8 @@ export const mentalPictures = {
   'uat-existence-error-band': {
     operation: 'piecewise-fit', review: 'Show the actual approximating segments and separately magnify their error. Existence of this fit must not be mistaken for successful training or generalization.',
     prediction: 'Does constructing these four segments prove a training algorithm will find them?', segments: 4, tolerance: .02,
+    plainLabels: { 'Maximum error 1/64; this demonstrates existence.': 'Maximum gap stays below 0.02 in this interval.' },
+    caption: 'Four straight segments stay close to the curved target throughout this interval. A construction with such a small error demonstrates that a fit exists. It does not establish that training will find it or that it generalizes outside the interval.',
   },
   'value-policy-action-interface': {
     operation: 'equal-value-policies', review: 'Keep equal action values fixed while two declared selection rules produce different actions or distributions.',
@@ -1243,6 +1520,7 @@ export const mentalPictures = {
   'weight-decay-adaptive-paths': {
     operation: 'decay-bypass', review: 'Follow the coupled route through distinct frozen scales and the direct route around them. Equal weights alone do not equalize coupled shrinkage.',
     prediction: 'Which route changes if the preconditioner grows from one to ten?', scales: [1, 10], base: .001,
+    plainLabels: { '/ 1': 'same', '/ 10': 'tenth' },
   },
   'why-dropout-shared-subnetworks': {
     operation: 'shared-mask-weights', review: 'Keep parameter identities fixed under both masks. Masked paths close without creating independently trained copies.',
@@ -1251,6 +1529,7 @@ export const mentalPictures = {
   'word-analogy-shared-displacement': {
     operation: 'translated-displacement', review: 'Move the same displacement arrow to a new origin. Its endpoint is a query coordinate before vocabulary search chooses an actual word.',
     prediction: 'Does reaching coordinate (3,1) itself identify a vocabulary word?', points: [[0, 1], [1, 2], [2, 0], [3, 1]],
+    caption: 'The same displacement arrow moves from one word pair to a new starting point. Its direction and length stay unchanged, creating a query coordinate. A separate vocabulary lookup chooses an actual word near that coordinate; the arrow’s endpoint is not itself a word.',
   },
   'product-metric-decision-authority': {
     operation: 'serial-gates', review: 'The launch rule is conjunction, not voting. Pass completion and cost, then stop the same release token at the latency gate.',
@@ -1261,36 +1540,68 @@ export const mentalPictures = {
     prediction: 'Does ordinary-case success authorize the protected-case violation?', lanes: [{ labels: ['speed', 'record rule'], states: [true, true], detail: 'Ordinary case passes both.' }, { labels: ['speed', 'record rule'], states: [true, false], detail: 'Protected case stops at its failed record rule.' }],
   },
   'ml-ab-test-launch-gates': {
-    operation: 'serial-gates', review: 'Show the two candidates stopped at different gates. Statistical evidence does not replace practical benefit or safety.',
-    prediction: 'Which failed requirement remains after the nonzero-effect check passes?', lanes: [{ labels: ['nonzero', 'worth it', 'safe'], states: [true, false, true], detail: 'Candidate A lacks practical value.' }, { labels: ['nonzero', 'worth it', 'safe'], states: [true, true, false], detail: 'Candidate B violates safety.' }],
+    operation: 'assignment-to-launch-evidence',
+    review: 'A final veto hides how an experiment earns its evidence. Preserve one hundred assigned users and thirty exposed users, then compare illustrative effect intervals on a shared worthwhile-effect ruler with validity and harm remaining independent requirements.',
+    prediction: 'Can the positive interval for A justify launch under the declared one-point rule?',
+    headline: 'Preserve assignment; require valid evidence, worthwhile gain, and safe outcomes',
+    caption: 'Assign at a stable unit and log actual exposure. Analyze assigned units; exposure diagnoses dilution, not permission to discard unexposed users. Predeclare duration, worthwhile effect, uncertainty, and harm limits. On these illustrative intervals, A is positive but too small. B clears the gain rule but fails safety. C remains inconclusive. Invalid measurement blocks every candidate.',
+    assigned: 100, exposed: 30, worthwhile: 1,
+    intervals: [[.1, .3], [1.2, 1.8], [.2, 1.8]],
   },
   'post-training-policy-gate': {
-    operation: 'serial-gates', review: 'Keep task completion and authorization as separate gates on the same trial. Unauthorized success remains a failed trial.',
-    prediction: 'Can successful completion override missing account authority?', lanes: [{ labels: ['task', 'authority'], states: [true, true], detail: 'Authorized successful trial passes.' }, { labels: ['task', 'authority'], states: [true, false], detail: 'Unauthorized successful trial is rejected.' }],
+    operation: 'episode-evidence-and-policy-grade',
+    review: 'A final policy veto omits how episodes produce trustworthy training evidence. Contrast two contained trajectories with identical task success but different account access, preserve structured grades and failed evidence, then separate training families from independent held-out evaluation.',
+    prediction: 'Can a polite answer or higher task score make unauthorized access eligible?',
+    headline: 'Build reproducible episodes; gate reward with action evidence and test transfer separately',
+    caption: 'Version the contained environment, permissions, tools, resets, and terminal rules. Save trajectory evidence. Both trajectories resolve the ticket, but only authorized access is eligible for quality scoring. Deterministic policy and state checks precede calibrated semantic or human judgment. Keep failed and contrastive cases with explicit labels; do not reward the violation. Train on declared families, then test held-out states and tools independently for exploitation and transfer.',
   },
   'distributed-recovery-consistency-gate': {
-    operation: 'serial-gates', review: 'A recovery bundle needs all versions aligned. Trace the second rank’s matching weights through a stale optimizer gate.',
-    prediction: 'Can correct v4 weights repair the stale v3 optimizer state?', lanes: [{ labels: ['model v4', 'optimizer v4', 'data p8'], states: [true, true, true], detail: 'Rank zero has a consistent bundle.' }, { labels: ['model v4', 'optimizer v3', 'data p8'], states: [true, false, true], detail: 'Rank one cannot restart from this mixed bundle.' }],
+    operation: 'coherent-recovery-scope', review: 'Classify failures and choose recovery scope from a complete committed bundle. Compare version identities rather than pretending rank-local shards or random streams must have equal values.',
+    prediction: 'Would a live worker with this stale optimizer justify resuming?',
+    committed: { model: 4, optimizer: 4, step: 17, data: 8, rng: 2, layout: 2 },
+    restored: { model: 4, optimizer: 3, step: 17, data: 8, rng: 2, layout: 2 },
+    headline: 'Classify the failure; resume only from one complete, compatible training bundle',
+    caption: 'Classify the failure, then choose the narrowest justified recovery. Retry only proven idempotent, uncommitted work. Replacement processes must restore one complete published bundle: step, parameters, optimizer, data position, RNG mapping and sharding layout. Matching weights alone cannot fix stale optimizer state. Preserve corruption evidence; stop or roll back when compatibility is unproven. Liveness does not prove a coherent experiment.',
   },
   'foundation-data-deletion-blast-radius': {
-    operation: 'evidence-chain', review: 'Source removal is only one known stage. Keep checkpoint and released-model influence as unresolved branches rather than completed deletion claims.',
-    prediction: 'Does excluding D7 from new data prove its old model influence was removed?', labels: ['new data', 'old checkpoint', 'released model'], states: ['verified', 'unknown', 'unknown'],
+    operation: 'permissioned-lineage-release',
+    review: 'The deletion-only warning omits the worked permission-withdrawal decision. Trace S17 through immutable M12 and trained artifacts, stop a new M12 release at current policy, and compare a new eligible manifest without implying old model influence was erased.',
+    prediction: 'Can renamed copies of the restricted shard pass the current release gate?',
+    headline: 'Trace withdrawn permission through lineage; gate each new release',
+    caption: 'Lineage connects source S17 to raw, parsed, tokenized, manifest, and model artifacts. Withdrawing training permission blocks new affected releases without rewriting historical M12. Build an eligible new manifest and verify exclusion under current policy. Source and model owners separately decide lawful retention and already-trained model treatment. Deleting a source or excluding future use does not prove that a trained model forgot it.',
+    edges: [['S17', 'R7'], ['R7', 'P4'], ['P4', 'T8'], ['T8', 'M12'], ['M12', 'C4'], ['C4', 'R1']],
+    manifests: { M12: ['S17', 'S18'], M13: ['S18'] },
+    approvedSources: ['S18'],
   },
   'adaptive-red-team-release-loop': {
-    operation: 'evidence-chain', review: 'One reproduced direct attack is now blocked. Preserve quoted and tool-output paths as separate untested evidence obligations.',
-    prediction: 'Which attack paths still lack an observed post-fix result?', labels: ['direct attack', 'quoted attack', 'tool output'], states: ['verified', 'unknown', 'unknown'],
+    operation: 'owned-adaptive-security-loop',
+    review: 'A single fixed-attack result omits the program that produces release evidence. Show bounded scope, reproducible action evidence, an owned system fix and adaptive retest, preserving separate unknown paths and legitimate-task utility before residual-risk approval.',
+    prediction: 'Does blocking the direct attack establish that quoted and tool-output paths are safe?',
+    headline: 'Turn scoped findings into owned fixes, adaptive retests, and a residual-risk decision',
+    caption: 'Start with authorized assets, attacker powers, budgets, and stop conditions. Reproduce actual boundary violations, not merely alarming text. Assign an owner to a system-level mitigation, then retest the finding, adaptive variants, and legitimate tasks. A blocked direct request leaves quoted and tool-output paths unknown. Release authority weighs severity, utility, and residual risk. Saved cases become regressions; production evidence updates the threat model.',
+    paths: [{ name: 'Direct request', blocked: true }, { name: 'Quoted input', blocked: null }, { name: 'Tool output', blocked: null }],
   },
   'coding-assistant-evidence-ladder': {
-    operation: 'evidence-chain', review: 'A test result should not flow automatically into durable user-value claims. Put each unobserved adoption stage behind its own evidence boundary.',
-    prediction: 'Which receipt would be required before claiming continued use?', labels: ['tested contract', 'acceptance', 'continued use', 'durable value'], states: ['verified', 'unknown', 'unknown', 'unknown'],
+    operation: 'coding-evaluation-layers', review: 'Bind mode, task, repository, environment and test oracle, then ask independent functional, quality/security and real-task questions of the same toy patch. A passing test receipt and acceptance cannot erase a separate safety failure or establish productivity.',
+    prediction: 'Can passing tests erase the separate privacy failure?',
+    tests: 12, passed: 12, privacySafe: false, accepted: true, completed: null,
+    headline: 'Match each coding-assistant claim to its own executable, reviewed, or real-task evidence',
+    caption: 'Bind modes to representative held-out tasks, versioned environments, and test oracles. Passing tests covers only tested properties. Static checks and calibrated human rubrics assess additional quality and security risks; neither is complete. Controlled real-task comparisons include review, repair, latency, cost, and completion. Acceptance alone is not productivity. Inspect important slices and stage releases behind independent safety gates.',
   },
   'policy-label-observation-loop': {
-    operation: 'observed-labels', review: 'Mature positives and negatives provide actual label routes. Pending and censored records stop before the label bucket without becoming zeros.',
+    operation: 'policy-exposure-and-maturity', review: 'Preserve the approved cohort through day-one and mature outcomes, while a separate blocked action has no approval outcome. Retain missingness gates and connect selected training labels to the successor\'s future policy and exposure.',
     prediction: 'Does a censored record belong in the observed negative bucket?', labels: ['mature +', 'mature -', 'pending', 'censored'], values: ['1', '0', '?', '?'],
+    count: 100, earlyPositive: 2, maturePositive: 10, window: 45,
+    headline: 'Policy selects observable outcomes; maturity changes labels and successor exposure',
+    caption: 'Policy chooses revealing actions, so observed labels cover selected cases. Two positives are known on day one; 98 are pending. Complete 45-day follow-up yields ten positives and 90 negatives. Pending, censored, and blocked cases are not negatives. Selected labels train a successor that changes future exposure. Keep decision-time features frozen. Waiting cannot repair missing action support.',
   },
   'fraud-policy-label-coverage': {
-    operation: 'observed-labels', review: 'Policy affects whether an outcome can be observed. Keep approved outcomes, pending maturity, and declined missing outcomes on distinct routes.',
-    prediction: 'Can a declined payment be labeled legitimate from an unobserved repayment?', labels: ['mature approval', 'pending', 'declined'], values: ['0/1', '?', '?'],
+    operation: 'fraud-loss-and-labels',
+    review: 'The missing-label warning omits the decision that selects exposure. Use the actual calibrated-risk toy losses to choose actions, then bind policy and frozen feature identities to separate mature, pending, declined and challenge routes.',
+    prediction: 'Does better ranking alone identify the right blocking threshold?',
+    headline: 'Choose actions from consequences; preserve how each label became observable',
+    caption: 'Use decision-time features and appropriate calibrated risk to compare action costs. Allow at two percent and decline at ten percent under this simplified loss model. Save policy, action, and challenge resolution before joining mature outcomes. Pending and declined cases lack observed allowed-payment labels; failed challenges do not prove fraud. Policy changes alter label coverage. Audits require defined targets, sampling evidence, and uncertainty.',
+    risks: [.02, .10], fraudLoss: 100, legitimateDeclineLoss: 3,
   },
   'training-loop-persistent-state': {
     operation: 'separate-state-rails', review: 'Model mode and gradient buffer are independent persistent state. Let each action change only its own rail.',
@@ -1301,38 +1612,61 @@ export const mentalPictures = {
     prediction: 'Which observation distinguishes gradient computation from a real parameter step?', gradient: .8, change: 0, loss: 1.1,
   },
   'multi-team-platform-contract-boundary': {
-    operation: 'compare-swap-owner', review: 'A version gate grants ownership only to the matching attempt. Carry A’s accepted version into B’s stale comparison and keep A’s result untouched.',
-    prediction: 'Can B overwrite A while still expecting version zero?',
+    operation: 'publication-promotion-recovery',
+    review: 'The publication race is only the first required contract. Retain private attempt artifacts and shared expected-state publication, then bind retries to one authorized deployment and enforce epoch plus desired-version fencing during metadata recovery.',
+    prediction: 'Can an old controller mutate rollout state after a newer writer epoch is installed?',
+    headline: 'Share authoritative release contracts without forcing one execution runtime',
+    caption: 'Keep existing executors behind explicit adapters. Attempts write private artifacts; only a validated expected-state transition publishes one result. Preserve losing attempt evidence and cost. An authorized deployment key binds exact arguments to one operation; retries reuse it, while changed arguments fail. During metadata loss, retain approved compatible serving state and freeze unverifiable promotions. Recovery requires a fenced writer and matching desired-state version.',
   },
   'enterprise-agent-three-plane-boundary': {
-    operation: 'idempotent-receipt', review: 'The same idempotency identity must return one committed receipt after reply loss. Keep the account effect visibly singular across both requests.',
-    prediction: 'Does a lost response authorize creating a second payment?',
+    operation: 'idempotent-receipt', review: 'Separate control authority, durable execution attempts and authoritative effect evidence for the actual fifty-unit credit. Block the injected export before dispatch and reconcile an unknown effect across runtime replacement.',
+    prediction: 'Does reply loss alone permit another credit?', call: 'credit-123', key: 'k-456', credit: 50,
+    headline: 'Control grants exact authority; execution persists one action; evidence resolves its effect',
+    caption: 'Control validates the user’s exact grant before saving authorization. Execution persists one logical credit and key before dispatch; attempts do not create new logical actions. Reply loss leaves the effect unknown. A replacement runtime reconciles that same key with current authority. Evidence closes the call only after an authoritative receipt. Without downstream deduplication and lookup, stop automatic retries.',
   },
   'rag-recall-precision-funnel': {
-    operation: 'retained-evidence', review: 'Carry the two required passages through selection. A removed passage stays outside the later reranker and final context.',
-    prediction: 'Can reranking recover evidence B after the cap removed it?', stages: [['A', 'B'], ['A'], ['A']], labels: ['retrieved', 'after cap', 'reranked'],
+    operation: 'hybrid-recall-before-reranking', review: 'Show complementary lexical and dense candidates, their deduplicated union, and paired lossy versus recall-preserving caps. A query-aware reranker selects only surviving evidence; context and citation support remain separate from retrieval presence.',
+    prediction: 'Can reranking recover B after the cap discards it?',
+    dense: ['A', 'C', 'D'], lexical: ['B', 'C'], required: ['A', 'B'],
+    headline: 'Protect hybrid recall before spending precision on reranking and grounded generation',
+    caption: 'Chunk boundaries must preserve evidence. In this toy, dense retrieval finds A while lexical retrieval adds required B. Merge and deduplicate before query-aware reranking. A cap that drops B cannot be repaired downstream; preserving both lets the reranker select a compact context. Generation still needs faithful, source-supported citations and must abstain or qualify missing support. Evaluate retrieval, reranking, and answers separately, then feed production failures back into evaluation.',
   },
   'llm-inference-two-budget-scheduler': {
-    operation: 'persistent-refreshing', review: 'Draw the persistent twelve-page ownership inventory separately from the eight reusable work slots. A new iteration refreshes only the work rail.',
-    prediction: 'Do free work slots release the nine pages already reserved by A and B?', pages: ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', '-', '-', '-'], work: ['D', 'D', 'D', 'P', 'P', 'P', 'P', 'P'],
+    operation: 'kv-admission-and-mixed-iteration',
+    review: 'Separate resource ledgers but also show the scheduler decision. Queue a four-page C behind nine reservations, retain B until confirmed cancellation, then admit C and show decode-first prompt work becoming decode while its pages persist.',
+    prediction: 'Do six idle work slots in the second iteration release any reserved cache pages?',
+    headline: 'Reserve persistent cache before admission; refresh only iteration work',
+    caption: 'Reserve prompt and bounded generation pages before admission. C needs four pages but only three are free, even with idle compute. A cancellation request retains B until the executor stops. Confirmed release admits C. Serve active decode before a bounded prefill chunk; rotate tenants within declared quotas. Next iteration refreshes work slots, not page ownership. Measure phase latency, queue age, and cache occupancy separately.',
+    pages: ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', '-', '-', '-'],
+    promptPages: 3, generationPages: 1, promptTokens: 6, tokensPerPage: 2, workBudget: 8,
   },
   'reasoning-fixed-budget-reclaim': {
-    operation: 'node-reassignment', review: 'Carry the same eight node identities across serving pressure. Reclaim the two offline nodes only after their checkpoint-and-pause boundary.',
-    prediction: 'Do quarterly accelerator hours create another free node in this instantaneous pool?', before: ['S', 'S', 'S', 'S', 'S', 'S', 'O', 'O'], after: ['S', 'S', 'S', 'S', 'S', 'S', 'S', 'S'],
+    operation: 'node-reassignment', review: 'Use the actual five-envelope 128-accelerator fixture. Preserve node identities through a reserve-node loss, keep the remaining reserve exclusive, and distinguish arithmetic feasibility from measured SLO and reasoning-policy admission.',
+    prediction: 'Does a better benchmark alone admit four candidates for everyone?',
+    before: ['S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'T', 'T', 'T', 'P', 'E', 'E', 'R', 'R'], acceleratorsPerNode: 8,
+    headline: 'Keep one exclusive capacity ledger through node loss and reasoning-policy changes',
+    caption: 'Sixteen eight-accelerator nodes share one physical ledger. Losing a reserve node leaves 120 accelerators: 112 assigned and eight protected. This is accounting, not an SLO certificate. If serving fails, checkpoint and pause offline work before reclaiming it. Extra reasoning candidates need measured task benefit, full candidate and verifier costs, and headroom under node loss. Quarterly hours do not create concurrent nodes.',
   },
   'offline-online-gap-diagnostic-order': {
-    operation: 'assignment-membership', review: 'Intention-to-treat preserves the full assigned group. Circle the forty fallback identities as changed delivery, not removal from the experimental denominator.',
+    operation: 'diagnostic-order-and-delivery', review: 'Put observation validity and versioned delivery before causal attribution. Use the post\'s exact thousand-user fixture to preserve fallback membership and distinguish conditional delivered rate from assigned-user product outcomes.',
     prediction: 'Does excluding fallback users preserve the originally assigned estimand?', total: 100, served: 60, unit: 1,
+    assigned: 1000, controlSuccess: 800, delivered: 900, deliveredSuccess: 738, fallback: 100, fallbackSuccess: 40,
+    headline: 'Verify the observation, trace actual delivery, then test the product-effect hypothesis',
+    caption: 'First check assignment, denominators, instrumentation, and label maturity. Then replay actual serving versions and trace latency, errors, and fallback. Only after validity and delivery checks test a model or feedback hypothesis. B\'s delivered branch scores 82%, yet fallback lowers its assigned-user rate below A. Removing fallback changes the estimand; delivered-only success is not causal proof. Contain harm and remeasure any repair.',
   },
   'youtube-recommender-selective-feedback-loop': {
-    operation: 'assignment-membership', review: 'Selection creates exposure evidence for only ten candidates. Keep the 890 unshown candidates visibly present without assigning negative outcomes.',
-    prediction: 'Do unshown eligible candidates supply observed negative responses?', total: 900, served: 10, unit: 10,
+    operation: 'video-objective-and-exposure', review: 'Preserve the actual conditional estimates and their expected-duration reversal, then carry source union, eligibility, slate, and unshown membership into versioned exposure-linked feedback. Do not infer satisfaction or causal benefit from the toy ranking.',
+    prediction: 'Does changing to expected duration keep A ahead?',
+    videos: [{ identity: 'A', watch: .9, seconds: 20 }, { identity: 'B', watch: .5, seconds: 60 }], sources: [800, 300, 100], unique: 1000, eligible: 900, shown: 10,
+    headline: 'Choose the objective, preserve candidate coverage, and learn only from recorded exposure',
+    caption: 'Estimates favor A by watch probability but B by expected seconds per impression. Assume zero seconds without a watch. Neither measures satisfaction or causal benefit. Overlapping sources become 1,000 unique candidates, then 900 eligible and ten displayed. Ranking cannot recover missing candidates. Compose a constrained slate; log item, position, policy, and model exposure before joining outcomes. The other 890 are unshown, not negative observations; evaluate coverage, ranking, and product effects separately.',
   },
   'chatbot-randomization-unit': {
     operation: 'conversation-assignment', review: 'One outcome encloses all three turns. Contrast one conserved conversation assignment with an A-B-A sequence that contaminates the same outcome.',
     prediction: 'Can this one conversation’s outcome isolate A after its middle turn uses B?',
   },
   'hierarchical-all-reduce-path': {
+      caption: 'Each local group first combines its own contributions. The cross-group stage combines those local results once. Finally the completed total is distributed unchanged to every rank. Distribution copies the total; it does not add it again.',
     operation: 'hierarchical-sum', review: 'Keep the rank inputs separate until local grouping. Combine four and six once, then copy the completed ten into every rank destination.',
     prediction: 'Does distributing the completed ten require adding it again?', inputs: [1, 3, 2, 4],
   },
@@ -1345,6 +1679,8 @@ export const mentalPictures = {
     prediction: 'Which result follows when expiry minus now equals zero?', positions: [-1, 0, 1], accepted: [false, false, true], labels: ['expired', 'equal now', 'future'],
   },
   'nms-greedy-suppression': {
+      plainLabels: { 'Adjacent IoU 1/3 > 0.30. A and C survive.': 'Adjacent overlap exceeds the 30% suppression threshold.' },
+      caption: 'The highest-scoring box removes an overlapping lower-scoring neighbor. Only boxes still kept may suppress later candidates. Here the middle box is removed before it can act on the last box. The first and last survive even though the removed middle box overlaps both.',
     operation: 'suppression-route', review: 'Retain the overlapping three-box chain and make the removed B route visibly unable to suppress C.',
     prediction: 'Does B’s overlap with C matter after A has already removed B?',
   },
@@ -1357,12 +1693,16 @@ export const mentalPictures = {
     prediction: 'Can a proposed action dispatch before its exact authorization?', lanes: [{ labels: ['proposal', 'authority', 'receipt'], states: [true, false, false], detail: 'A proposal alone stops before execution.' }, { labels: ['proposal', 'authority', 'receipt'], states: [true, true, true], detail: 'The authorized action has an outcome receipt.' }],
   },
   'ivf-pq-query-funnel': {
-    operation: 'unscanned-partition', review: 'Put the actual nearest member physically inside excluded C. Improving representations within A and B cannot open the absent scan route.',
-    prediction: 'Can more accurate PQ distances inside A and B expose the true neighbor in C?',
+    operation: 'ann-routing-and-compression', review: 'Distinguish visiting graph neighbors, selecting IVF partitions, and quantizing separate vector slices. Preserve the unscanned-neighbor counterexample and count shared codebook storage separately.',
+    prediction: 'Does better compression open the unscanned partition?',
+    graph: [[3, 0], [2, 1], [.3, .2]], vector: [.2, .8, 1.8, 1.2], codebook: [[0, 1], [2, 1]],
+    headline: 'Graph and cluster routing choose candidates; vector codes change their representation',
+    caption: 'HNSW follows graph links; IVF scans selected clusters. Broader search reaches more candidates. PQ splits vectors and stores shared codebook choices instead of full coordinates. Distances become approximate, and codebook memory still counts. Better codes cannot expose an unscanned cluster. Evaluate recall, latency, and total memory separately; neither routing nor compression guarantees the exact neighbor.',
   },
   'ml-role-activity-profiles': {
     operation: 'role-budget', review: 'Use one hundred shared units per fictional role so the activity mix changes while total time stays fixed.',
     prediction: 'Does the lead example have more total time, or a different allocation?', values: [[60, 15, 25], [10, 65, 25], [20, 20, 60]], labels: ['RS', 'MLE', 'lead'],
+    plainLabels: { '60 / 15 / 25 research / build / coordinate': '60 research, 15 build, 25 coordinate', '10 / 65 / 25 research / build / coordinate': '10 research, 65 build, 25 coordinate', '20 / 20 / 60 research / build / coordinate': '20 research, 20 build, 60 coordinate' },
   },
   'autoregressive-diffusion-sampling-steps': {
     operation: 'committed-provisional', review: 'Retain committed prefix identities only on the autoregressive lane. Mark every diffusion position provisional until the completed sample.',
@@ -1377,40 +1717,56 @@ export const mentalPictures = {
     prediction: 'Which rail actually records whether the prohibited write changed?', states: [['alarm', 'write'], ['calm', 'write']], actions: ['before', 'after'], labels: ['explanation', 'action'], good: [['calm'], []], footer: 'The explanation changed; the prohibited action did not.',
   },
   'fused-moe-triton-sram-roofline': {
-    operation: 'memory-roundtrip', review: 'The intermediate should follow an actual out-and-back HBM route in the unfused case, then stay on chip in the fitting fused case. Inputs and outputs still cross the boundary.',
+    operation: 'scaling-experts-and-fusion', review: 'Conserve fixed dense training work while exchanging model width and tokens, distinguish stored experts from selected work, then retain the actual on-chip intermediate reuse comparison.',
     prediction: 'Which traffic remains after the intermediate round trip disappears?',
+    budgets: [[2, 8], [4, 4], [8, 2]], work: 16, experts: 4, active: [1],
+    headline: 'Balance model and data, execute selected experts, and avoid unnecessary memory trips',
+    caption: 'At fixed dense training work, a larger model leaves fewer tokens. Balance model and data rather than maximizing one. MoE stores many experts but activates only some per token, so stored and active parameters differ. Fusion keeps fitting intermediates on chip. Input, output, routing, and communication costs still remain. These are illustrative budgets, not an empirical scaling optimum.',
   },
   'coding-interview-method-state': {
     operation: 'complement-before-store', review: 'The current value queries an earlier identity before inserting itself. Preserve the distinct saved index rather than matching a freshly stored current index.',
     prediction: 'Which two original indices are returned when saved value two meets current value four?',
   },
   'content-moderation-governed-decision-loop': {
-    operation: 'policy-region', review: 'Place the score inside the explicitly versioned P7 action region. The score is a coordinate, not an intrinsic publishing permission.',
+    operation: 'moderation-review-and-appeal', review: 'Retain the explicit P7 score region, then preserve content identity through human review, authorized action, optional appeal and senior adjudication. Separate selected versioned labels from representative audits and held-out checks.',
     prediction: 'Which P7 region contains 0.62?', score: .62, boundaries: [.4, .8], actions: ['allow', 'review', 'block'],
+    headline: 'Scores feed policy; review and appeals govern actions and supply selected evidence',
+    caption: 'Content produces model scores, not policy authority. P7 routes this score to review; other policies may use different costs and thresholds. Capacity limits need an explicit deferred response, not automatic permission. Apply authorized decisions with reasons. Appeals can trigger senior adjudication. Versioned review labels can train successors, but appeals are selected evidence. Representative audits and held-out slice checks are still needed.',
   },
   'paper-critique-prioritization-funnel': {
     operation: 'matched-comparison', review: 'Arrange task accuracy and compute on separate axes. Keep the missing baseline-at-two-times-compute cell open rather than attributing the full reported gain.',
     prediction: 'Which missing result would isolate benefit at the new method’s resource budget?', labels: ['baseline 1x', 'baseline 2x', 'new at 2x'], values: [0, null, 4], suffix: 'points above A',
   },
   'cross-validation-preserve-structure': {
-    operation: 'group-cut', review: 'Move the cut so all three identities of one user stay on one side. Contrast a random row assignment that divides the same user across train and test.',
+    operation: 'rotate-structured-folds', review: 'Rotate complete groups through held-out folds, retain a distinct fitted pipeline per fold, and average their toy scores. Contrast forward-only time eligibility and retain the random-row user-leakage counterexample.',
     prediction: 'Which assignment keeps user A from appearing on both sides?',
+    groups: [['A1', 'A2'], ['B1', 'B2'], ['C1', 'C2']], losses: [4, 6, 5], timePoints: 6, timeBoundaries: [3, 4],
+    headline: 'Rotate held-out folds without splitting related entities or training on the future',
+    caption: 'Cross-validation rotates held-out data and averages its scores. Each fold fits its own pipeline on training data alone. Group folds keep related records together; rolling time splits use only earlier periods to train. These protect different dependencies. Random row assignment can put the same user on both sides. The toy losses illustrate averaging, not measured generalization.',
   },
   'dbscan-neighborhood-expansion': {
-    operation: 'core-border-source', review: 'Show E joining D’s neighborhood without acquiring D’s expansion authority. F remains disconnected; counts explicitly include self.',
+    operation: 'measured-density-neighborhoods', review: 'Hold six point coordinates and one neighborhood radius fixed. Compute all neighbor counts including self, then distinguish measured core expansion, reachable border membership, and isolated noise.',
     prediction: 'Can border E expand the cluster when its neighborhood count is only two?',
+    points: [{ name: 'D', xy: [0, 0] }, { name: 'A', xy: [-.6, 0] }, { name: 'B', xy: [-.4, .5] }, { name: 'C', xy: [-.4, -.5] }, { name: 'E', xy: [.9, 0] }, { name: 'F', xy: [2.5, .4] }], radius: 1, minimum: 4,
+    headline: 'Measure one shared neighborhood radius; border membership does not grant expansion',
+    caption: 'Count neighbors inside one fixed radius, including self. Core points reach the minimum and expand to their neighbors. A reachable non-core point joins as border but cannot expand; unconnected non-core points remain noise. The same six points stay fixed in all three views. Changing the radius or minimum can change both expansion and membership.',
   },
   'frontier-training-divergence-zoom': {
     operation: 'first-failure', review: 'Traverse actual rank-time cells. Pin the first nonfinite cell at rank one, step two before showing the later shared symptoms.',
     prediction: 'Do the three bad cells at step three identify where failure began?',
   },
   'work-prioritization-counterfactual-portfolio': {
+      plainLabels: { 'compatible B + C': 'compatible B and C' },
     operation: 'alternative-whole', review: 'Put two feasible fixed-capacity portfolios side by side. Compatible B and C share the alternative whole, not two unrelated opportunities added without permission.',
     prediction: 'Does past effort on A change its forward value eight versus eleven?', values: [8, 11], labels: ['A alone', 'compatible B + C'],
   },
   'decision-tree-partitions-feature-space': {
-    operation: 'conditional-spatial-cut', review: 'Draw the root boundary across the whole feature plane and the second cut only on its right branch.',
-    prediction: 'Does changing y above one move any x<=0 point out of A?',
+    operation: 'label-mixture-and-local-split', review: 'Compare two actual candidate cuts on one conserved labeled dataset using weighted child mixture. Then retain the conditional right-child partition and its left-leaf invariance.',
+    prediction: 'Does changing only the height move a left-side point into another leaf?',
+    plainLabels: { 'Root cut x=0. Right branch alone splits at y=1.': 'First cut: left or right. Only the right region splits by height.' },
+    points: [{ xy: [-.8, 1.2], label: 0 }, { xy: [-.6, 1.5], label: 0 }, { xy: [-.4, 1.8], label: 0 }, { xy: [-.6, .4], label: 0 }, { xy: [.3, 1.2], label: 1 }, { xy: [.6, 1.6], label: 1 }, { xy: [.3, .6], label: 0 }, { xy: [.7, .3], label: 0 }],
+    headline: 'Choose splits from label mixture; later tests affect only their reached branch',
+    caption: 'A tree chooses splits that reduce mixed labels in the reached region. The same eight points compare two candidate cuts; left/right leaves less mixture here. The right child then splits again, while left-side points keep their original leaf. Leaf predictions use only their region\'s data. Further splitting can fit noise, so control depth and check held-out performance.',
   },
   'ethical-decision-process-outcome': {
     operation: 'clock-after-boundary', review: 'The committed decision boundary separates original evidence from later luck. Outcome observation cannot travel back into the decision-time evidence set.',
@@ -1419,103 +1775,167 @@ export const mentalPictures = {
   'ablation-rival-hypotheses': {
     operation: 'matched-comparison', review: 'Make the original-to-matched resource gain distinct from the small matched-to-method gap. Only the latter isolates the component under this setup.',
     prediction: 'Which gap is the matched component effect: three or 0.2 points?', labels: ['original', 'matched control', 'method'], values: [80, 82.8, 83], suffix: 'score',
+    plainLabels: { 'Matched method gap: 83 - 82.8 = 0.2 points.': 'The matched comparison leaves a 0.2-point gap.' },
   },
   'coding-product-authority-boundary': {
-    operation: 'authority-rails', review: 'Shared repository context reaches all four modes. Execution routes close in three modes and open only for a scoped isolated agent.',
+    operation: 'pinned-work-and-developer-apply', review: 'Keep the four mode contracts, then bind one bounded agent artifact to r1/o7. Stop old green tests at the changed r2/o8 target; require authorized reconciliation, intact independent checks, and separate developer acceptance.',
     prediction: 'Does having the same repository context grant chat execution authority?', labels: ['inline', 'chat', 'review', 'agent'], allowed: [false, false, false, true],
+    original: { repository: 'R', revision: 'r1', overlay: 'o7' }, current: { repository: 'R', revision: 'r2', overlay: 'o8' },
+    headline: 'Pin bounded work and evidence to a state; current checks still need developer acceptance',
+    caption: 'Share repository context without sharing execution authority. Bind asynchronous work to repository, revision, dirty overlay, permissions, and budget. Return a pinned patch with independent check evidence. After revision or overlay changes, old green tests and textual applicability do not validate the new target. Reconcile in an authorized workspace and rerun checks. Developer acceptance remains required; tests do not authorize publication.',
   },
   'feature-store-two-time-contract': {
-    operation: 'availability-before', review: 'Draw B’s event and arrival on one clock around noon. Only A has crossed the availability boundary before the historical query.',
-    prediction: 'Can B’s earlier event time override its later 12:10 availability?',
+    operation: 'availability-before',
+    review: 'The late-arrival warning omits shared computation and the two read contracts. Preserve entity and definition identities through online and historical stores, then compare current lookup with a frozen noon replay after late arrival and backfill.',
+    prediction: 'If C arrives at 12:20, can it change the noon example?',
+    headline: 'Share the definition; separate current lookup from historical replay',
+    caption: 'One versioned definition computes values for both stores. Online reads choose the latest ready value; historical reads replay what the decision could access. B happened before noon but arrived afterward, so the noon example still uses A. Later arrival or backfill must not rewrite that past decision. Shared definitions reduce skew but do not guarantee timely delivery.',
+    entity: 'U7', definition: 'D3',
+    versions: [
+      { identity: 'A', value: 3, event: 660, available: 665, entity: 'U7', definition: 'D3' },
+      { identity: 'B', value: 8, event: 710, available: 730, entity: 'U7', definition: 'D3' },
+    ],
+    backfill: { identity: 'C', value: 9, event: 715, available: 740, entity: 'U7', definition: 'D3' },
   },
   'ml-monitoring-observability-layers': {
-    operation: 'clock-after-boundary', review: 'Separate immediately known freshness failure from outcome labels that mature later. Unknown future quality is not a delay in detecting the current contract breach.',
-    prediction: 'Which failure is already knowable before quality outcomes mature?', events: [{ value: 0, label: 'snapshot stale' }, { value: 1, label: 'freshness failure known' }, { value: 2, label: 'maturation wait' }, { value: 3, label: 'quality readout' }], boundary: 1,
+    operation: 'monitoring-evidence-and-coverage',
+    review: 'A freshness timeline omits output evidence and the later denominator failure. Use the actual twenty-minute breach and seven-day window, then preserve all one thousand eligible records through joined accuracy and missing-join bounds.',
+    prediction: 'Could all missing joins belong to one critical slice?',
+    headline: 'Act on known contract failures; keep mature quality tied to its covered cohort',
+    caption: 'Separate endpoint health, data contracts, output behavior, and mature quality. A twenty-minute snapshot violates the two-minute limit now; changed scores alone do not prove worse accuracy. Use an approved fallback and retain affected identities. After seven days, evaluate eligible labels and join coverage by slice. Here ninety percent accuracy covers only joined records; missing joins leave full-cohort accuracy between eighty-one and ninety-one percent.',
+    age: 20, maximumAge: 2, matureDays: 7, eligible: 1000, joined: 900, correct: 810,
   },
   'ecosystem-experiment-interference': {
-    operation: 'shared-supply-return', review: 'Keep one shared creator reservoir between the assigned cells. Changed supply returns to both future treatment and future control.',
-    prediction: 'Which return route breaks a simple no-interference interpretation?',
+    operation: 'shared-supply-return', review: 'Preserve both thousand-creator cohorts, distinguish tested returns from test receipt and whole-cohort bounds, and retain every untested outcome as unknown. Only then show why shared creator supply can compromise a viewer-cell no-interference interpretation.',
+    prediction: 'Does the tested-only gain prove all-creator retention improved?',
+    cohorts: [{ identity: 'A', eligible: 1000, tested: 400, returned: 200 }, { identity: 'B', eligible: 1000, tested: 200, returned: 120 }],
+    headline: 'Keep every eligible creator in the denominator and follow delayed shared-supply effects',
+    caption: 'Tested-only returns rise while access halves. Untested outcomes remain unknown. All-eligible return spans 20 to 80% for A and 12 to 92% for B; either can win. Recover mature outcomes for the whole cohort. These cohorts are not randomized. Viewer randomization can still share creator supply that reaches control later. Preserve hard policy gates, participant outcomes, reversible exposure, and delayed readouts.',
   },
   'spotify-two-level-shelf-composition': {
-    operation: 'duplicate-penalty', review: 'Expose the repeated song identity in A+B before applying its four-point penalty. A+C retains ten without that repeated item.',
-    prediction: 'Why does choosing the two highest-scoring shelves lose to A+C?',
+    operation: 'duplicate-penalty', review: 'Keep coherent shelf membership intact, compare all three eligible pairs in common toy utility units, and explicitly separate symmetric membership selection from position-sensitive display ordering.',
+    prediction: 'Does selecting A with C establish which shelf goes first?',
+    shelves: [{ identity: 'A', intent: 'Familiar', songs: [1, 2], score: 6 }, { identity: 'B', intent: 'Repeat', songs: [1, 3], score: 5 }, { identity: 'C', intent: 'Discovery', songs: [4, 5], score: 4 }],
+    headline: 'Select whole shelves by page utility; do not infer their display order',
+    caption: 'Each shelf stays intact. All toy pairs are eligible; scores share utility units. A with B repeats song 1 and pays a four-point penalty, leaving seven. A with C keeps ten, beating B with C at nine. That selects membership, not display order: reversing A and C leaves this symmetric score unchanged. Ordering needs position-sensitive evidence; real selection also respects editorial, rights, freshness, and privacy constraints.',
   },
   'encoder-once-decoder-loop': {
-    operation: 'fixed-source-growing-prefix', review: 'Carry the same source-memory identity across three decode steps while extending only the generated prefix.',
-    prediction: 'Which inventory grows between step one and step three?',
+    operation: 'fixed-source-growing-prefix', review: 'Show one fixed three-position source cache and two incremental target queries making six source-score pairs per head and layer. Separate causal target attention from source access, teacher-forced input/label shifting, and source-change invalidation.',
+    prediction: 'May the first teacher-forced prediction read the y1 input?',
+    source: ['s1', 's2', 's3'], inputs: ['BOS', 'y1'], labels: ['y1', 'EOS'],
+    headline: 'Keep source keys fixed while new target queries read permitted source memory',
+    caption: 'One encoder pass supplies layer-specific source keys and values while input and parameters stay fixed. Two target queries each score three source positions: six pairs per head and layer. Target self-attention is causal; cross-attention uses separate source masks. Teacher forcing shifts inputs against labels and may score positions in parallel without future access. A changed bidirectional source invalidates affected encodings, caches, and possibly target states; streaming requires its own policy.',
   },
   'agent-eval-diagnostic-flywheel': {
-    operation: 'serial-gates', review: 'Carry the same trial through task and authority checks. Passing task tests does not open the unauthorized-write gate.',
-    prediction: 'Can this task-test pass make the joint trial pass?', lanes: [{ labels: ['task test', 'authority'], states: [true, false], detail: 'The unauthorized write vetoes the completed task.' }],
+    operation: 'trajectory-outcome-and-budget', review: 'Inspect the first failing authority step in a contained tool trajectory, independently verify final state, and aggregate repeated reset trials under one call budget. Preserve task-only versus joint success and charge unsuccessful trials rather than reporting only the cheapest successful run.',
+    prediction: 'Do two task completions mean two authorized successes?',
+    callBudget: 10, trials: [{ task: true, authorized: true, state: true, calls: 4 }, { task: true, authorized: false, state: true, calls: 8 }, { task: false, authorized: true, state: false, calls: 7 }],
+    headline: 'Evaluate the whole trajectory, verify external state, and count every trial and cost',
+    caption: 'Reset versioned, contained environments and repeat representative tasks at fixed budgets. Inspect plans, tool arguments, receipts, recovery, and external state, not just final answers. This toy has two task completions but only one authorized success across three trials. Charge failed trials too. Diagnose the first failing step, repair its owner, and retest on held-out tasks. Calibrate graders, report uncertainty and safety separately, then compare offline evidence with staged production behavior.',
   },
   'search-ranker-evidence-flywheel': {
-    operation: 'weighted-tail', review: 'Preserve the ninety/ten traffic weights while separating the failing tail from its larger head contribution.',
-    prediction: 'Does weighted score 0.88 clear the tail floor 0.78?', weights: [.9, .1], values: [[.8, .8], [.9, .7]], floor: .78,
+    operation: 'weighted-tail', review: 'Distinguish equal-sized judged query sets from ninety/ten target traffic weights. Show the unchanged equal-slice average beside the traffic gain and failed tail gate, then retain judgment coverage and randomized product evidence as separate requirements.',
+    prediction: 'Does equal-slice averaging preserve B\'s headline gain?', weights: [.9, .1], values: [[.8, .8], [.9, .7]], floor: .78,
+    headline: 'Declare the averaging population, preserve the tail gate, and separate offline from product evidence',
+    caption: 'Equal-sized judged query sets give both rankers an equal-slice mean of 0.80. Target traffic instead weights head queries nine times more. B reaches 0.88 but its 0.70 tail fails the declared 0.78 floor. Neither average proves user benefit. New unjudged documents are unknown, not irrelevant; pool and version judgments. Freeze the evaluation manifest, then test defined product effects under randomized exposure with safety, uncertainty, ownership, and rollback gates.',
   },
   'independent-confirmation-vs-adaptive-reuse': {
-    operation: 'clock-after-boundary', review: 'Keep benchmark-guided selection left of the lock and genuinely fresh confirmation right of it.',
-    prediction: 'Is the feedback used to choose the model independent confirmation of that choice?', events: [{ value: 0, label: 'benchmark feedback' }, { value: 1, label: 'feedback guides choice' }, { value: 2, label: 'selection locked' }, { value: 3, label: 'fresh confirmation' }], boundary: 2,
+    operation: 'claim-validity-and-confirmation', review: 'Start with the claim and four validity questions, then distinguish feedback-guided selection from confirmation. A later same-family variant remains dependent; the withheld-family control is eligible only under explicit no-overlap, no-training and no-feedback assumptions, not an automatic broad-claim certificate.',
+    prediction: 'Does merely later evidence restore independence?',
+    usedFamilies: ['F2'], candidates: [{ label: 'Later F2 variant', family: 'F2', afterLock: true, trained: false, selected: false }, { label: 'Withheld F9', family: 'F9', afterLock: true, trained: false, selected: false }],
+    headline: 'Match evidence to the claim; later data is not automatically independent confirmation',
+    caption: 'Start with the claim, target population, allowed tools, and failure costs. Check task coverage, population match, grader validity, and prediction of later behavior. Benchmark feedback used for training or selection becomes development evidence. Lock the choice before independent confirmation. Later variants from the same source family can still overlap. A withheld family needs audited independence, and independence alone does not establish the four validity conditions.',
   },
   'collective-failure-commit-boundary': {
-    operation: 'restore-common', review: 'Mixed local progress cannot be a collective restart point. Both rank paths return to the same committed v4 before retrying.',
-    prediction: 'Can rank zero keep v5 while rank one restores v4 for the retry?',
+    operation: 'restore-common', review: 'Compute the mismatched weights left by partial application, the double-update failure, and the coherent restored transition before discussing changed membership.',
+    prediction: 'After partial application, does replaying communication undo rank zero\'s update?',
+    headline: 'Restore one committed training state before replaying a partially applied optimizer transition',
+    caption: 'Communication replay cannot undo an update. The toy leaves mismatched weights; blind replay applies the transition twice on one rank. Coordinated restore and replay match the intended weights. Restore optimizer, scheduler, scaler, randomness, input position and step identity too. Fewer ranks change the gradient mean and experiment. Timeout and checksum checks do not prove numerical correctness. Verify checkpoint lineage and supported reconstruction; this is not Byzantine tolerance.',
+    weight: 1, rate: .1, gradient: 2,
   },
   'llm-adaptation-layers': {
-    operation: 'serial-gates', review: 'Schema validity is only one gate. Stale knowledge and failed policy retain their own blocking states.',
-    prediction: 'Does valid JSON establish correct knowledge or authorized behavior?', lanes: [{ labels: ['schema', 'knowledge', 'policy'], states: [true, false, false], detail: 'Correct formatting cannot release this stale, prohibited response.' }],
+    operation: 'adaptation-diagnostic', review: 'Keep policy and output-contract checks independent while changing authorized context and instructions in the same fictional day-fourteen case.',
+    prediction: 'If valid JSON still applies policy A, which check fails?',
+    headline: 'Isolate missing policy evidence from output-format failure before choosing an intervention',
+    caption: 'Policy correctness and output format are independent checks. Supplied policy B fixes eligibility in the day-fourteen case, but not JSON. Adding an output contract passes both stipulated checks; valid JSON using stale A still fails policy. Direct context tests evidence use, not retrieval coverage. Prompting, authorized retrieval and training can compose. Evaluate persistent behavior errors on held-out tasks; compare quality, cost, freshness and rollback.',
   },
   'fine-tuning-two-decisions': {
-    operation: 'independent-choices', review: 'Selection of a training signal and parameter scope should have separate rails. Cross all four combinations instead of treating LoRA as a supervision type.',
-    prediction: 'Does choosing preference pairs force either full-scope or LoRA updates?',
+    operation: 'independent-choices', review: 'Cross all three training signals with both scopes, then expose a computed low-rank addition with the base unchanged.',
+    prediction: 'Do preference pairs force full-scope rather than adapter updates?',
+    headline: 'Choose the training signal separately from which parameters can change',
+    caption: 'Choose targets separately from trainable parameters. Domain text, ideal answers and preferences provide different training signals; each can use full or adapter updates. LoRA freezes the base and adds a low-rank update, visibly changing the toy output. Preference data do not force a scope. Fewer trainable values do not guarantee quality or remove base storage. Evaluate leakage, regressions, privacy, serving compatibility and rollback.',
   },
   'as-five-cross-cutting-signals': {
-    operation: 'independent-evidence', review: 'Two observed signals remain observations, while three other skills stay unresolved. None should inherit evidence from confident presentation.',
-    prediction: 'Which signals remain unknown after this framing-and-testing follow-up?', labels: ['framing', 'testing', 'scaling', 'leading', 'impact'], states: ['verified', 'verified', 'unknown', 'unknown', 'unknown'],
+    operation: 'practice-feedback-loop', review: 'Diagnose the actual same-logit chain-rule mistake, select a targeted drill, and preserve the other four practice lenses as unobserved.',
+    prediction: 'Does one corrected derivative establish delivery or collaboration skill?',
+    headline: 'Use an observed mechanism gap to choose a drill, then change the assumption',
+    caption: 'An observed error selects a drill, not a personality judgment. In this sigmoid case, squared loss has an extra derivative factor under the same logit. Reconstruct that chain, then change to direct probability parameters: the gradients change. Record the attempt, feedback and transfer check. Other skills remain unobserved until supported by work. These five practice lenses are not a universal hiring rubric; clarify and test objections rather than agreeing automatically.',
   },
   'flashattention-sram-tile-stream': {
     operation: 'stable-tile-merge', review: 'Discard local scores only after preserving the running maximum, denominator, and weighted numerator. Verify their rescaled merge against the complete softmax.',
-    prediction: 'Which retained quantities let a second tile merge without keeping the first score tile?', logits: [[0, 2], [1]], values: [[1, 3], [5]],
-    caption: 'These illustrative tiles retain a maximum, normalizer, and weighted-value accumulator. Stable rescaling merges both tiles to the same weighted output as complete softmax. Temporary score storage can then be discarded.',
+    prediction: 'If the second tile is entirely future-only, should the output become five?', logits: [[0], [Math.log(3)]], values: [[2], [6]],
+    headline: 'Rescale both retained totals when a new tile raises the softmax reference',
+    caption: 'Retain a maximum, mass and unnormalized value numerator, not old scores. The new maximum shrinks both old totals by one third before adding the new tile. Their ratio becomes five, matching dense softmax; forgetting rescaling gives four. Masking the second tile leaves output two. Skip forbidden blocks and declare fully masked-row behavior. Mathematical equivalence permits floating-point differences; validate an appropriate tolerance.',
   },
   'flashattention-standard-hbm-path': {
-    operation: 'memory-roundtrip', review: 'Remove the out-and-back score-intermediate route, not all HBM activity. The surviving input/output route remains explicit.',
+    operation: 'dense-attention-storage', review: 'Distinguish avoided global score/probability storage from surviving QKV/output traffic, dense pair arithmetic and measured latency.',
     prediction: 'Are QKV reads and output writes removed with temporary score storage?',
+    headline: 'Avoid global score-matrix round trips without claiming less dense attention arithmetic',
+    caption: 'Tiling avoids materializing complete score and probability intermediates in global memory. Input reads and output writes remain; temporary score tiles and row state live on chip when they fit. The tensor-size comparison is not a traffic ratio or speedup. Dense allowed pairs still require computation. Backward may recompute tiles. Measure memory, traffic and latency separately: the short-sequence timing toy is slower despite the same operator.',
   },
   'foundation-data-curation-lineage': {
-    operation: 'serial-gates', review: 'Accepted membership needs its own consumption receipt. Preserve rejected R18’s denial instead of treating absence as missing provenance.',
-    prediction: 'Does manifest membership alone establish actual training consumption?', lanes: [{ labels: ['policy', 'manifest', 'read receipt'], states: [true, true, true], detail: 'R17 has permission, membership, and actual consumption evidence.' }, { labels: ['policy', 'manifest', 'read receipt'], states: [false, false, false], detail: 'R18 retains its denial; no membership or read is claimed.' }],
+    operation: 'curation-exposure-lineage', review: 'Show actual logged exposure separately from eligible storage and intended weights; bind accepted/rejected lineage without equating membership to consumption.',
+    prediction: 'Does manifest membership alone establish actual training consumption?',
+    headline: 'Measure realized exposure and trace retained or rejected records through versioned lineage',
+    caption: 'Mixture weights do not prove consumption. Logged draws give A one effective epoch and B two despite B having fewer eligible positions. Halving B draws halves its exposure, not necessarily improving capability. Track source, transforms, gates, shards, manifests, runs and actual consumption at checkpoints. Rejected records retain protected reasons. Membership is not a read receipt; raw deletion is not unlearning. Independently audit coverage, policy errors and changed selection rules.',
   },
   'interview-evidence-to-drill': {
-    operation: 'independent-evidence', review: 'A known time constraint may select a drill; an unknown tool constraint must still prompt a permission question.',
-    prediction: 'Does knowing the time budget grant unknown tool permission?', labels: ['time budget', 'tool permission'], states: ['verified', 'unknown'],
+    operation: 'scoped-interview-permission', review: 'Route the actual codebase and oral rounds to different drills, preserving the named-tool scope and an unknown third-round rule.',
+    prediction: 'Does permission in the first round authorize tools in a silent third round?',
+    headline: 'Match each drill to confirmed round constraints and keep tool permissions scoped',
+    caption: 'Route practice by confirmed constraints, not employer names. The codebase round allows one named assistant; oral math permits no AI. Their drills differ, and permission does not transfer to another tool or round. A silent rule remains unknown: ask before use. Clarify conflicts with an authorized contact. Dated reports and pilots supply scoped questions, not universal policy.',
   },
   'proof-of-work-three-checks': {
-    operation: 'independent-evidence', review: 'Patch evidence establishes authorship without automatically attributing decision or rollout ownership.',
-    prediction: 'Which additional evidence would establish personal rollout responsibility?', labels: ['personal patch', 'decision ownership', 'rollout ownership'], states: ['verified', 'unknown', 'unknown'],
+    operation: 'bounded-contribution', review: 'Replace the inflated platform claim with the actual benchmark/gate contribution, then separate team ownership, observed outcomes and limited witness coverage.',
+    prediction: 'Does an outcome-only witness establish who designed the benchmark?',
+    headline: 'Bound the personal claim by artifacts, team ownership and witness knowledge',
+    caption: 'Claim the benchmark design and gate recommendation, not another team\'s platform or rollout. The report records slice recovery; concurrent cleanup limits causal credit. Keep evidence kind, disclosure status and witness coverage explicit. An outcome-only witness cannot establish an unseen decision. Restricted originals need approved, labeled alternatives, not unrelated proof. References should be factually compatible without scripts. Missing corroboration is a limit, not proof of falsehood.',
   },
   'fsdp-wrapped-unit-lifecycle': {
-    operation: 'transient-gather', review: 'Follow one rank’s retained quarter into a temporary complete wrapped unit and back to its same resting shard. Gathering is a lifetime peak, not permanent replication of the whole model.',
-    prediction: 'Does sharded resting storage eliminate the active unit’s temporary gather?',
+    operation: 'transient-gather', review: 'Connect persistent stage storage to the forward/backward unit lifetime, then test retention and activation-dominated capacity with the lesson\'s stated byte convention.',
+    prediction: 'If activations dominate, does doubling ranks alone guarantee the model fits?',
+    headline: 'Separate sharded persistent state from gathered-unit and activation lifetimes',
+    caption: 'Sharding divides selected persistent state, not every live buffer. The byte convention reduces persistent storage. A full wrapped unit still gathers for forward and again for backward. Retaining it trades communication for memory. The live-buffer ledger can exceed capacity despite small shards; more ranks do not divide unchanged activations. Check actual wrapping, overlap, precision and allocation lifetimes. Hypothetical accounting is not a measured peak.',
   },
   'gan-alternating-update-ownership': {
     operation: 'gradient-ownership', review: 'Freeze D parameter updates without breaking the differentiable path through D on the G step. Stop fake-to-G gradients only on the D step.',
     prediction: 'Can gradients pass through D while D’s weights remain frozen?',
+    headline: 'Alternate the update owner while preserving the generator\'s path through the critic',
+    caption: 'Alternate updates. D learns real versus detached fake samples; G learns through D to improve samples. Freeze D parameters during the G step, not its input-gradient path. A confident discriminator shrinks the original saturating toy signal; a non-saturating objective changes it. Strong gradients do not guarantee coverage or convergence. Validate diversity, quality and actual latency separately.',
   },
   'hallucination-claim-release-gates': {
-    operation: 'serial-gates', review: 'Factual support and release authority operate on the same claim but require independent receipts.',
-    prediction: 'Does factual support authorize a private claim’s disclosure?', lanes: [{ labels: ['support', 'release'], states: [true, true], detail: 'Public supported claim is releasable.' }, { labels: ['support', 'release'], states: [true, false], detail: 'Private supported claim stops at release permission.' }],
+    operation: 'claim-evidence-release', review: 'Five agreeing samples still lack passage support; a supported private claim still needs release permission. Keep both controls and matched fallback evidence explicit.',
+    prediction: 'Do five agreeing samples justify releasing the unsupported approval promise?',
+    headline: 'Require claim-level evidence and release permission rather than agreement or citation presence',
+    caption: 'Five answers can repeat one unsupported promise. Agreement, fluent reasoning and resolving citations do not prove claim support. Check authorized, current passages and separate disclosure permission. Unsupported claims need abstention, controlled correction or review; supported private claims still stop at release. Independently label verifier errors and confidence signals by slice. Track unsupported claims, false alarms, refusals, latency and incidents. No detector or reviewer guarantees zero hallucinations.',
   },
   'llm-eval-calibration-loop': {
-    operation: 'count-floor', review: 'One trial mark is one joint result. Place the required fourteen-pass boundary after the thirteenth green identity.',
-    prediction: 'Which single additional joint result is needed to reach seventy percent?', total: 20, passed: 13, required: 14,
+    operation: 'count-floor', review: 'Compute the intersection of citation validity and substantive support on the same cases, then apply the observed floor without inferring population quality.',
+    prediction: 'Does averaging the marginal rates measure the required joint outcome?', total: 20, passed: 13, required: 14, cost: .4,
+    headline: 'Count same-answer joint success instead of averaging separate quality checks',
+    caption: 'Both requirements must hold on the same answer. Eighteen valid citations and fourteen supported answers overlap on thirteen cases: 65% joint success. Averaging marginal rates answers a different question. The observed 70% floor needs fourteen joint passes. Report cost, sampling and uncertainty; small teaching counts do not prove population quality or product gains. Validate scorers and use fresh confirmation after tuning.',
   },
   'asr-adaptation-boundaries': {
-    operation: 'replace-one-state', review: 'A modular lexicon change leaves the acoustic core identity untouched. Do not depict all adaptation as retraining all model parts.',
-    prediction: 'Which component remains fixed in this modular adaptation?', states: [['acoustic fixed', 'lexicon old'], ['acoustic fixed', 'lexicon new']], changed: 1,
+    operation: 'asr-text-score-control', review: 'Change the external-language-model scoring weight on fixed acoustic scores, preserve candidate-support limits, and distinguish vocabulary from channel adaptation.',
+    prediction: 'If the rare name never enters the candidate list, can rescoring choose it?',
+    headline: 'Change text-side decoding preferences without claiming changed acoustic evidence',
+    caption: 'Locate the changing knowledge source. Fixed acoustic scores favor the common word; increasing the external-LM weight makes the rare name win this toy. Acoustic parameters did not change, and the result is not measured accuracy or proof of speech content. Rescoring cannot select an absent candidate. Version lexicon, tokens, graph, fusion and rollback. Test rare-term recall against false insertions; channel failures need representative acoustic evidence.',
   },
   'model-gain-evidence-decision': {
-    operation: 'gain-floor', review: 'Put the half-point estimate on the same ruler as the one-point practical threshold. Positive is not synonymous with worthwhile.',
-    prediction: 'Does a statistically positive half point cross the one-point practical floor?', estimate: .5, required: 1,
+    operation: 'gain-floor', review: 'Compute paired variance from discordant examples, draw the actual two confidence intervals, and distinguish direction, useful-effect evidence and dependent duplication.',
+    prediction: 'Does the positive second interval establish a gain exceeding one point?', estimate: .8, required: 1,
+    headline: 'Use paired uncertainty before claiming direction or a worthwhile model gain',
+    caption: 'Keep one difference per paired example. The first interval spans zero and the useful-gain threshold, so direction remains uncertain. More new independent pairs narrow it above zero, but it still crosses the threshold. Positive evidence is not proof of a worthwhile gain. Duplicating observations supplies no new independent information. Coverage is a repeated-sampling property, not a posterior probability. Predeclare the test and claim family; twenty claims need multiplicity control.',
   },
   'beam-search-live-finished-transition': {
     operation: 'normalized-ranking', review: 'Keep both complete beam identities while changing only the declared scoring normalization. Stop expansion at EOS.',
@@ -1533,6 +1953,7 @@ export const mentalPictures = {
   'project-stop-forward-evidence-ledger': {
     operation: 'future-net', review: 'Follow forward value three minus remaining cost five to net minus two. Keep spent twenty outside the forward arithmetic route.',
     prediction: 'Can sunk twenty change the additional net value of continuing?', value: 3, remaining: 5, sunk: 20,
+    plainLabels: { 'Future 3 minus remaining 5 = -2': 'Remaining cost exceeds future value by two' },
   },
   'senior-principal-delegated-coherence': {
     operation: 'scope-join', review: 'Local implementation ends within one owner’s boundary. A shared-interface change crosses into multiple affected owners who must align.',
@@ -1623,6 +2044,8 @@ export const mentalPictures = {
   'accelerator-critical-path-trace': {
     operation: 'parallel-finish', review: 'Start both dependencies at the same clock origin. The finish marker follows their maximum, not the sum or a noncritical improvement.',
     prediction: 'Does halving the sixty-unit parallel task shorten the hundred-unit finish?', cases: [[100, 60], [100, 30], [80, 60]],
+    plainLabels: { 'Case 1: max(100,60) = 100': 'Both finish after 100 units', 'Case 2: max(100,30) = 100': 'Still finish after 100 units', 'Case 3: max(80,60) = 80': 'Shorter awaited path finishes after 80 units' },
+    caption: 'Both tasks start together, and completion waits for the slower one. Speeding up the shorter task leaves that finish time unchanged. Speeding up the awaited task moves the finish earlier. Optimize the critical path, not simply a task with a large individual runtime.',
   },
   'paged-attention-block-table-indirection': {
     operation: 'logical-physical-pages', review: 'Scatter the selected physical page identities but preserve logical sequence order through the explicit mapping.',
@@ -1643,6 +2066,7 @@ export const mentalPictures = {
   'plan-70b-parallel-accounting': {
     operation: 'distinct-examples', review: 'Count physical example identities across two data replicas and four sixteen-example microbatches. Tensor and pipeline subdivisions reuse these identities.',
     prediction: 'Does multiplying by TP eight count any additional distinct example?', replicas: 2, batches: 4, batchSize: 16,
+    plainLabels: { '2 x 4 x 16 = 128. TP and PP reuse these same identities.': '128 distinct examples; tensor and pipeline splits reuse them.' },
   },
   'reward-model-distribution-shift': {
     operation: 'independent-evidence', review: 'Validation belongs to its observed response distribution. The optimized distribution requires new evidence rather than inheriting the old accuracy receipt.',
@@ -1655,10 +2079,13 @@ export const mentalPictures = {
   'technical-project-decision-spine': {
     operation: 'parallel-finish', review: 'An awaited hundred-unit dependency keeps the response finish fixed while model time shrinks from sixty to thirty.',
     prediction: 'Which dependency remains on the end-to-end critical path?', cases: [[100, 60], [100, 30]],
+    plainLabels: { 'Case 1: max(100,60) = 100': 'Both finish after 100 units', 'Case 2: max(100,30) = 100': 'Still finish after 100 units' },
+    caption: 'The response waits for both parallel dependencies. Halving the model’s work does not change the longer dependency it still awaits. The faster component improves locally, but the end-to-end finish stays fixed.',
   },
   'profiling-exposed-collective-tail': {
     operation: 'overlap-tail', review: 'Place forty communication units and thirty useful-compute units on the same clock. Only their uncovered ten-unit tail extends the step.',
     prediction: 'Is the exposed delay forty units or ten?', communication: 40, covered: 30,
+    plainLabels: { 'Exposed tail 40 - 30 = 10': 'Ten units remain exposed after compute overlap' },
   },
   'legal-rag-claim-lineage': {
     operation: 'serial-gates', review: 'Resolve each citation first, then test support for the exact claim. Working links cannot supply absent semantic support.',
@@ -1671,6 +2098,7 @@ export const mentalPictures = {
   'personalization-three-feature-clocks': {
     operation: 'age-versus-latency', review: 'Draw the long snapshot-to-response tether and short request-to-response tether on one clock without confusing their endpoints.',
     prediction: 'Does request latency 0.1 make the ten-unit-old feature snapshot fresh?',
+    plainLabels: { 'Feature age 10 - 0 = 10': 'Feature age: ten time units', 'Request latency 10 - 9.9 = 0.1': 'Request latency: 0.1 time units' },
   },
   'recsys-llm-bounded-augmentation': {
     operation: 'serial-gates', review: 'Generated suggestions must satisfy both deadline and catalog membership before displacing the bounded baseline.',
@@ -1715,12 +2143,14 @@ export const mentalPictures = {
   'strong-scaling-wall-time-cost-knee': {
     operation: 'device-time-area', review: 'Use actual device count as one side and elapsed hours as the other. The faster sixteen-device run has greater total device-hour area.',
     prediction: 'Which run finishes sooner but uses more device-hours?', cases: [[8, 2], [16, 1.5]],
+    plainLabels: { '8 devices x 2 hours = 16': '16 device-hours', '16 devices x 1.5 hours = 24': '24 device-hours' },
   },
   'synthetic-data-two-independent-evidence-gates': {
     operation: 'clock-after-boundary', review: 'Place training-row filtering before selection lock and independent held-out confirmation after it.',
     prediction: 'Can reused training-filter feedback serve as fresh final confirmation?', events: [{ value: 0, label: 'training-row filter feedback' }, { value: 1, label: 'selection locked' }, { value: 2, label: 'fresh held-out confirmation' }], boundary: 1,
   },
   'tensor-parallel-ffn-handoff': {
+      plainLabels: { '4 + 6 reconstructs one coordinate, not two concatenated ones.': 'Combine four and six into one output coordinate.' },
     operation: 'partial-coordinate-sum', review: 'Two channel shards contribute to one output coordinate. Their four and six merge into one ten-valued coordinate rather than a two-coordinate concatenation.',
     prediction: 'Does concatenating four and six reconstruct the complete output coordinate?',
   },
@@ -1743,14 +2173,19 @@ export const mentalPictures = {
   'two-tower-cross-encoder-fanout': {
     operation: 'opportunity-count', review: 'The cross-encoder receives only the twenty retrieved candidate identities, not all one thousand corpus items.',
     prediction: 'Can joint encoding rescue an item absent from the twenty retrieved candidates?', counts: [1000, 20], units: [20, 1], labels: ['Corpus: one mark twenty items', 'Joint scoring: one mark one pair'],
+    caption: 'The first stage retrieves twenty candidates from the full corpus. Joint encoding scores only those surviving query-item pairs. A more powerful reranker cannot recover an item excluded before it receives the candidates.',
   },
   'vae-training-and-generation-paths': {
     operation: 'different-latent-source', review: 'Training reaches latent z through an encoder of observed x. Generation starts from the prior and cannot borrow an absent observation.',
     prediction: 'Which latent source is used when no observed input exists?',
+    plainLabels: { 'Train: observed x is encoded into q(z|x)': 'Training infers a latent distribution from input' },
+    caption: 'Training encodes an observed input into a latent distribution, samples a code, and decodes a reconstruction. Generation instead draws a code from the prior and decodes it. No observed input or encoder is needed then. Training encourages inferred distributions to stay near that prior, linking the two routes.',
   },
   'speculative-decoding-weight-read-ledger': {
     operation: 'cost-per-output', review: 'Preserve total speculative work 1.3 while changing the number of accepted output identities sharing it.',
     prediction: 'Why can one accepted token cost more than the one-unit baseline?', total: 1.3, outputs: [2, 1], baseline: 1,
+    plainLabels: { '1.3 total work / 2 accepted': 'Two accepted outputs share 1.3 work units', '1.3 total work / 1 accepted': 'One accepted output carries 1.3 work units' },
+    caption: 'Verification work belongs to the whole draft, not only its accepted tokens. Two accepted tokens can share that work; one accepted token carries it alone. More accepted output can lower cost per token even when total speculative work stays fixed.',
   },
   'cross-validation-fit-the-question': {
     operation: 'split-dependencies', review: 'Show new-user and future-time boundaries on separate rails. A random split cannot claim both protections by default.',
@@ -1773,23 +2208,27 @@ export const mentalPictures = {
     prediction: 'Can completed shard files publish before both permission and validation pass?', lanes: [{ labels: ['built', 'policy', 'validation'], states: [true, true, false], detail: 'Built and permitted but invalid: hold.' }, { labels: ['built', 'policy', 'validation'], states: [true, false, true], detail: 'Built and valid but unpermitted: hold.' }, { labels: ['built', 'policy', 'validation'], states: [true, true, true], detail: 'All required artifact gates pass.' }],
   },
   'multimodal-path-boundaries': {
-    operation: 'independent-evidence', review: 'Authorization, dispatch, and effect are separately evidenced events. A correlated device receipt establishes effect rather than permission alone.',
+    operation: 'permission-dispatch-receipt', review: 'Keep permission and dispatch verified while the external effect remains unknown without its correlated receipt. Add the same route after authoritative effect confirmation; neither authorization nor dispatch substitutes for occurrence evidence.',
     title: 'Permission differs from occurrence', caption: '',
-    prediction: 'Does permission establish occurrence?', labels: ['permission', 'dispatch', 'receipt'], states: ['verified', 'verified', 'verified'],
+    prediction: 'Does permission establish occurrence?', labels: ['permission', 'dispatch', 'receipt'], frames: [['verified', 'verified', 'unknown'], ['verified', 'verified', 'verified']],
   },
   'multimodal-turn-lifecycle': {
-    operation: 'epoch-members', review: 'Carry the active epoch through late-packet rejection. Rejecting seven under active eight cannot retire or rewind the new epoch.',
+    operation: 'epoch-admission-and-stop', review: 'Retain the active epoch through old-packet rejection, then keep it unchanged across independent playback stop-request and device-receipt states. Retiring packets does not prove queued audio stopped.',
     title: 'Retired packets stay rejected', footer: 'Late seven cannot rewind eight.',
     caption: '',
     prediction: 'Can retired packets reenter?',
+    activeEpoch: 8, oldEpoch: 7, playback: ['queued', 'unknown', 'stopped'],
   },
   'video-publication-evidence': {
     operation: 'serial-gates', review: 'Rollback binds model, features, and policy to a compatible versioned bundle. An old model alone cannot open mismatched feature and policy gates.',
     prediction: 'Does restoring model v1 alone authorize feature/policy v2?', lanes: [{ labels: ['model v1', 'features v1', 'policy v1'], states: [true, false, false], detail: 'Unsafe rollback still has features/policy v2.' }, { labels: ['model v1', 'features v1', 'policy v1'], states: [true, true, true], detail: 'Compatible restored v1 bundle passes.' }],
   },
   'infonce-positive-candidate-set': {
-    operation: 'positive-in-whole', review: 'Carry the declared positive identity into its own denominator alongside both negative candidates. Semantic relevance cannot silently change the declared labels.',
+    operation: 'paired-views-and-candidates', review: 'Show two allowed views sharing an encoder, then a unit-length embedding change that actually increases the positive share against both negatives. Retain the positive-in-denominator and false-negative labeling boundary.',
     prediction: 'Is the declared positive excluded from the denominator candidate set?',
+    names: ['A', 'P', 'N1', 'N2'], angles: [[0, .8, .3, -.3], [0, .2, 1.2, -1.2]],
+    headline: 'Allowed views define agreement; comparison with declared negatives shapes the representation',
+    caption: 'Two allowed views of one item pass through the same encoder. Training raises their match relative to declared negatives. The unit-length embeddings show an illustrative step, not a fitted result. View choices define which changes should be ignored. The positive remains in the whole candidate set; an undeclared relevant item remains a negative. Negatives oppose collapse, but false negatives can damage the representation.',
   },
   'fp16-safe-update-order': {
     operation: 'scaled-clipping-order', review: 'Run the same scaled gradient through both orders. The wrong order produces one hundredth of the correct clipped gradient; a nonfinite route remains unable to step.',
@@ -1811,6 +2250,7 @@ export const mentalPictures = {
   'lcs-conditional-parent-cells': {
     operation: 'conditional-diagonal', review: 'Make the match-to-diagonal and mismatch-to-up/left arrows different. The highlighted two must inherit the selected diagonal one plus one.',
     prediction: 'Which predecessor is extended when B matches B?',
+    plainLabels: { 'AB versus ACB: matching B uses diagonal one + one = two.': 'Matching B extends the shorter-prefix subsequence to two.' },
   },
   'subset-sum-old-snapshot': {
     operation: 'old-snapshot-extension', review: 'Carry only old zero and one through the current five-valued item. Publish new five and six after extension; never feed new five back through the same item.',
@@ -1825,6 +2265,202 @@ export const mentalPictures = {
     prediction: 'Why is the backward one-then-zero path a duplicate rather than a new subset?', paths: [[0, 1], [1, 0]], strict: true,
   },
 };
+
+function leakageBoundaries(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const training = picture.trainingGroups.flatMap(group => picture.groups[group]);
+  const mean = training.reduce((sum, value) => sum + value, 0) / training.length;
+  const heldOut = picture.groups[2];
+  const transformed = heldOut.map(value => value - mean);
+  assert.deepEqual(training, [1, 3, 5, 7]);
+  assert.equal(mean, 4);
+  assert.deepEqual(transformed, [5, 7]);
+  assert.notEqual([...training, ...heldOut].reduce((sum, value) => sum + value, 0) / 6, mean);
+  const clock = eventClock(picture, model, tools);
+  let body = clock.body + text(20, 550, 'Keep related records together', { width: 320, weight: 700 });
+  for (const [group, values] of picture.groups.entries()) {
+    const horizontal = 20 + group * 115;
+    const tone = picture.trainingGroups.includes(group) ? 'input' : 'output';
+    body += text(horizontal + 45, 612, `${['A', 'B', 'C'][group]}: ${group === 2 ? 'test' : 'train'}`, { width: 95, anchor: 'middle', weight: 700, tone })
+      + `<rect x="${horizontal}" y="635" width="90" height="88" data-picture-leakage-group="${group}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    for (const [record, value] of values.entries()) body += text(horizontal + 24 + record * 42, 687, value, { width: 36, anchor: 'middle', weight: 700 });
+  }
+  body += arrowBetween([65, 741], [120, 790], 'input', tools, 2)
+    + arrowBetween([180, 741], [180, 790], 'input', tools, 2)
+    + line(295, 741, 295, 773, 'warning', true)
+    + line(283, 778, 307, 802, 'warning') + line(307, 778, 283, 802, 'warning')
+    + `<rect x="80" y="810" width="145" height="60" data-picture-leakage-fit-mean="${mean}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + text(152.5, 846, 'Train mean: 4', { width: 132, anchor: 'middle', weight: 700 })
+    + text(340, 842, 'Test does not fit', { width: 102, anchor: 'end', tone: 'warning' })
+    + text(20, 932, 'Apply saved mean 4 to C', { width: 320, weight: 700 })
+    + text(20, 985, 'Held-out inputs', { width: 320 });
+  for (const [record, value] of heldOut.entries()) {
+    const horizontal = 85 + record * 180;
+    body += circle(horizontal, 1038, 24, 'output') + text(horizontal, 1044, value, { width: 44, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 1074], [horizontal, 1120], 'output', tools, 2)
+      + circle(horizontal, 1155, 24, 'output') + text(horizontal, 1161, transformed[record], { width: 44, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1235, 'New C values do not refit the saved mean.', { width: 320 })
+    + text(20, 1320, 'Choose first; test without choosing again', { width: 320, weight: 700 })
+    + circle(80, 1410, 27, 'input') + text(80, 1416, 'pick', { width: 49, anchor: 'middle', weight: 700 })
+    + arrowBetween([120, 1410], [240, 1410], 'output', tools, 2)
+    + circle(280, 1410, 27, 'output') + text(280, 1416, 'test', { width: 49, anchor: 'middle', weight: 700 })
+    + text(80, 1480, 'Choose with validation', { width: 125, anchor: 'middle' })
+    + text(280, 1480, 'Untouched test', { width: 125, anchor: 'middle' })
+    + line(280, 1530, 280, 1560, 'warning', true) + line(280, 1560, 196, 1560, 'warning', true)
+    + line(164, 1560, 80, 1560, 'warning', true) + line(80, 1560, 80, 1530, 'warning', true)
+    + line(168, 1548, 192, 1572, 'warning') + line(192, 1548, 168, 1572, 'warning')
+    + text(20, 1640, 'Test outcomes must not return to choice.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1720, 'Future or related examples stay on the held-out side.', { width: 320, tone: 'soft' });
+  return { body, height: 1795 };
+}
+
+function unitAreaMassAndCollapse(picture, model, tools) {
+  const { text, line, circle, color, fill, number } = tools;
+  const determinant = columns => columns[0][0] * columns[1][1] - columns[0][1] * columns[1][0];
+  const stages = [[[1, 0], [0, 1]], picture.columns, [...picture.columns].reverse(), picture.collapsed];
+  assert.deepEqual(stages.map(determinant), [1, 2.25, -2.25, 0]);
+  const inputs = Array.from({ length: 16 }, (_, index) => [(index % 4 + .5) / 4, (Math.floor(index / 4) + .5) / 4]);
+  const map = (columns, input) => [0, 1].map(coordinate => columns[0][coordinate] * input[0] + columns[1][coordinate] * input[1]);
+  assert.equal(2.25 * (1 / 2.25), 1);
+  assert.deepEqual(map(picture.collapsed, [.25, .75]), map(picture.collapsed, [.5, .25]));
+  const headings = ['Start: the unit square', 'Map: columns become the square edges', 'Swap columns: same region, opposite order', 'Align columns: lose one independent direction'];
+  let body = '';
+  for (const [stage, columns] of stages.entries()) {
+    const vertical = stage * 441;
+    const tone = stage === 2 || stage === 3 ? 'warning' : 'input';
+    const vertices = [[0, 0], [1, 0], [1, 1], [0, 1]].map(input => map(columns, input));
+    const point = input => [80 + input[0] * 72, vertical + 220 - input[1] * 72];
+    const screen = vertices.map(point);
+    const polygonArea = vertices.reduce((sum, vertex, index) => sum + vertex[0] * vertices[(index + 1) % 4][1] - vertex[1] * vertices[(index + 1) % 4][0], 0) / 2;
+    assert.equal(polygonArea, determinant(columns));
+    body += text(20, vertical + 27, headings[stage], { width: 320, weight: 700 })
+      + line(55, vertical + 220, 325, vertical + 220) + line(80, vertical + 245, 80, vertical + 68)
+      + `<path data-picture-mapped-area="${Math.abs(polygonArea)}" d="M${screen.map(vertex => vertex.join(' ')).join('L')}Z" style="fill:${fill('output')};stroke:${color(tone)};stroke-width:2"></path>`;
+    for (const [index, input] of inputs.entries()) {
+      const [horizontal, height] = point(map(columns, input));
+      body += `<g data-picture-preserved-mass-member="${stage},${index}" data-picture-mass-share="0.0625">${circle(horizontal, height, 2.7, 'output', true)}</g>`;
+    }
+    for (let edge = 0; edge < 2; edge++) {
+      const from = screen[edge];
+      const to = screen[edge + 1];
+      body += arrowBetween(from, [from[0] + (to[0] - from[0]) * .72, from[1] + (to[1] - from[1]) * .72], tone, tools, 2.5);
+    }
+    const first = point(columns[0]);
+    const second = point(columns[1]);
+    body += text(stage === 2 ? 72 : first[0] + 12, first[1] + 26, 'first', { width: 72, anchor: stage === 2 ? 'end' : 'start', weight: 700, tone })
+      + text(stage === 2 ? second[0] + 12 : second[0], second[1] + (stage === 2 ? 26 : -22), 'second', { width: 82, anchor: stage === 2 ? 'start' : 'middle', weight: 700, tone })
+      + text(20, vertical + 307, stage === 3 ? 'Area: zero. No unique inverse.' : `Area: ${number(Math.abs(polygonArea))}; density: ${number(1 / Math.abs(polygonArea))}`, { width: 320, weight: 700 })
+      + text(20, vertical + 367, stage === 3 ? 'Distinct inputs meet on the same line.' : `Signed scale: ${polygonArea > 0 ? 'positive' : 'negative'} ${number(Math.abs(polygonArea))}. Mass: one.`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1838, 'Sixteen fixed marks track conserved mass, not sampled observations. Larger area means lower density.', { width: 320, tone: 'soft' })
+    + text(20, 1944, 'A collapsed image has no ordinary two-dimensional density. The regular inverse-density rule requires a nonsingular map.', { width: 320, weight: 700 });
+  return { body, height: 2040 };
+}
+
+function eigenbasisChangeAndReturn(picture, model, tools) {
+  const { text, line, circle, number } = tools;
+  const basis = [[Math.SQRT1_2, Math.SQRT1_2], [-Math.SQRT1_2, Math.SQRT1_2]];
+  const multiply = (matrix, vector) => matrix.map(row => row.reduce((sum, value, coordinate) => sum + value * vector[coordinate], 0));
+  const close = (actual, expected) => assert(actual.every((value, coordinate) => Math.abs(value - expected[coordinate]) < 1e-12));
+  const coordinates = basis.map(direction => direction.reduce((sum, value, coordinate) => sum + value * picture.input[coordinate], 0));
+  const scaled = coordinates.map((value, coordinate) => value * picture.gains[coordinate]);
+  const returnToAxes = values => [0, 1].map(coordinate => basis.reduce((sum, direction, index) => sum + direction[coordinate] * values[index], 0));
+  const output = returnToAxes(scaled);
+  assert.equal(picture.matrix[0][1], picture.matrix[1][0]);
+  close(basis.map(direction => Math.hypot(...direction)), [1, 1]);
+  assert(Math.abs(basis[0].reduce((sum, value, coordinate) => sum + value * basis[1][coordinate], 0)) < 1e-12);
+  for (const [index, direction] of basis.entries()) close(multiply(picture.matrix, direction), direction.map(value => value * picture.gains[index]));
+  close(returnToAxes(coordinates), picture.input);
+  close(output, multiply(picture.matrix, picture.input));
+  close(output, [5, 4]);
+  assert(Math.abs(Math.hypot(...coordinates) - Math.hypot(...picture.input)) < 1e-12);
+  const erased = returnToAxes([0, coordinates[1]]);
+  close(erased, [.5, -.5]);
+  close(returnToAxes([-scaled[0], scaled[1]]), [-4, -5]);
+  const headings = ['1. View along the perpendicular eigen-directions', '2. Stretch each eigen-component independently', '3. Return to the original viewing axes', 'Change only the first scale: erase it'];
+  const vectors = [picture.input, scaled, output, erased];
+  let body = '';
+  for (const [stage, vector] of vectors.entries()) {
+    const vertical = stage * 460;
+    const origin = [stage === 1 ? 70 : 110, vertical + 305];
+    const point = value => [origin[0] + value[0] * 36, origin[1] - value[1] * 36];
+    body += text(20, vertical + 27, headings[stage], { width: 320, weight: 700 })
+      + text(20, vertical + 101, stage === 0 ? 'Original input: two, one' : stage === 1 ? 'Same input view; only the first component triples' : stage === 2 ? 'Output: five, four' : 'First component gone; second still contributes', { width: 320, weight: 700 })
+      + line(40, origin[1], 331, origin[1]) + line(origin[0], vertical + 365, origin[0], vertical + 145);
+    if (stage !== 1) {
+      for (const [index, direction] of basis.entries()) {
+        const tip = point(direction.map(value => value * 2.5));
+        body += line(...origin, ...tip, index ? 'warning' : 'focus', true)
+          + text(index ? 20 : 175, vertical + 215, index ? 'second' : 'first', { width: 84, weight: 700, tone: index ? 'warning' : 'focus' });
+      }
+    }
+    const previous = stage === 1 ? coordinates : stage === 2 ? picture.input : stage === 3 ? output : null;
+    if (previous) body += `<g opacity=".35">${arrowBetween(origin, point(previous), 'input', tools, 2)}${circle(...point(previous), 4, 'input', true)}</g>`;
+    if (stage === 0) {
+      const component = basis[0].map(value => value * coordinates[0]);
+      body += line(...origin, ...point(component), 'focus', true) + line(...point(component), ...point(vector), 'warning', true);
+    }
+    if (stage === 1) {
+      body += line(...point(coordinates), ...point(scaled), 'focus')
+        + line(...point([scaled[0], 0]), ...point(scaled), 'warning', true)
+        + text(150, vertical + 273, 'before', { width: 78, anchor: 'middle', tone: 'input' })
+        + text(299, vertical + 372, 'after', { width: 78, anchor: 'middle', weight: 700, tone: 'output' })
+        + text(330, vertical + 283, 'first', { width: 78, anchor: 'end', weight: 700, tone: 'focus' })
+        + text(20, vertical + 159, 'second', { width: 84, weight: 700, tone: 'warning' });
+    }
+    body += `<g data-picture-eigenbasis-stage="${stage}" data-picture-vector="${vector.join(',')}">${arrowBetween(origin, point(vector), 'output', tools, 3)}${circle(...point(vector), 5, 'output', true)}</g>`
+      + text(20, vertical + 408, stage === 0 ? `Eigen-coordinates: ${number(coordinates[0])}, ${number(coordinates[1])}. Length unchanged.` : stage === 1 ? `First: ${number(scaled[0])}. Second: ${number(scaled[1])}, unchanged.` : stage === 2 ? 'The new arrow is the actual matrix output.' : 'Output: one half, minus one half. Not a unique inverse.', { width: 320, weight: 700 });
+  }
+  body += text(20, 1887, 'The diagonal basis is orthonormal. Zero erases a direction; negative scale reverses it. Symmetry supplies a complete basis.', { width: 320, tone: 'soft' });
+  return { body, height: 1985 };
+}
+
+function currentEvidenceAndAudibleStop(picture, model, tools) {
+  const { text, line, circle, color, fill, number } = tools;
+  const age = picture.arrival - picture.capture;
+  const qualifies = (uncertainty, consent = picture.consent, epoch = picture.epoch, clockMapped = picture.clockMapped) => consent && clockMapped && epoch === picture.activeEpoch && age + uncertainty < picture.limit;
+  assert(Math.abs(age + picture.uncertainty - .068) < 1e-12);
+  assert(qualifies(picture.uncertainty));
+  assert(!qualifies(picture.changedUncertainty));
+  assert(!qualifies(picture.uncertainty, false));
+  assert(!qualifies(picture.uncertainty, true, 'retired'));
+  assert(!qualifies(picture.uncertainty, true, picture.epoch, false));
+  const durations = [picture.serverCancelled, picture.queuedStopped, picture.localStopped].map(stop => stop - picture.speech);
+  assert.deepEqual(durations, [50, 900, 150]);
+  const old = eventClock(picture, model, tools);
+  let body = old.body
+    + text(20, 553, 'Request a keyframe; do not relabel the old one', { width: 320, weight: 700 })
+    + text(20, 645, 'New K: captured 14.40 s; arrives 14.45 s', { width: 320, weight: 700 })
+    + text(20, 713, 'Same active epoch E; consent and clock map valid', { width: 320, weight: 700 });
+  const ageWidth = 310 / .55;
+  for (const [index, uncertainty] of [picture.uncertainty, picture.changedUncertainty].entries()) {
+    const vertical = 837 + index * 225;
+    const accepted = qualifies(uncertainty);
+    body += text(20, vertical - 56, index ? 'Change only clock uncertainty to 480 ms' : 'Clock uncertainty: 18 ms', { width: 320, weight: 700 })
+      + `<rect x="25" y="${vertical}" width="${age * ageWidth}" height="38" data-picture-frame-age="${age}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:2"></rect>`
+      + `<rect x="${25 + age * ageWidth}" y="${vertical}" width="${uncertainty * ageWidth}" height="38" data-picture-frame-uncertainty="${uncertainty}" style="fill:${fill('warning')};stroke:${color('warning')};stroke-width:2"></rect>`
+      + line(25 + picture.limit * ageWidth, vertical - 10, 25 + picture.limit * ageWidth, vertical + 53, 'warning', true)
+      + text(20, vertical + 100, `${number(age + uncertainty)} s upper age bound: ${accepted ? 'fresh' : 'wait or abstain'}`, { width: 320, weight: 700, tone: accepted ? 'output' : 'warning' });
+  }
+  body += text(20, 1263, 'Shared age scale; dashed limit at 0.50 s', { width: 320, weight: 700 })
+    + text(20, 1331, 'First segment: capture age. Second: clock uncertainty. Revoked consent or retired epoch blocks either row.', { width: 320, tone: 'soft' })
+    + text(20, 1449, 'Speech starts at 1000 ms in both client traces', { width: 320, weight: 700 });
+  const labels = ['Server cancellation finishes', 'Queued audio actually stops', 'Alternative local flush stops playback'];
+  const stops = [picture.serverCancelled, picture.queuedStopped, picture.localStopped];
+  for (const [index, duration] of durations.entries()) {
+    const vertical = 1578 + index * 203;
+    const tone = index === 2 ? 'output' : 'warning';
+    body += text(20, vertical - 54, labels[index], { width: 320, weight: 700 })
+      + line(25, vertical + 19, 335, vertical + 19)
+      + `<rect x="25" y="${vertical}" width="${duration / 900 * 310}" height="38" data-picture-interruption-duration="${duration}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`
+      + circle(25 + duration / 900 * 310, vertical + 19, 4, tone, true)
+      + text(20, vertical + 92, `${duration} ms from onset; endpoint ${stops[index]} ms`, { width: 320, weight: 700, tone });
+  }
+  body += text(20, 2209, 'Server cancellation is not the 900 ms audible stop. A direct client flush changes this trace to 150 ms.', { width: 320, weight: 700 })
+    + text(20, 2311, 'Retire old output and require a device stop receipt. These synthetic traces are not latency percentiles.', { width: 320, tone: 'soft' });
+  return { body, height: 2395 };
+}
 
 function eventClock(picture, model, tools) {
   const { text, line, circle, color, fill, number } = tools;
@@ -1888,6 +2524,34 @@ function eventClock(picture, model, tools) {
     + text(20, 415, 'The early stop misses the later response', { width: 320, size: 18, weight: 700 })
     + text(20, 472, 'Event order only; no duration estimate is implied.', { width: 320, tone: 'soft' });
   return { body, height: 519 };
+}
+
+function errorPricesAndReviewCapacity(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const costs = picture.missPrices.map(price => [picture.score * price, (1 - picture.score) * picture.alarmPrice]);
+  assert(costs.every(values => Math.abs(values[1] - 1.5) < 1e-12));
+  assert(Math.abs(costs[0][0] - .85) < 1e-12 && Math.abs(costs[1][0] - 4.25) < 1e-12);
+  assert(costs[0][0] < costs[0][1] && costs[1][0] > costs[1][1]);
+  let body = text(20, 27, 'Same probability 0.85; different error prices', { width: 320, weight: 700 });
+  for (const [condition, price] of picture.missPrices.entries()) {
+    const offset = condition * 620;
+    body += text(20, 100 + offset, `Miss price ${price}; false-alarm price ${picture.alarmPrice}`, { width: 320, weight: 700 })
+      + text(20, 150 + offset, 'Allow: miss risk', { width: 145, weight: 700 })
+      + text(205, 150 + offset, 'Block: alarm risk', { width: 140, weight: 700 });
+    const comparison = weightedValues({ weights: [picture.score, 1 - picture.score], values: [price, picture.alarmPrice], expected: costs[condition], unit: .05, widthUnit: .05, heightUnit: 1, normalized: true, combine: false, widthLabel: 'error chance', heightLabel: 'error price', verdict: condition ? 'Block costs less: 1.5 versus 4.25' : 'Allow costs less: 0.85 versus 1.5' }, model, tools);
+    body += `<g transform="translate(0 ${165 + offset})">${comparison.body}</g>`;
+  }
+  body += text(20, 1320, 'Review capacity is a separate gate', { width: 320, weight: 700 })
+    + text(20, 1390, 'Two cases need review; only one slot is available', { width: 320 });
+  for (let request = 0; request < 2; request++) body += circle(80 + request * 200, 1475, 24, request ? 'warning' : 'input')
+    + text(80 + request * 200, 1481, request ? 'B' : 'A', { width: 42, anchor: 'middle', weight: 700 });
+  body += arrowBetween([80, 1510], [154, 1562], 'input', tools, 2)
+    + line(280, 1510, 258, 1531, 'warning', true)
+    + line(231, 1538, 255, 1562, 'warning') + line(255, 1538, 231, 1562, 'warning')
+    + `<rect x="130" y="1580" width="100" height="50" data-picture-review-capacity="1" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + text(180, 1611, 'A: 1 slot', { width: 90, anchor: 'middle', weight: 700 })
+    + text(20, 1700, 'Queue or abstain for B. Choose review priority explicitly.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1800 };
 }
 
 function policyBands(picture, model, tools) {
@@ -1966,6 +2630,74 @@ function decayBypass(picture, model, tools) {
   return { body, height: 580 };
 }
 
+function adamMemoryAndScale(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  let direction = [0, 0];
+  let squared = [0, 0];
+  const states = picture.gradients.map((gradient, step) => {
+    direction = direction.map((value, coordinate) => picture.beta1 * value + (1 - picture.beta1) * gradient[coordinate]);
+    squared = squared.map((value, coordinate) => picture.beta2 * value + (1 - picture.beta2) * gradient[coordinate] ** 2);
+    const corrected = direction.map(value => value / (1 - picture.beta1 ** (step + 1)));
+    const roots = squared.map(value => Math.sqrt(value / (1 - picture.beta2 ** (step + 1))));
+    const updates = corrected.map((value, coordinate) => picture.learningRate * value / (roots[coordinate] + picture.epsilon));
+    return { gradient, direction, squared, corrected, roots, updates };
+  });
+  assert.deepEqual(states[0].direction, [1, 2]);
+  assert.deepEqual(states[0].squared, [2, 8]);
+  assert.deepEqual(states[1].direction, [1.5, 1]);
+  assert.deepEqual(states[1].squared, [3, 4]);
+  assert(states[0].updates.every(value => Math.abs(value - .1) < 1e-12));
+  assert(Math.abs(states[1].updates[1] - .1 / Math.sqrt(3)) < 1e-12);
+  assert.equal(picture.gradients[1][1], 0);
+  assert(states[1].direction[1] > 0 && states[1].updates[1] > 0);
+  let body = text(20, 27, 'Store history before rescaling the step', { width: 320, weight: 700 })
+    + text(20, 72, 'Zero start; both buffers keep half their past', { width: 320, tone: 'soft' })
+    + text(20, 109, 'Learning rate 0.1; epsilon zero', { width: 320, tone: 'soft' });
+  for (const [step, state] of states.entries()) {
+    const vertical = 155 + step * 470;
+    body += text(20, vertical, step ? 'Next update: second gradient vanishes' : 'First update: different gradient sizes', { width: 320, weight: 700 });
+    const fields = [['stored direction', state.direction, 95], ['squared history', state.squared, 140], ['corrected direction', state.corrected, 222], ['root-size', state.roots, 262]];
+    for (const [coordinate, gradient] of state.gradient.entries()) {
+      const horizontal = 160 + coordinate * 120;
+      const tone = coordinate ? 'output' : 'input';
+      body += `<g data-picture-adam-coordinate="${coordinate}" data-picture-adam-update="${step + 1}" data-picture-adam-gradient="${gradient}" data-picture-adam-direction="${state.direction[coordinate]}" data-picture-adam-squared="${state.squared[coordinate]}" data-picture-adam-step="${state.updates[coordinate]}">`
+        + circle(horizontal, vertical + 47, 17, gradient ? tone : 'neutral')
+        + text(horizontal, vertical + 53, gradient, { width: 30, anchor: 'middle', weight: 700, tone: gradient ? tone : 'neutral' });
+      for (const [label, values, offset] of fields) {
+        if (!coordinate) body += text(20, vertical + offset, label, { width: 112, tone: 'soft' });
+        body += text(horizontal, vertical + offset, number(values[coordinate]), { width: 90, anchor: 'middle', weight: 700, tone });
+      }
+      const height = state.updates[coordinate] * 1000;
+      body += `<rect x="${horizontal - 28}" y="${vertical + 385 - height}" width="56" height="${height}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+        + text(horizontal, vertical + 417, number(state.updates[coordinate]), { width: 98, anchor: 'middle', weight: 700, tone })
+        + '</g>';
+    }
+    body += text(20, vertical + 50, 'gradient', { width: 100, tone: 'soft' })
+      + text(20, vertical + 184, 'Correct the zero-start bias', { width: 320, weight: 700 })
+      + text(20, vertical + 361, 'step size', { width: 100, tone: 'soft' })
+      + line(132, vertical + 385, 308, vertical + 385, 'neutral');
+  }
+  body += `<path d="M305 246H340V709H306" style="fill:none;stroke:${color('output')};stroke-width:2"></path>`
+    + arrowBetween([340, 709], [306, 709], 'output', tools)
+    + text(20, 601, 'Half the saved direction remains', { width: 320, tone: 'output' })
+    + text(20, 1095, 'Remove direction memory: this step vanishes', { width: 320, weight: 700 });
+  const tiny = [0, picture.tinyEpsilon].map(epsilon => picture.learningRate * picture.tinyGradient / (Math.abs(picture.tinyGradient) + epsilon));
+  assert(Math.abs(tiny[1] - .1 / 11) < 1e-12);
+  body += text(20, 1172, 'Same tiny input: epsilon prevents scale cancellation', { width: 320, weight: 700 })
+    + text(20, 1229, 'Input one-billionth; epsilon ten-billionths', { width: 320, tone: 'soft' });
+  for (const [index, value] of tiny.entries()) {
+    const horizontal = 100 + index * 160;
+    const tone = index ? 'output' : 'input';
+    body += `<rect data-picture-adam-tiny-epsilon="${index}" data-picture-adam-tiny-step="${value}" x="${horizontal - 28}" y="${1400 - value * 1250}" width="56" height="${value * 1250}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+      + text(horizontal, 1430, index ? 'with epsilon' : 'no epsilon', { width: 130, anchor: 'middle', weight: 700, tone })
+      + text(horizontal, 1470, number(value), { width: 110, anchor: 'middle', weight: 700, tone });
+  }
+  body += line(70, 1400, 290, 1400, 'neutral');
+  const decay = decayBypass(picture, model, tools);
+  body += `<g transform="translate(0 1540)">${decay.body}</g>`;
+  return { body, height: 1540 + decay.height };
+}
+
 function arrowBetween(from, to, tone, tools, width = 2) {
   const horizontal = to[0] - from[0];
   const vertical = to[1] - from[1];
@@ -1975,6 +2707,159 @@ function arrowBetween(from, to, tone, tools, width = 2) {
   const cross = [-along[1], along[0]];
   const wing = (side) => [to[0] - along[0] * 8 + cross[0] * 4 * side, to[1] - along[1] * 8 + cross[1] * 4 * side];
   return `<path d="M${from.join(' ')}L${to.join(' ')}M${wing(1).join(' ')}L${to.join(' ')}L${wing(-1).join(' ')}" style="fill:none;stroke:${tools.color(tone)};stroke-width:${width};stroke-linejoin:round"></path>`;
+}
+
+function rawAndNormalizedVectors(picture, model, tools) {
+  const { text, line, circle, color, number } = tools;
+  assert.deepEqual(picture.query, [1, 0]);
+  assert.deepEqual(picture.candidates, [[10, 10], [1, 0]]);
+  const normalize = vector => vector.map(value => value / Math.hypot(...vector));
+  const normalized = picture.candidates.map(normalize);
+  const projections = picture.candidates.map(vector => vector.reduce((sum, value, coordinate) => sum + value * picture.query[coordinate], 0));
+  const normalizedProjections = normalized.map(vector => vector[0]);
+  const distances = normalized.map(vector => Math.hypot(...vector.map((value, coordinate) => value - picture.query[coordinate])));
+  assert(projections[0] > projections[1]);
+  assert(normalizedProjections[0] < normalizedProjections[1]);
+  assert(distances[0] > distances[1]);
+  assert(normalized.every(vector => Math.abs(Math.hypot(...vector) - 1) < 1e-12));
+  assert.deepEqual(normalize(picture.candidates[0].map(value => value * 2)), normalized[0]);
+  let body = '';
+  for (let stage = 0; stage < 2; stage++) {
+    const vertical = stage * 520;
+    const unit = stage ? 100 : 20;
+    const origin = [stage ? 145 : 60, vertical + 310];
+    const point = vector => [origin[0] + vector[0] * unit, origin[1] - vector[1] * unit];
+    const vectors = stage ? normalized : picture.candidates;
+    body += text(20, vertical + 27, stage ? 'Normalize both; enlarge the unit circle five times' : 'Raw view: preserve query, A and B identities', { width: 320, weight: 700 })
+      + line(35, origin[1], 332, origin[1]) + line(origin[0], vertical + 68, origin[0], stage ? vertical + 434 : vertical + 337)
+      + `<circle cx="${origin[0]}" cy="${origin[1]}" r="${unit}" data-picture-unit-circle="${stage}" style="fill:none;stroke:${color('neutral')};stroke-width:1.5;stroke-dasharray:4 4"></circle>`;
+    if (!stage) {
+      for (const tick of [0, 5, 10]) body += line(...point([tick, 0]), ...point([tick, -.3]))
+        + text(point([tick, 0])[0], vertical + 353, tick, { width: 32, anchor: 'middle' });
+    } else {
+      body += text(245, vertical + 350, '1', { width: 32, anchor: 'middle' })
+        + text(130, vertical + 209, '1', { width: 32, anchor: 'middle' });
+    }
+    for (const [index, vector] of vectors.entries()) {
+      const tone = index ? 'output' : 'input';
+      const tip = point(vector);
+      body += `<g data-picture-embedding-member="${stage},${index}" data-picture-vector="${vector.join(',')}">${arrowBetween(origin, tip, tone, tools, index ? 3 : 2)}${circle(...tip, index ? 3 : 5, tone, true)}</g>`;
+      if (!index) body += line(...tip, ...point([vector[0], 0]), tone, true)
+        + text(stage ? tip[0] : 290, tip[1] - 18, 'A', { width: 40, anchor: 'middle', weight: 700, tone });
+    }
+    const queryPoint = point(picture.query);
+    body += circle(...queryPoint, 9, 'focus') + circle(...queryPoint, 3, 'output', true)
+      + text(stage ? 300 : 180, origin[1] - 36, 'Query and B', { width: stage ? 78 : 150, anchor: 'middle', weight: 700 })
+      + text(20, vertical + (stage ? 471 : 384), 'Query: hollow ring. B: inner dot at the same point.', { width: 320, tone: 'soft' })
+      + text(20, vertical + (stage ? 530 : 445), stage ? `Query projection: A ${number(normalizedProjections[0])}; B 1. B wins.` : 'Raw query projection: A 10; B 1. A wins.', { width: 320, weight: 700 });
+    if (stage) body += line(...point(vectors[0]), ...queryPoint, 'warning', true)
+      + text(20, vertical + 599, `Query distance: A ${number(distances[0])}; B zero. Longer raw A stays at this same normalized point.`, { width: 320, weight: 700 });
+  }
+  return { body, height: 1220 };
+}
+
+function populationMomentsAndDependence(picture, model, tools) {
+  const { text, line, circle, color, fill, number } = tools;
+  const measure = population => {
+    const means = [0, 1].map(coordinate => population.reduce((sum, outcome) => sum + outcome[coordinate], 0) / population.length);
+    const centered = population.map(outcome => outcome.map((value, coordinate) => value - means[coordinate]));
+    const variances = [0, 1].map(coordinate => centered.reduce((sum, outcome) => sum + outcome[coordinate] ** 2, 0) / population.length);
+    const covariance = centered.reduce((sum, outcome) => sum + outcome[0] * outcome[1], 0) / population.length;
+    const sumVariance = centered.reduce((sum, outcome) => sum + (outcome[0] + outcome[1]) ** 2, 0) / population.length;
+    return { means, centered, variances, covariance, sumVariance, correlation: covariance / Math.sqrt(variances[0] * variances[1]) };
+  };
+  const original = measure(picture.outcomes);
+  const independentPopulation = [-1, 1].flatMap(horizontal => picture.outcomes.map(outcome => [horizontal, outcome[1]]));
+  const independent = measure(independentPopulation);
+  const rescaledPopulation = picture.outcomes.map(outcome => [outcome[0], outcome[1] * 100]);
+  const rescaled = measure(rescaledPopulation);
+  assert.deepEqual(original.means, [0, 1]);
+  assert.deepEqual(original.variances, [1, 2]);
+  assert.equal(original.covariance, 1);
+  assert.equal(original.sumVariance, 5);
+  assert.deepEqual(independent.means, original.means);
+  assert.deepEqual(independent.variances, original.variances);
+  assert.equal(independent.covariance, 0);
+  assert.equal(independent.sumVariance, 3);
+  assert.equal(rescaled.covariance, 100);
+  assert.equal(rescaled.variances[1], 20000);
+  assert(Math.abs(rescaled.correlation - original.correlation) < 1e-12);
+  const standardized = statistics => statistics.centered.map(outcome => outcome.map((value, coordinate) => value / Math.sqrt(statistics.variances[coordinate])));
+  const standardOriginal = standardized(original);
+  const standardChanged = standardized(rescaled);
+  assert(standardOriginal.every((outcome, index) => outcome.every((value, coordinate) => Math.abs(value - standardChanged[index][coordinate]) < 1e-12)));
+  const curved = [[-1, 1], [0, 0], [1, 1]];
+  assert.equal(measure(curved).covariance, 0);
+  assert(curved.every(outcome => outcome[1] === outcome[0] ** 2));
+  let body = '';
+  for (const [stage, population] of [picture.outcomes, independentPopulation].entries()) {
+    const vertical = stage * 650;
+    const statistics = stage ? independent : original;
+    const point = outcome => [180 + outcome[0] * 90, vertical + 240 - (outcome[1] - 1) * 50];
+    const locations = new Map();
+    for (const outcome of population) {
+      const key = JSON.stringify(outcome);
+      const location = locations.get(key) ?? { outcome, count: 0 };
+      location.count++;
+      locations.set(key, location);
+    }
+    body += text(20, vertical + 27, stage ? 'Keep the marginals; pair X and Y independently' : 'Four equally likely outcomes; center on the means', { width: 320, weight: 700 })
+      + text(20, vertical + 100, stage ? 'Same X and Y probabilities; different pairings' : 'Actual population: two products are positive, two zero', { width: 320, weight: 700 })
+      + line(60, vertical + 240, 320, vertical + 240) + line(180, vertical + 130, 180, vertical + 360)
+      + text(326, vertical + 245, 'X', { width: 24, weight: 700 })
+      + text(160, vertical + 133, 'Y', { width: 30, anchor: 'end', weight: 700 });
+    for (const { outcome, count } of locations.values()) {
+      const product = outcome[0] * (outcome[1] - 1);
+      const [horizontal, height] = point(outcome);
+      const tone = product > 0 ? 'output' : product < 0 ? 'warning' : 'neutral';
+      if (product) {
+        const width = Math.abs(horizontal - 180);
+        const rectangleHeight = Math.abs(height - vertical - 240);
+        assert.equal(width * rectangleHeight, Math.abs(product) * 4500);
+        body += `<rect x="${Math.min(horizontal, 180)}" y="${Math.min(height, vertical + 240)}" width="${width}" height="${rectangleHeight}" data-picture-centered-product="${product}" style="fill:${fill(tone)};opacity:.7"></rect>`
+          + text((horizontal + 180) / 2, (height + vertical + 240) / 2 + 6, product > 0 ? 'positive 2' : 'negative 2', { width: 86, anchor: 'middle', weight: 700, tone });
+      }
+      body += `<g data-picture-population-location="${stage},${outcome.join(',')}" data-picture-probability="${count / population.length}">${circle(horizontal, height, 17 * Math.sqrt(count / population.length), tone, true)}</g>`;
+    }
+    for (const tick of [-1, 0, 1]) body += text(point([tick, 1])[0], vertical + 391, tick, { width: 40, anchor: 'middle' });
+    for (const tick of [-1, 1, 3]) body += text(52, point([0, tick])[1] + 6, tick, { width: 36, anchor: 'end' });
+    body += circle(180, vertical + 240, 8, 'focus')
+      + text(20, vertical + 438, 'Means: X zero, Y one. Center here before comparing.', { width: 320, weight: 700 })
+      + text(20, vertical + 500, 'Rectangles show signed products; circle area shows probability, including repeated locations.', { width: 320, tone: 'soft' })
+      + text(20, vertical + 579, `Covariance: ${statistics.covariance}; squared spreads: X 1, Y 2.`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1377, 'Pairing changes the spread of the sum', { width: 320, weight: 700 });
+  for (const [stage, variance] of [original.sumVariance, independent.sumVariance].entries()) {
+    const vertical = 1480 + stage * 145;
+    body += text(20, vertical - 43, `${stage ? 'Independent' : 'Original'} sum variance: ${variance}`, { width: 320, weight: 700 })
+      + `<rect x="40" y="${vertical}" width="${variance * 50}" height="32" data-picture-sum-variance="${variance}" style="fill:${fill(stage ? 'input' : 'output')};stroke:${color(stage ? 'input' : 'output')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1697, 'Shared variance scale. Positive co-movement increases sum spread without changing either marginal spread.', { width: 320, tone: 'soft' })
+    + text(20, 1807, 'Change only Y units: values become one hundred times larger', { width: 320, weight: 700 })
+    + text(20, 1890, 'Covariance: 1 becomes 100. Y variance: 2 becomes 20000.', { width: 320, weight: 700 })
+    + text(20, 1980, `Correlation: ${number(original.correlation)} in either unit system`, { width: 320, weight: 700 })
+    + line(55, 2170, 320, 2170) + line(180, 2065, 180, 2260)
+    + text(326, 2175, 'X', { width: 24, weight: 700 })
+    + text(160, 2075, 'Y', { width: 30, anchor: 'end', weight: 700 });
+  for (const [index, outcome] of standardOriginal.entries()) {
+    const horizontal = 180 + outcome[0] * 90;
+    const height = 2170 - outcome[1] * 50;
+    body += circle(horizontal, height, 9, 'input')
+      + `<g data-picture-standardized-rescaled="${index}" data-picture-vector="${standardChanged[index].join(',')}">${circle(horizontal, height, 3, 'output', true)}</g>`;
+  }
+  body += text(20, 2317, 'In standard-deviation units, old rings and rescaled dots coincide at every point.', { width: 320, weight: 700 })
+    + text(20, 2437, 'Zero covariance can still hide curved dependence', { width: 320, weight: 700 })
+    + text(20, 2517, 'X: minus one, zero, one. Y: one, zero, one.', { width: 320, weight: 700 })
+    + text(20, 2590, 'Mean Y: two thirds; signed centered products cancel.', { width: 320, tone: 'soft' })
+    + line(55, 2800, 320, 2800) + line(180, 2680, 180, 2830)
+    + `<path d="M90 2710Q180 2890 270 2710" data-picture-curved-dependence="true" style="fill:none;stroke:${color('output')};stroke-width:2"></path>`
+    + text(326, 2805, 'X', { width: 24, weight: 700 })
+    + text(160, 2690, 'Y', { width: 30, anchor: 'end', weight: 700 });
+  for (const outcome of curved) body += circle(180 + outcome[0] * 90, 2800 - outcome[1] * 90, 7, 'output', true)
+    + text(180 + outcome[0] * 90, 2860, outcome[0], { width: 40, anchor: 'middle' });
+  body += text(20, 2937, 'Covariance is zero, but X still determines Y.', { width: 320, weight: 700 })
+    + text(20, 3015, 'These are declared population probabilities, not empirical estimates. Correlation does not prove causation.', { width: 320, tone: 'soft' });
+  return { body, height: 3120 };
 }
 
 function geometricAction(picture, model, tools) {
@@ -2187,6 +3072,36 @@ function biasedSample(picture, model, tools) {
   return { body, height: 497 };
 }
 
+function samplingAndErrorCosts(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const sampled = biasedSample(picture, model, tools);
+  const policies = picture.policies.map(policy => ({ ...policy, misses: picture.counts[0] - policy.hits }));
+  assert(policies.every(policy => policy.misses >= 0 && policy.alarms <= picture.counts[1]));
+  const costs = picture.missCosts.map(missCost => policies.map(policy => policy.misses * missCost + policy.alarms));
+  assert.deepEqual(costs, [[10, 32], [55, 50]]);
+  assert(costs[0][0] < costs[0][1] && costs[1][0] > costs[1][1]);
+  let body = sampled.body + text(20, 565, 'Same deployment cases; two fixed thresholds', { width: 320, weight: 700 });
+  for (const [policyIndex, policy] of policies.entries()) {
+    body += text(20, 636 + policyIndex * 57, `${policy.name}: ${policy.misses} misses; ${policy.alarms} alarms`, { width: 320, weight: 700 });
+  }
+  for (const [condition, missCost] of picture.missCosts.entries()) {
+    const vertical = 785 + condition * 310;
+    body += text(20, vertical, `A miss costs ${missCost}; an alarm costs 1`, { width: 320, weight: 700 });
+    for (const [policyIndex, policy] of policies.entries()) {
+      const top = vertical + 92 + policyIndex * 83;
+      const total = costs[condition][policyIndex];
+      body += text(20, top - 14, `${policy.name}: ${total} cost units`, { width: 320, weight: 700 });
+      for (let unit = 0; unit < total; unit++) {
+        const tone = unit < policy.misses * missCost ? 'warning' : 'input';
+        body += `<rect x="${20 + unit * 5}" y="${top}" width="5" height="22" data-picture-imbalance-cost-condition="${condition}" data-picture-imbalance-cost-policy="${policyIndex}" data-picture-imbalance-cost-member="${unit}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:.6"></rect>`;
+      }
+    }
+  }
+  body += text(20, 1345, 'One tile is one cost unit. Cost priorities can reverse the choice.', { width: 320, tone: 'soft' })
+    + text(20, 1445, 'Training treatment does not replace deployment evaluation.', { width: 320, weight: 700 });
+  return { body, height: 1505 };
+}
+
 function selectDenominator(picture, model, tools) {
   const { text, color, fill, number } = tools;
   const [[hits, misses], [alarms, correctNegatives]] = model.values;
@@ -2233,6 +3148,87 @@ function forecastCount(picture, model, tools) {
   return { body, height: 510 };
 }
 
+function forecastAndTemperature(picture, model, tools) {
+  const { text, circle, line, number } = tools;
+  const probabilities = picture.probabilities.map(probability => {
+    const logit = Math.log(probability / (1 - probability));
+    return 1 / (1 + Math.exp(-logit / picture.temperature));
+  });
+  assert(Math.abs(probabilities[0] - 2 / 3) < 1e-12);
+  const ranking = values => values.map((value, index) => ({ value, index })).sort((left, right) => right.value - left.value).map(item => item.index);
+  assert.deepEqual(ranking(probabilities), ranking(picture.probabilities));
+  assert(picture.probabilities[0] > picture.threshold && probabilities[0] < picture.threshold);
+  const forecast = forecastCount(picture, model, tools);
+  const horizontal = probability => 45 + 270 * probability;
+  let body = forecast.body + text(20, 578, 'Separate example: three positive-event forecasts', { width: 320, weight: 700 })
+    + text(20, 650, 'Warm the logits; move probabilities toward half', { width: 320 })
+    + text(20, 724, 'Blue: before. Green: after.', { width: 320, weight: 700 });
+  for (const [index, probability] of picture.probabilities.entries()) {
+    const vertical = 825 + index * 125;
+    const adjusted = probabilities[index];
+    const moveFrom = [horizontal(probability), vertical + 20];
+    const moveTo = [horizontal(adjusted), vertical + 20];
+    assert.equal(Math.sign(moveTo[0] - moveFrom[0]), Math.sign(adjusted - probability));
+    body += text(20, vertical - 34, `Case ${['A', 'B', 'C'][index]}`, { width: 100, weight: 700 })
+      + line(45, vertical, 315, vertical, 'neutral')
+      + circle(horizontal(probability), vertical, 6, 'input', true)
+      + circle(horizontal(adjusted), vertical, 6, 'output', true)
+      + arrowBetween(moveFrom, moveTo, 'output', tools, 2)
+      + `<g data-picture-temperature-case="${index}" data-picture-temperature-before="${probability}" data-picture-temperature-after="${adjusted}">${text(20, vertical + 54, `Before ${number(probability * 100)}%; after ${number(adjusted * 100)}%`, { width: 320 })}</g>`;
+  }
+  body += text(45, 1154, '0%', { width: 50, anchor: 'middle' }) + text(315, 1154, '100%', { width: 70, anchor: 'middle' })
+    + text(20, 1213, 'A stays above B; B stays above C', { width: 320, weight: 700 })
+    + text(20, 1290, 'At a 70% action threshold, A changes sides', { width: 320, weight: 700 })
+    + line(45, 1370, 315, 1370, 'neutral')
+    + line(horizontal(picture.threshold), 1357, horizontal(picture.threshold), 1383, 'warning')
+    + circle(horizontal(picture.probabilities[0]), 1370, 6, 'input', true)
+    + circle(horizontal(probabilities[0]), 1370, 6, 'output', true)
+    + text(horizontal(picture.threshold), 1420, '70% threshold', { width: 160, anchor: 'middle', tone: 'warning' })
+    + text(20, 1480, 'Check held-out reliability, not ranking alone', { width: 320, tone: 'soft' });
+  return { body, height: 1540 };
+}
+
+function contextChoiceAndFeedback(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const best = values => values.indexOf(Math.max(...values));
+  assert.deepEqual(picture.contexts.map(context => best(context.means)), [0, 1]);
+  assert.deepEqual(picture.contexts.map(context => best(context.ranges.map(range => range[1]))), [1, 1]);
+  const updated = (picture.contexts[0].means[1] * picture.observations + picture.reward) / (picture.observations + 1);
+  assert(Math.abs(updated - 4 / 11) < 1e-12);
+  const horizontal = value => 75 + value * 210;
+  let body = text(20, 27, 'Context changes reward; uncertainty can change choice', { width: 320, weight: 700 });
+  for (const [contextIndex, context] of picture.contexts.entries()) {
+    const offset = contextIndex * 370;
+    body += text(20, 104 + offset, context.name, { width: 320, weight: 700 })
+      + text(75, 148 + offset, '0', { width: 35 }) + text(285, 148 + offset, '1', { width: 35 });
+    for (const [action, mean] of context.means.entries()) {
+      const vertical = 194 + offset + action * 82;
+      const tone = action ? 'output' : 'input';
+      body += text(20, vertical + 6, picture.actions[action], { width: 35, weight: 700, tone })
+        + line(horizontal(0), vertical, horizontal(1), vertical, 'neutral')
+        + line(horizontal(context.ranges[action][0]), vertical, horizontal(context.ranges[action][1]), vertical, tone)
+        + `<g data-picture-bandit-context="${contextIndex}" data-picture-bandit-action="${action}" data-picture-bandit-mean="${mean}">${circle(horizontal(mean), vertical, 8, tone)}</g>`
+        + text(horizontal(mean), vertical + 39, mean, { width: 65, anchor: 'middle', weight: 700 });
+    }
+    body += text(20, 346 + offset, contextIndex ? 'This context favors B even without exploration.' : 'Greedy favors A; trying the high upper range chooses B.', { width: 320, weight: 700 });
+  }
+  body += text(20, 794, 'Dot: estimate. Colored span: illustrative uncertainty.', { width: 320 })
+    + text(20, 887, 'Choose B; observe only B\'s reward', { width: 320, weight: 700 });
+  for (const [action, name] of picture.actions.entries()) {
+    const horizontalPosition = 65 + action * 115;
+    const tone = action === 1 ? 'output' : 'neutral';
+    body += circle(horizontalPosition, 958, 24, tone) + text(horizontalPosition, 964, name, { width: 44, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontalPosition, 991], [horizontalPosition, 1039], tone, tools, 2)
+      + text(horizontalPosition, 1070, action === 1 ? picture.reward : '?', { width: 70, anchor: 'middle', weight: 700, tone });
+  }
+  body += text(20, 1146, 'Update B: 0.3 becomes 0.364 after this success', { width: 320, weight: 700 })
+    + text(20, 1224, 'No observed A or C reward accompanies this choice.', { width: 320 })
+    + text(20, 1302, 'Separate offline logger: C is never selected', { width: 320, weight: 700 });
+  const support = loggedSupport(picture, model, tools);
+  body += `<g transform="translate(0 1370)">${support.body}</g>`;
+  return { body, height: 1370 + support.height };
+}
+
 function loggedSupport(picture, model, tools) {
   const { text, circle, line, color, fill } = tools;
   assert.equal(picture.probabilities.reduce((sum, value) => sum + value, 0), 1);
@@ -2252,6 +3248,38 @@ function loggedSupport(picture, model, tools) {
   body += text(20, 398, 'No path means no observed reward', { width: 320, weight: 700 })
     + text(20, 443, 'Unknown is not zero', { width: 320, size: 22, weight: 700, tone: 'warning' });
   return { body, height: 471 };
+}
+
+function slotReuseAndAdmission(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const promptBudget = picture.tokenBudget - picture.decodeTokens;
+  const progress = Array.from({ length: Math.ceil(picture.promptTokens / promptBudget) }, (unused, chunk) => Math.min((chunk + 1) * promptBudget, picture.promptTokens));
+  assert.equal(promptBudget, 2);
+  assert.deepEqual(progress, [2, 4, 6, 8]);
+  assert.equal(picture.requiredBlocks - picture.freeBlocks, 1);
+  const reuse = replaceSlot(picture, model, tools);
+  let body = reuse.body + text(20, 521, 'Top: C is ready and fits. A retains its KV and sampler state.', { width: 320 })
+    + text(20, 612, 'Changed condition: C still needs prefill', { width: 320, weight: 700 })
+    + text(20, 670, 'Budget 4; ongoing decode uses 2; prefill gets 2', { width: 320 });
+  for (const [chunk, completed] of progress.entries()) {
+    const vertical = 744 + chunk * 90;
+    body += text(20, vertical - 17, `Chunk ${chunk + 1}${completed === picture.promptTokens ? ': ready' : ': unfinished'}`, { width: 320, weight: 700 });
+    for (let token = 0; token < picture.promptTokens; token++) {
+      const tone = token < completed ? 'input' : 'neutral';
+      body += `<rect x="${20 + token * 40}" y="${vertical}" width="40" height="35" data-picture-batch-prefill-progress="${completed}" data-picture-batch-prefill-token="${token}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    }
+  }
+  body += text(20, 1110, 'C can decode only after the final prefill chunk.', { width: 320, weight: 700 })
+    + text(20, 1210, 'Changed condition: an empty row lacks KV', { width: 320, weight: 700 })
+    + text(20, 1290, 'Free: 2 blocks', { width: 145, weight: 700, tone: 'output' })
+    + text(185, 1290, 'Need: 3 blocks', { width: 155, weight: 700, tone: 'focus' });
+  for (let block = 0; block < picture.freeBlocks; block++) body += `<rect x="${30 + block * 62}" y="1320" width="52" height="48" data-picture-batch-free-block="${block}" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`;
+  for (let block = 0; block < picture.requiredBlocks; block++) {
+    const tone = block < picture.freeBlocks ? 'focus' : 'warning';
+    body += `<rect x="${185 + block * 52}" y="1320" width="48" height="48" data-picture-batch-required-block="${block}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1440, 'The third block has no available capacity. Defer admission.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1540 };
 }
 
 function replaceSlot(picture, model, tools) {
@@ -2300,6 +3328,164 @@ function nestedCohorts(picture, model, tools) {
   return { body, height: 451 };
 }
 
+function reserveDispatchAndReconcile(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const admission = permissions => {
+    let reserved = 0;
+    const accepted = permissions.map(permitted => {
+      if (!permitted || reserved + picture.request > picture.accountLimit) return false;
+      reserved += picture.request;
+      return true;
+    });
+    return { accepted, reserved, remaining: picture.accountLimit - reserved };
+  };
+  assert.deepEqual(admission([true, true]), { accepted: [true, false], reserved: 12, remaining: 8 });
+  assert.deepEqual(admission([false, true]), { accepted: [false, true], reserved: 12, remaining: 8 });
+  assert.equal(admission([false, false]).reserved, 0);
+  const unknown = { reserved: picture.request, observed: 0, effect: null };
+  const confirmed = { reserved: 0, observed: picture.request, effect: picture.request };
+  assert.equal(unknown.reserved + unknown.observed, confirmed.reserved + confirmed.observed);
+  assert.equal(picture.accountLimit - unknown.reserved - unknown.observed, 8);
+  assert.equal(picture.accountLimit - confirmed.reserved - confirmed.observed, 8);
+  const canReleaseUnknown = (state, monitorsAgree) => state.effect !== null;
+  assert(!canReleaseUnknown(unknown, true) && canReleaseUnknown(confirmed, false));
+  let body = text(20, 27, 'Independent safety narrows already granted authority', { width: 320, weight: 700 });
+  body += circle(47, 155, 24, 'input') + text(47, 161, 'grant', { width: 43, anchor: 'middle', weight: 700 })
+    + `<rect x="122" y="120" width="114" height="70" style="fill:${fill('state')};stroke:${color('state')};stroke-width:1.5"></rect>`
+    + text(179, 148, 'Safety control', { width: 98, anchor: 'middle', weight: 700 })
+    + circle(310, 155, 24, 'neutral') + text(310, 161, 'tool', { width: 43, anchor: 'middle', weight: 700 })
+    + arrowBetween([79, 155], [105, 155], 'input', tools, 2) + arrowBetween([253, 155], [278, 155], 'state', tools, 2)
+    + text(20, 247, 'Deterministic limits own admission. Learned monitors supply evidence, not larger grants.', { width: 320, weight: 700 });
+  body += text(20, 385, 'Atomic first reservation: twelve of twenty slots', { width: 320, weight: 700 });
+  for (let slot = 0; slot < picture.accountLimit; slot++) {
+    const tone = slot < picture.request ? 'input' : 'neutral';
+    body += `<rect data-picture-safety-slot="${slot}" data-picture-safety-reserved="${slot < picture.request}" x="${20 + slot % 10 * 32}" y="${469 + Math.floor(slot / 10) * 47}" width="28" height="34" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 605, 'Twelve held for the first proposal; eight remain.', { width: 320, weight: 700 })
+    + text(20, 707, 'Second proposal requests twelve against eight free slots', { width: 320, weight: 700 });
+  for (let slot = 0; slot < picture.request; slot++) {
+    const tone = slot < 8 ? 'focus' : 'warning';
+    body += `<rect x="${20 + slot * 26.5}" y="799" width="23" height="40" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  }
+  body += line(20 + 8 * 26.5 - 2, 780, 20 + 8 * 26.5 - 2, 857, 'warning')
+    + text(20, 905, 'Four cannot fit. Hold the second request; narrowing needs an explicit tool contract.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1032, 'First dispatch times out: effect unknown', { width: 320, weight: 700 });
+  body += circle(70, 1157, 27, 'input') + text(70, 1163, 12, { width: 47, anchor: 'middle', weight: 700 })
+    + line(113, 1157, 243, 1157, 'warning', true)
+    + circle(290, 1157, 27, 'neutral') + text(290, 1163, '?', { width: 47, anchor: 'middle', weight: 700 })
+    + text(20, 1237, 'Reservation stays held', { width: 144, weight: 700 })
+    + text(210, 1237, 'External outcome unknown', { width: 130, weight: 700 });
+  body += text(20, 1367, 'Even two allow opinions are not an outcome read', { width: 320, weight: 700 });
+  for (const [index, label] of ['M1', 'M2'].entries()) body += circle(75 + index * 210, 1470, 26, 'input') + text(75 + index * 210, 1476, label, { width: 44, anchor: 'middle', weight: 700 });
+  body += text(20, 1545, 'Missing required evidence: freeze or narrow the affected path. Do not release or blindly retry.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1677, 'Authoritative read confirms twelve affected accounts', { width: 320, weight: 700 });
+  for (const [index, [label, value]] of [['reserved', confirmed.reserved], ['observed', confirmed.observed]].entries()) {
+    const horizontal = 75 + index * 210;
+    body += circle(horizontal, 1787, 26, index ? 'output' : 'neutral') + text(horizontal, 1793, value, { width: 44, anchor: 'middle', weight: 700 })
+      + text(index ? 220 : 20, 1867, label, { width: 120, weight: 700 });
+  }
+  body += text(20, 1959, 'Settlement moves held impact to observed impact; eight slots remain. Refusal cannot undo confirmed effects.', { width: 320, weight: 700 });
+  return { body, height: 2070 };
+}
+
+function trafficBudgetAndEvidence(picture, model, tools) {
+  const { text, line, circle, color, fill, number } = tools;
+  const daily = picture.users * picture.requestsPerUser;
+  const annual = daily * picture.days;
+  const ceiling = picture.budget / annual * 1000;
+  const spends = [annual * picture.proposedUnitCost / 1000, annual * 2 * picture.proposedUnitCost / 1000, annual * 2 * picture.changedUnitCost / 1000];
+  assert.equal(daily, 100000000);
+  assert.equal(annual, 36500000000);
+  assert(Math.abs(ceiling - .0821917808219178) < 1e-12);
+  assert.deepEqual(spends, [2190000, 4380000, 2920000]);
+  assert(spends[0] < picture.budget && spends[1] > picture.budget && spends[2] < picture.budget);
+  assert(picture.counts.every(count => count % picture.unit === 0));
+  let body = text(20, 27, 'Declare the workload before choosing hardware', { width: 320, weight: 700 })
+    + text(20, 110, '20 million users; five requests each day', { width: 320, weight: 700 })
+    + text(20, 173, '100 million requests/day; 36.5 billion/year', { width: 320, weight: 700 })
+    + text(20, 251, `Average ${number(daily / 86400)} requests/s; assumed peak ${number(daily / 86400 * picture.peakFactor)}`, { width: 320, weight: 700 })
+    + text(20, 349, 'Full-scope budget: $3 million per year', { width: 320, weight: 700 });
+  for (const [index, value] of [ceiling, ceiling / 2].entries()) {
+    const vertical = 465 + index * 145;
+    body += text(20, vertical - 42, index ? 'Doubled traffic; unchanged budget' : 'Original unit ceiling', { width: 320, weight: 700 })
+      + `<rect x="25" y="${vertical}" width="${value / ceiling * 310}" height="34" data-picture-unit-ceiling="${value}" style="fill:${fill(index ? 'warning' : 'input')};stroke:${color(index ? 'warning' : 'input')};stroke-width:2"></rect>`
+      + text(20, vertical + 75, `$${value.toFixed(5)} per thousand requests`, { width: 320, weight: 700 });
+  }
+  body += text(20, 770, 'Reduce work; retain upstream membership', { width: 320, weight: 700 })
+    + text(20, 832, 'Each fixed mark: twenty candidates', { width: 320, tone: 'soft' });
+  const members = picture.counts[0] / picture.unit;
+  for (const [stage, count] of picture.counts.entries()) {
+    const vertical = 928 + stage * 145;
+    body += text(20, vertical - 35, `${picture.labels[stage]}: ${count}`, { width: 320, weight: 700 })
+      + dotField(members, 50, 25, vertical, 6.2, index => ({ tone: index < count / picture.unit ? 'output' : 'neutral' }), tools, `budget-funnel-${stage}`);
+  }
+  body += text(20, 1372, 'Gray marks were removed; final scoring cannot recover them.', { width: 320, weight: 700 })
+    + text(20, 1467, 'Compare complete annual cost on one scale', { width: 320, weight: 700 });
+  const labels = ['Original traffic; $0.06 per thousand', 'Double traffic; same $0.06', 'Double traffic; proposed $0.04'];
+  for (const [index, spend] of spends.entries()) {
+    const vertical = 1594 + index * 183;
+    const accepted = spend <= picture.budget;
+    body += text(20, vertical - 49, labels[index], { width: 320, weight: 700 })
+      + `<rect x="25" y="${vertical}" width="${spend / 4500000 * 310}" height="38" data-picture-annual-spend="${spend}" style="fill:${fill(accepted ? 'input' : 'warning')};stroke:${color(accepted ? 'input' : 'warning')};stroke-width:2"></rect>`
+      + line(25 + picture.budget / 4500000 * 310, vertical - 8, 25 + picture.budget / 4500000 * 310, vertical + 48, 'warning', true)
+      + text(20, vertical + 90, `$${(spend / 1000000).toFixed(2)} million: ${accepted ? 'cost fits only' : 'budget fails'}`, { width: 320, weight: 700, tone: accepted ? 'input' : 'warning' });
+  }
+  body += text(20, 2169, 'Dashed annual limit: $3 million', { width: 320, weight: 700 })
+    + text(20, 2250, 'The cheaper proposal is not a measured product point', { width: 320, weight: 700 });
+  for (const [index, label] of ['Useful quality and freshness', 'End-to-end p95 below 80 ms at peak'].entries()) {
+    const vertical = 2367 + index * 126;
+    body += text(20, vertical + 5, label, { width: 230, weight: 700 }) + circle(310, vertical, 23, 'neutral')
+      + text(310, vertical + 6, '?', { width: 40, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 2613, 'Measure router, queue, feature, fallback and replication costs. Stage counts are not tail-latency evidence.', { width: 320, tone: 'soft' });
+  return { body, height: 2710 };
+}
+
+function evidenceOwnerCommitReopen(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const permitted = (index, approved = picture.approved[index]) => picture.latencies[index] < picture.latencyLimit && approved;
+  assert.deepEqual(picture.latencies.map((_, index) => permitted(index)), [true, false]);
+  assert(permitted(1, true));
+  assert(!permitted(1, false));
+  assert(picture.costs[1] < picture.costs[0] && picture.latencies[1] < picture.latencies[0]);
+  let body = text(20, 27, 'Shared goals; credible competing positions', { width: 320, weight: 700 })
+    + text(20, 104, 'A favors approved processing. B favors speed and lower cost.', { width: 320, weight: 700 });
+  for (const [index, latency] of picture.latencies.entries()) {
+    const vertical = 239 + index * 306;
+    const label = index ? 'B' : 'A';
+    body += text(20, vertical - 51, `${label}: ${latency} ms; shared limit below 100 ms`, { width: 320, weight: 700 })
+      + `<rect x="25" y="${vertical}" width="${latency / picture.latencyLimit * 310}" height="35" data-picture-disagreement-latency="${latency}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:2"></rect>`
+      + line(335, vertical - 8, 335, vertical + 45, 'warning', true)
+      + text(20, vertical + 98, `Cost: $${picture.costs[index].toLocaleString('en')}`, { width: 320, weight: 700 })
+      + text(20, vertical + 168, 'Approved processing region', { width: 232, weight: 700 })
+      + circle(308, vertical + 163, 24, picture.approved[index] ? 'output' : 'warning')
+      + text(308, vertical + 169, picture.approved[index] ? 'yes' : 'no', { width: 41, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 794, 'Cost cannot compensate for a failed mandatory gate', { width: 320, weight: 700 });
+  for (const [index, label] of ['A', 'B'].entries()) {
+    const horizontal = index ? 285 : 80;
+    body += circle(horizontal, 915, 28, index ? 'warning' : 'output') + text(horizontal, 921, label, { width: 48, anchor: 'middle', weight: 700 });
+    if (index) body += line(horizontal, 951, horizontal, 1010, 'warning', true)
+      + line(horizontal - 14, 1010, horizontal + 14, 1010, 'warning') + text(285, 1046, 'blocked', { width: 93, anchor: 'middle', weight: 700, tone: 'warning' });
+    else body += arrowBetween([104, 938], [156, 1060], 'output', tools, 3);
+  }
+  body += circle(180, 1093, 34, 'state') + text(180, 1099, 'Owner', { width: 62, anchor: 'middle', weight: 700 })
+    + text(20, 1173, 'Record owner, evidence, decision and revisit rule', { width: 320, weight: 700 })
+    + circle(180, 1309, 35, 'input') + text(180, 1315, 'Apply', { width: 61, anchor: 'middle', weight: 700 })
+    + text(20, 1298, 'Permitted choice', { width: 100, weight: 700 })
+    + arrowBetween([180, 1352], [180, 1458], 'input', tools, 3)
+    + circle(180, 1502, 35, 'output') + text(180, 1508, 'Check', { width: 61, anchor: 'middle', weight: 700 })
+    + text(20, 1491, 'Observed outcome', { width: 100, weight: 700 })
+    + text(20, 1584, 'Follow an allowed decision responsibly, even when your recommendation loses.', { width: 320, weight: 700 })
+    + text(20, 1703, 'Conditional change: B gains verified regional approval', { width: 320, weight: 700 })
+    + circle(180, 1839, 41, 'state') + text(180, 1845, 'Evidence', { width: 75, anchor: 'middle', weight: 700 })
+    + arrowBetween([180, 1890], [180, 1984], 'state', tools, 3)
+    + circle(180, 2029, 40, 'output') + text(180, 2035, 'Reopen', { width: 70, anchor: 'middle', weight: 700 })
+    + text(20, 2125, 'B becomes eligible for reconsideration, not automatically selected. Approval is not presumed.', { width: 320, weight: 700 })
+    + text(20, 2253, 'Escalate prohibited actions. An owner does not waive every external duty.', { width: 320, tone: 'soft' });
+  return { body, height: 2350 };
+}
+
 function boundedCapacity(picture, model, tools) {
   const { text, line, color, fill, number, circle } = tools;
   let body = '';
@@ -2325,9 +3511,9 @@ function boundedCapacity(picture, model, tools) {
     }
     body += line(20 + picture.capacity * scale, 253, 20 + picture.capacity * scale, 340, 'warning')
       + text(20, 372, `${picture.committed} + ${picture.proposed} = ${total}`, { width: 320, size: 24, weight: 700 })
-      + text(20, 418, `${total - picture.capacity} units cannot pass the ${picture.capacity}-unit wall`, { width: 320, weight: 700, tone: 'warning' })
-      + text(20, 470, 'Refusal does not erase the committed prefix.', { width: 320, tone: 'soft' });
-    return { body, height: 516 };
+      + text(20, 453, `${total - picture.capacity} units cannot pass the ${picture.capacity}-unit wall`, { width: 320, weight: 700, tone: 'warning' })
+      + text(20, 521, 'Refusal does not erase the committed prefix.', { width: 320, tone: 'soft' });
+    return { body, height: 575 };
   }
   assert.equal(picture.required.length, picture.available.length);
   const maximum = Math.max(...picture.required, ...picture.available);
@@ -2388,6 +3574,45 @@ function conditionPopulation(picture, model, tools) {
   return { body, height: 562 };
 }
 
+function experimentAndPower(picture, model, tools) {
+  const { text, circle, line, color } = tools;
+  assert.equal(picture.assignments.length, picture.outcomes.length);
+  const groups = [0, 1].map(group => picture.assignments.flatMap((assigned, member) => assigned === group ? [member] : []));
+  assert.deepEqual(groups.map(group => group.length), [4, 4]);
+  assert.deepEqual(groups.flat().sort(), Array.from({ length: 8 }, (_, index) => index));
+  const positive = groups.map(group => group.reduce((count, member) => count + picture.outcomes[member], 0));
+  assert.deepEqual(positive, [1, 3]);
+  let body = text(20, 27, 'Randomize units; compare observed outcomes', { width: 320, weight: 700 })
+    + text(20, 80, 'Eight comparable units; one fixed assignment', { width: 320, tone: 'soft' });
+  for (const [member, assigned] of picture.assignments.entries()) body += `<g data-picture-experiment-source="${member}">${circle(36 + member * 41, 112, 6, assigned ? 'output' : 'input', true)}</g>`;
+  for (const [group, members] of groups.entries()) {
+    const tone = group ? 'output' : 'input';
+    for (const [position, member] of members.entries()) {
+      const horizontal = 54 + group * 180 + position * 25;
+      body += arrowBetween([36 + member * 41, 126], [horizontal, 218], tone, tools)
+        + `<g data-picture-experiment-member="${member}" data-picture-experiment-group="${group}" data-picture-experiment-positive="${picture.outcomes[member]}">${circle(horizontal, 233, 8, tone, Boolean(picture.outcomes[member]))}</g>`;
+    }
+    body += text(91 + group * 180, 274, `${group ? 'B' : 'A'}: ${positive[group]} positive`, { width: 145, anchor: 'middle', weight: 700, tone });
+  }
+  body += text(20, 311, 'Fill: a measured positive; not a significance claim', { width: 320, tone: 'soft' })
+    + `<path d="M100 375H260" style="fill:none;stroke:${color('warning')};stroke-width:2;stroke-dasharray:5 4"></path>`
+    + line(174, 369, 186, 381, 'warning') + line(174, 381, 186, 369, 'warning')
+    + text(20, 413, 'Cross-group effects break isolation', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 472, 'Fix the readout before seeing results', { width: 320, weight: 700 });
+  for (const [index, horizontal] of [128, 298].entries()) {
+    const vertical = 548 + index * 120;
+    body += line(35, vertical, 325, vertical, 'neutral')
+      + circle(horizontal, vertical, 7, index ? 'warning' : 'input', true)
+      + text(20, vertical + 41, index ? 'delayed response' : 'early response', { width: 180, weight: 700, tone: index ? 'warning' : 'input' });
+  }
+  body += `<path data-picture-experiment-readout="230" d="M230 520V688" style="fill:none;stroke:${color('focus')};stroke-width:1.75;stroke-dasharray:4 4"></path>`
+    + text(230, 754, 'fixed readout', { width: 170, anchor: 'middle', tone: 'focus' })
+    + text(20, 809, 'Do not move the finish line after peeking', { width: 320, weight: 700 });
+  const power = squareSpread(picture, model, tools);
+  body += `<g transform="translate(0 895)">${power.body}</g>`;
+  return { body, height: 895 + power.height };
+}
+
 function squareSpread(picture, model, tools) {
   const { text, line, color, fill, circle, number } = tools;
   assert.deepEqual(picture.noise.map(noise => noise ** 2), model.rows.map(row => row[1]));
@@ -2412,6 +3637,134 @@ function squareSpread(picture, model, tools) {
   return { body, height: 488 };
 }
 
+function queryWeightedValues(picture, model, tools) {
+  const { text, circle, number } = tools;
+  const scores = picture.keys.map(key => key.reduce((sum, value, coordinate) => sum + value * picture.query[coordinate], 0));
+  const normalizer = scores.reduce((sum, score) => sum + Math.exp(score), 0);
+  assert(scores[0] > scores[1]);
+  assert(scores.every((score, index) => Math.abs(Math.exp(score) / normalizer - picture.weights[index]) < 1e-12));
+  const values = weightedValues(picture, model, tools);
+  let body = text(20, 27, 'Query matches choose the weights', { width: 320, weight: 700 })
+    + text(20, 89, 'Same rightward query; two different keys', { width: 320, weight: 700 });
+  for (const [index, key] of picture.keys.entries()) {
+    const horizontal = index ? 270 : 70;
+    const tone = index ? 'output' : 'input';
+    body += text(horizontal, 151, `Key ${index + 1}`, { width: 112, anchor: 'middle', weight: 700, tone })
+      + arrowBetween([horizontal - 40, 207], [horizontal + 25, 207], 'focus', tools, 3)
+      + circle(horizontal, 274, 3, tone, true)
+      + arrowBetween([horizontal, 274], [horizontal + key[0] * 50, 274 - key[1] * 50], tone, tools, 3)
+      + `<g data-picture-attention-key="${index}" data-picture-attention-score="${scores[index]}" data-picture-attention-weight="${picture.weights[index]}">${text(horizontal, 337, `Match ${number(scores[index])}`, { width: 128, anchor: 'middle', tone })}${text(horizontal, 386, `Weight ${picture.weights[index]}`, { width: 130, anchor: 'middle', weight: 700, tone })}</g>`;
+  }
+  body += `<g transform="translate(0 447)">${values.body}</g>`;
+  return { body, height: values.height + 447 };
+}
+
+function rotateKvAndNormalize(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const visits = picture.blocks.map((unused, device) => picture.blocks.map((unusedBlock, step) => picture.blocks[(device + step) % picture.blocks.length]));
+  assert.deepEqual(visits, [['A', 'B'], ['B', 'A']]);
+  assert(visits.every(blocks => new Set(blocks).size === picture.blocks.length));
+  const normalizer = picture.normalizers.reduce((sum, value) => sum + value, 0);
+  assert.deepEqual(picture.normalizers.map(value => value / normalizer), picture.weights);
+  assert.equal(picture.normalizers.reduce((sum, value, block) => sum + value * picture.values[block], 0) / normalizer, 8.4);
+  let body = text(20, 27, 'Queries stay; KV blocks travel', { width: 320, weight: 700 });
+  for (let step = 0; step < picture.blocks.length; step++) {
+    const offset = step * 420;
+    body += text(20, 83 + offset, step ? 'Second visit: received block' : 'First visit: local block', { width: 320, weight: 700 });
+    for (let device = 0; device < picture.blocks.length; device++) {
+      const horizontal = 20 + device * 175;
+      const block = visits[device][step];
+      const tone = block === 'A' ? 'focus' : 'output';
+      body += `<rect x="${horizontal}" y="${128 + offset}" width="145" height="192" style="fill:none;stroke:${color('neutral')};stroke-width:1.5"></rect>`
+        + `<g data-picture-ring-query="${device}" data-picture-ring-step="${step}">${circle(horizontal + 72.5, 173 + offset, 22, 'input')}${text(horizontal + 72.5, 179 + offset, `Q${device}`, { width: 40, anchor: 'middle', weight: 700 })}</g>`
+        + arrowBetween([horizontal + 72.5, 207 + offset], [horizontal + 72.5, 231 + offset], 'input', tools, 2)
+        + `<rect x="${horizontal + 25}" y="${245 + offset}" width="95" height="48" data-picture-ring-kv="${block}" data-picture-ring-device="${device}" data-picture-ring-visit="${step}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(horizontal + 72.5, 275 + offset, `KV ${block}`, { width: 85, anchor: 'middle', weight: 700, tone });
+    }
+  }
+  body += line(92.5, 303, 92.5, 350, 'focus') + line(92.5, 350, 345, 350, 'focus') + line(345, 350, 345, 689, 'focus')
+    + arrowBetween([345, 689], [324, 689], 'focus', tools, 2)
+    + line(267.5, 303, 267.5, 370, 'output') + line(267.5, 370, 15, 370, 'output') + line(15, 370, 15, 689, 'output')
+    + arrowBetween([15, 689], [37, 689], 'output', tools, 2)
+    + text(20, 404, 'Exchange blocks, not queries', { width: 320, tone: 'soft' })
+    + text(20, 810, 'Q0: combine the two visits with their unequal weights', { width: 320, weight: 700 });
+  const merged = weightedValues(picture, model, tools);
+  body += `<g transform="translate(0 880)">${merged.body}</g>`;
+  return { body, height: 880 + merged.height };
+}
+
+function binConfidenceOutcomeAndWeight(picture, model, tools) {
+  const { text, line, color, fill } = tools;
+  const names = ['A', 'B', 'C'];
+  const tones = ['input', 'focus', 'warning'];
+  const gaps = picture.confidence.map((confidence, index) => Math.round(Math.abs(confidence - picture.accuracy[index]) * 100));
+  const contributionPoints = counts => counts.map((count, index) => count * gaps[index] / 100);
+  const original = contributionPoints(picture.counts);
+  const changed = contributionPoints(picture.changedCounts);
+  assert.equal(picture.counts.reduce((sum, value) => sum + value, 0), 100);
+  assert.equal(picture.changedCounts.reduce((sum, value) => sum + value, 0), 100);
+  assert.deepEqual(gaps, [10, 10, 40]);
+  assert.deepEqual(original, [5, 4, 4]);
+  assert.deepEqual(changed, [4, 4, 8]);
+  assert.equal(original.reduce((sum, value) => sum + value, 0), 13);
+  assert.equal(changed.reduce((sum, value) => sum + value, 0), 16);
+  assert(picture.counts.every((count, index) => Number.isInteger(count * picture.accuracy[index])));
+  assert(picture.changedCounts.every((count, index) => Number.isInteger(count * picture.accuracy[index])));
+  const tiles = (counts, bin, vertical, stage) => {
+    const columns = counts[bin] / 10;
+    const rows = gaps[bin] / 10;
+    assert(Number.isInteger(columns) && Number.isInteger(rows));
+    assert.equal(columns * rows, contributionPoints(counts)[bin]);
+    let body = '';
+    for (let row = 0; row < rows; row++) for (let column = 0; column < columns; column++) body += `<rect x="${40 + column * 22}" y="${vertical + row * 22}" width="22" height="22" data-picture-bin-contribution="${stage},${bin},${row},${column}" style="fill:${fill(tones[bin])};stroke:${color(tones[bin])};stroke-width:1.5"></rect>`;
+    return body;
+  };
+  const total = (points, vertical, stage) => {
+    let horizontal = 45;
+    let body = '';
+    for (const [bin, count] of points.entries()) for (let cell = 0; cell < count; cell++) {
+      body += `<rect x="${horizontal}" y="${vertical}" width="16" height="26" data-picture-bin-total="${stage},${bin},${cell}" style="fill:${fill(tones[bin])};stroke:${color(tones[bin])};stroke-width:1.5"></rect>`;
+      horizontal += 16;
+    }
+    return body;
+  };
+  let body = text(20, 27, '100 multiclass predictions; keep all three bins', { width: 320, weight: 700 })
+    + text(20, 99, 'Confidence is a forecast. Correctness is an observed frequency.', { width: 320, weight: 700 });
+  for (const [bin, count] of picture.counts.entries()) {
+    const vertical = 170 + bin * 520;
+    const confidence = picture.confidence[bin];
+    const accuracy = picture.accuracy[bin];
+    const confidenceEnd = 45 + confidence * 270;
+    const accuracyEnd = 45 + accuracy * 270;
+    body += text(20, vertical, `Bin ${names[bin]}: ${count} predictions`, { width: 320, weight: 700 })
+      + text(20, vertical + 75, `Average confidence: ${Math.round(confidence * 100)} percent`, { width: 320, weight: 700 })
+      + `<rect x="45" y="${vertical + 105}" width="${confidence * 270}" height="20" data-picture-bin-confidence="${bin}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + text(20, vertical + 166, `Correct: ${count * accuracy} of ${count}; ${Math.round(accuracy * 100)} percent`, { width: 320, weight: 700 })
+      + `<rect x="45" y="${vertical + 194}" width="${accuracy * 270}" height="20" data-picture-bin-accuracy="${bin}" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+      + line(accuracyEnd, vertical + 243, confidenceEnd, vertical + 243, 'warning')
+      + line(accuracyEnd, vertical + 237, accuracyEnd, vertical + 249, 'warning')
+      + line(confidenceEnd, vertical + 237, confidenceEnd, vertical + 249, 'warning')
+      + text(20, vertical + 286, `Gap: ${gaps[bin]} percentage points`, { width: 320, weight: 700 })
+      + tiles(picture.counts, bin, vertical + 336, 'original')
+      + text(20, vertical + 446, `Weighted contribution: ${original[bin]} ECE points`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1747, 'Width: ten predictions per column. Height: ten gap points per row. Each tile contributes one ECE point.', { width: 320, tone: 'soft' })
+    + text(20, 1830, 'Original total: thirteen ECE points', { width: 320, weight: 700 })
+    + total(original, 1880, 'original')
+    + text(20, 1970, 'Replace ten A cases with ten C cases; total stays 100', { width: 320, weight: 700 })
+    + text(20, 2050, 'New sample mixture; keep bin confidence and accuracy fixed. Do not reassign unchanged predictions to different bins.', { width: 320, weight: 700 });
+  for (const [bin, count] of picture.changedCounts.entries()) {
+    const vertical = 2160 + bin * 190;
+    body += text(20, vertical, `${names[bin]}: ${count} predictions; contribution ${changed[bin]} points`, { width: 320, weight: 700 })
+      + tiles(picture.changedCounts, bin, vertical + 45, 'changed');
+  }
+  body += text(20, 2717, 'Changed total: sixteen ECE points', { width: 320, weight: 700 })
+    + total(changed, 2770, 'changed')
+    + text(20, 2857, 'Both total bars use the same one-point tiles. B and original C contribute equally despite different bin sizes and gaps.', { width: 320, tone: 'soft' })
+    + text(20, 2970, 'These finite multiclass bin averages do not prove population calibration. Keep bin definitions and evaluation cases explicit.', { width: 320, weight: 700 });
+  return { body, height: 3090 };
+}
+
 function weightedValues(picture, model, tools) {
   const { text, color, fill, line, number } = tools;
   const contributions = picture.weights.map((weight, index) => weight * picture.values[index]);
@@ -2425,6 +3778,7 @@ function weightedValues(picture, model, tools) {
   const tileHeight = Math.min(20, 144 / Math.max(...picture.values.map(value => value / heightUnit)));
   let body = text(20, 26, `Width: ${picture.widthLabel ?? 'weight'}. Height: ${picture.heightLabel ?? 'value'}.`, { width: 320, weight: 700 });
   const tones = ['input', 'output'];
+  let member = 0;
   for (const [index, weight] of picture.weights.entries()) {
     const horizontal = index ? 210 : 20;
     const unitsWide = Math.round(weight / widthUnit);
@@ -2432,7 +3786,7 @@ function weightedValues(picture, model, tools) {
     assert(Math.abs(unitsWide * widthUnit - weight) < 1e-12 && Math.abs(unitsTall * heightUnit - picture.values[index]) < 1e-12);
     body += text(horizontal, 66, `${picture.widthLabel ?? 'weight'} ${number(weight)}`, { width: 140, weight: 700, tone: tones[index] });
     for (let row = 0; row < unitsTall; row++) for (let column = 0; column < unitsWide; column++) {
-      body += `<rect data-picture-contribution="${index}" x="${horizontal + column * tileWidth}" y="${244 - (row + 1) * tileHeight}" width="${tileWidth}" height="${tileHeight}" style="fill:${fill(tones[index])};stroke:${color(tones[index])};stroke-width:1.5"></rect>`;
+      body += `<rect data-picture-contribution="${index}" data-picture-source-member="${member++}" x="${horizontal + column * tileWidth}" y="${244 - (row + 1) * tileHeight}" width="${tileWidth}" height="${tileHeight}" style="fill:${fill(tones[index])};stroke:${color(tones[index])};stroke-width:1.5"></rect>`;
     }
     body += text(horizontal, 278, `${picture.heightLabel ?? 'value'} ${number(picture.values[index])}`, { width: 140, tone: tones[index] })
       + text(horizontal, 313, `area ${number(contributions[index])}`, { width: 140, size: 20, weight: 700, tone: tones[index] });
@@ -2444,42 +3798,105 @@ function weightedValues(picture, model, tools) {
     return { body, height: 493 };
   }
   const total = contributions.reduce((sum, value) => sum + value, 0);
-  let position = 20;
+  const perRow = Math.floor(320 / tileWidth);
+  let collected = 0;
   for (const [index, contribution] of contributions.entries()) {
     for (let unit = 0; unit < Math.round(contribution / picture.unit); unit++) {
-      const width = 320 / Math.round(total / picture.unit);
-      body += `<rect x="${position}" y="376" width="${width}" height="25" style="fill:${fill(tones[index])};stroke:${color(tones[index])};stroke-width:1.25"></rect>`;
-      position += width;
+      body += `<rect data-picture-collected-member="${collected}" x="${20 + collected % perRow * tileWidth}" y="${376 + Math.floor(collected / perRow) * tileHeight}" width="${tileWidth}" height="${tileHeight}" style="fill:${fill(tones[index])};stroke:${color(tones[index])};stroke-width:1.5"></rect>`;
+      collected++;
     }
   }
-  body += text(20, 439, `${contributions.map(number).join(' + ')} = ${number(total)}`, { width: 320, size: 22, weight: 700 })
-    + text(20, 478, `Each tile contributes ${picture.unit}`, { width: 320, tone: 'soft' });
-  if (picture.totalLabel) body += text(20, 515, picture.totalLabel, { width: 320, tone: 'soft' });
-  return { body, height: picture.totalLabel ? 541 : 501 };
+  assert.equal(collected, member);
+  const bottom = 376 + Math.ceil(collected / perRow) * tileHeight;
+  body += text(20, bottom + 38, `Combined contribution: ${number(total)}`, { width: 320, size: 20, weight: 700 })
+    + text(20, bottom + 101, `Same tiles, regrouped; each contributes ${picture.unit}`, { width: 320, tone: 'soft' });
+  if (picture.totalLabel) body += text(20, bottom + 165, picture.totalLabel, { width: 320, tone: 'soft' });
+  return { body, height: bottom + (picture.totalLabel ? 230 : 164) };
+}
+
+function treeMessageAndSum(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  const messages = [picture.values, picture.otherValues].map(values => values.reduce((sum, value, index) => sum + value * picture.weights[index], 0));
+  const total = messages.reduce((sum, value) => sum + value, 0);
+  const normalized = messages.map(value => value / total);
+  assert(normalized.every((value, index) => Math.abs(value - [.38, .62][index]) < 1e-12));
+  const incorrectlyReused = messages.map((value, index) => value * picture.recipientReply[index]);
+  assert(Math.abs(incorrectlyReused[0] / incorrectlyReused.reduce((sum, value) => sum + value, 0) - normalized[0]) > .5);
+  let body = text(20, 27, 'A supplies evidence; X is the message recipient', { width: 320, weight: 700 })
+    + circle(60, 150, 24, 'input') + text(60, 156, 'A', { width: 42, anchor: 'middle', weight: 700 })
+    + text(105, 156, 'A supplies U weights 0.3, 0.7', { width: 230 })
+    + arrowBetween([60, 183], [60, 290], 'input', tools, 2)
+    + circle(60, 321, 24, 'state') + text(60, 327, 'U', { width: 42, anchor: 'middle', weight: 700 })
+    + `<rect x="156" y="297" width="48" height="48" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:2"></rect>`
+    + text(180, 327, 'f', { width: 42, anchor: 'middle', weight: 700 })
+    + circle(300, 321, 24, 'output') + text(300, 327, 'X', { width: 42, anchor: 'middle', weight: 700 })
+    + arrowBetween([94, 321], [147, 321], 'state', tools, 2)
+    + arrowBetween([213, 321], [267, 321], 'output', tools, 2)
+    + line(300, 352, 300, 380, 'warning') + arrowBetween([300, 380], [254, 380], 'warning', tools, 2)
+    + `<g data-picture-message-excluded-recipient="X">${line(232, 372, 248, 388, 'warning')}${line(232, 388, 248, 372, 'warning')}</g>`
+    + text(20, 430, 'Exclude X\'s returning message from this outgoing route', { width: 320, weight: 700 })
+    + text(20, 505, `X reply ${picture.recipientReply.join(', ')} is not reused here`, { width: 320, tone: 'soft' })
+    + text(20, 584, 'For X0, gather both hidden U-state contributions', { width: 320, weight: 700 });
+  const summed = weightedValues(picture, model, tools);
+  const bottom = 650 + summed.height;
+  body += `<g transform="translate(0 650)">${summed.body}</g>`
+    + text(20, bottom + 60, 'Both target states use the same U weights', { width: 320, weight: 700 })
+    + text(20, bottom + 130, `X1 factor values: ${picture.otherValues.join(', ')}`, { width: 320 })
+    + text(20, bottom + 185, `X0: ${number(messages[0])}; X1: ${number(messages[1])}`, { width: 320 });
+  for (let unit = 0; unit < 100; unit++) {
+    const target = unit < Math.round(normalized[0] * 100) ? 0 : 1;
+    const tone = target ? 'output' : 'input';
+    body += `<rect x="${20 + unit % 20 * 16}" y="${bottom + 250 + Math.floor(unit / 20) * 16}" width="16" height="16" data-picture-message-normalized-member="${unit}" data-picture-message-target="${target}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1"></rect>`;
+  }
+  body += text(20, bottom + 383, 'Outgoing message: X0 38%; X1 62%', { width: 320, weight: 700 })
+    + text(20, bottom + 449, 'Not the recipient\'s final belief', { width: 320, tone: 'soft' });
+  return { body, height: bottom + 507 };
 }
 
 function arithmeticPaths(picture, model, tools) {
   const { text, line, circle, color, fill, number } = tools;
+  const magnitude = Math.max(1, ...picture.paths.flatMap(path => [...path.inputs, path.result].map(Math.abs)));
+  const scale = 52 / magnitude;
+  const band = (from, to, before, after, tone) => `<path d="M${from[0]} ${from[1] - Math.abs(before) * scale / 2}L${to[0]} ${to[1] - Math.abs(after) * scale / 2}V${to[1] + Math.abs(after) * scale / 2}L${from[0]} ${from[1] + Math.abs(before) * scale / 2}Z" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.25"></path>`;
   let body = '';
   for (const [index, path] of picture.paths.entries()) {
-    const vertical = 30 + index * 149;
+    const vertical = 30 + index * 268;
     const calculated = path.operator === 'multiply' ? path.inputs.reduce((product, value) => product * value, 1) : path.operator === 'add' ? path.inputs.reduce((sum, value) => sum + value, 0) : path.operator === 'maximum' ? Math.max(...path.inputs) : path.inputs[0] - path.inputs[1];
     assert(Math.abs(calculated - path.result) < 1e-12);
     assert.equal(path.inputs.length, 2);
+    assert(['multiply', 'add', 'maximum'].includes(path.operator));
     const tone = index ? 'output' : 'input';
-    body += text(20, vertical, path.label, { width: 320, weight: 700, tone });
-    for (const [operand, value] of path.inputs.entries()) {
-      const horizontal = 52 + operand * 112;
-      body += circle(horizontal, vertical + 56, 27, tone)
-        + text(horizontal, vertical + 62, number(value), { width: 49, anchor: 'middle', weight: 700 })
-        + line(horizontal + 29, vertical + 56, horizontal + (operand ? 57 : 36), vertical + 56, tone);
+    const center = vertical + 137;
+    body += `<g data-picture-arithmetic="${index}" data-picture-result="${path.result}" data-picture-signal-operation="${path.operator}" data-picture-signal-scale="${scale}">`
+      + text(20, vertical, path.label, { width: 320, weight: 700, tone });
+    if (path.operator === 'multiply') {
+      body += band([20, center], [129, center], path.inputs[0], path.inputs[0], tone)
+        + band([129, center], [244, center], path.inputs[0], path.result, tone)
+        + text(52, vertical + 89, number(path.inputs[0]), { width: 88, anchor: 'middle', weight: 700 })
+        + circle(184, center, 27, tone) + text(184, center + 6, number(path.inputs[1]), { width: 49, anchor: 'middle', weight: 700 })
+        + text(52, vertical + 214, 'incoming', { width: 94, anchor: 'middle' })
+        + text(184, vertical + 214, 'sensitivity', { width: 102, anchor: 'middle' });
+    } else {
+      assert(path.inputs.every(value => value >= 0));
+      const selected = path.operator === 'maximum' ? path.inputs.indexOf(path.result) : -1;
+      for (const [branch, value] of path.inputs.entries()) {
+        const branchCenter = center + (branch ? 39 : -39);
+        const branchTone = selected < 0 || selected === branch ? tone : 'neutral';
+        body += band([20, branchCenter], [129, branchCenter], value, value, branchTone)
+          + band([129, branchCenter], [175, center], value, selected >= 0 && selected !== branch ? 0 : value, branchTone)
+          + text(52, branchCenter + (branch ? 38 : -15), number(value), { width: 88, anchor: 'middle', weight: 700, tone: branchTone });
+      }
+      body += circle(184, center, 28, tone)
+        + text(184, center + 6, selected >= 0 ? 'best' : 'merge', { width: 52, anchor: 'middle', weight: 700 })
+        + band([216, center], [244, center], path.result, path.result, tone)
+        + text(184, vertical + 214, selected >= 0 ? 'select one' : 'both arrive', { width: 104, anchor: 'middle' });
     }
-    body += text(108, vertical + 62, path.operator === 'multiply' ? 'x' : path.operator === 'add' ? '+' : path.operator === 'maximum' ? 'max' : '-', { width: path.operator === 'maximum' ? 43 : 28, anchor: 'middle', size: path.operator === 'maximum' ? 15 : 22, weight: 700 })
-      + `<path d="M236 ${vertical + 49}l10 7-10 7" style="fill:none;stroke:${color(tone)};stroke-width:2"></path>`
-      + `<rect data-picture-arithmetic="${index}" data-picture-result="${path.result}" x="263" y="${vertical + 28}" width="76" height="56" rx="4" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`
-      + text(301, vertical + 63, number(path.result), { width: 68, anchor: 'middle', size: 20, weight: 700, tone });
+    body += `<rect data-picture-signal-output="${path.result}" x="244" y="${center - Math.abs(path.result) * scale / 2}" width="96" height="${Math.abs(path.result) * scale}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.25"></rect>`
+      + text(298, vertical + 89, number(path.result), { width: 84, anchor: 'middle', weight: 700, tone })
+      + text(298, vertical + 214, 'outgoing', { width: 84, anchor: 'middle' }) + '</g>';
+    if (index < picture.paths.length - 1) body += line(20, vertical + 248, 340, vertical + 248, 'neutral', true);
   }
-  return { body, height: picture.paths.length * 149 + 4 };
+  return { body, height: picture.paths.length * 268 + 20 };
 }
 
 function gainCascade(picture, model, tools) {
@@ -2507,27 +3924,107 @@ function gainCascade(picture, model, tools) {
 }
 
 function residualStep(picture, model, tools) {
-  const { text, line, circle, color, number } = tools;
-  const residual = picture.targetValue - picture.predictionValue;
-  const step = residual * picture.shrinkage;
-  const after = picture.predictionValue + step;
-  assert.equal(Number(model.rows[0][1].at(-1)), residual);
-  assert.equal(Number(model.rows[2][1].at(-1)), after);
-  const position = value => 34 + value * 28;
-  let body = text(20, 27, 'Fit the remaining gap, not the whole target', { width: 320, weight: 700 });
-  for (const [phase, prediction] of [picture.predictionValue, after].entries()) {
-    const vertical = 119 + phase * 188;
-    body += text(20, vertical - 38, phase ? 'After one shrunk correction' : 'Before the new tree', { width: 320, weight: 700 });
-    body += line(34, vertical, 314, vertical)
-      + `<path d="M${position(prediction)} ${vertical}H${position(picture.targetValue)}" style="stroke:${color('warning')};stroke-width:12;opacity:.2"></path>`
-      + circle(position(prediction), vertical, 7, 'input', true) + circle(position(picture.targetValue), vertical, 7, 'output', true)
-      + text(position(prediction), vertical + 39, prediction, { width: 100, anchor: 'end', weight: 700, tone: 'input' })
-      + text(330, vertical - 16, '10', { width: 55, anchor: 'end', tone: 'output', weight: 700 })
-      + text(34, vertical + 39, '0', { width: 40, tone: 'soft' });
+  const { text, line, circle, color, fill } = tools;
+  const residuals = picture.targets.map(target => target - picture.initial);
+  const leaves = [residuals.slice(0, 2), residuals.slice(2)].map(values => values.reduce((sum, value) => sum + value, 0) / values.length);
+  const update = rate => picture.targets.map((unused, index) => picture.initial + rate * leaves[index < 2 ? 0 : 1]);
+  const loss = predictions => picture.targets.reduce((sum, target, index) => sum + (target - predictions[index]) ** 2 / 2, 0);
+  const after = update(picture.shrinkage);
+  assert.deepEqual(residuals, [-3, -3, 3, 3]);
+  assert.deepEqual(after, [3.5, 3.5, 6.5, 6.5]);
+  assert.equal(loss(picture.targets.map(() => picture.initial)), 18);
+  assert.equal(loss(after), 4.5);
+  assert.deepEqual(update(.25), [4.25, 4.25, 5.75, 5.75]);
+  assert.equal(loss(update(.25)) * 2, 20.25);
+  const logisticResiduals = [0, 0, 1, 1].map(label => label - .5);
+  assert.deepEqual(logisticResiduals, [-.5, -.5, .5, .5]);
+  const newtonLeaf = -1 / (.5 + 1);
+  assert.equal(newtonLeaf, -2 / 3);
+  const position = value => 35 + (value + 3) / 11 * 290;
+  let body = text(20, 27, 'Fit a correction to the current loss gradient', { width: 320, weight: 700 })
+    + text(20, 105, 'Toy: ordered features one to four; targets two, two, eight, eight. Current prediction five.', { width: 320 });
+  for (const [index, residual] of residuals.entries()) {
+    const vertical = 255 + index * 115;
+    const tone = residual < 0 ? 'warning' : 'output';
+    body += text(20, vertical - 33, `Sample ${index + 1}: negative gradient ${residual}`, { width: 320, weight: 700 })
+      + line(position(-3), vertical, position(3), vertical, 'neutral')
+      + line(position(0), vertical - 10, position(0), vertical + 10, 'neutral')
+      + circle(position(residual), vertical, 6, tone, true);
   }
-  body += text(20, 222, `${number(residual)} remaining x ${picture.shrinkage} = ${number(step)}`, { width: 320, size: 20, weight: 700, tone: 'focus' })
-    + text(20, 411, 'The correction closes only part of the gap.', { width: 320, weight: 700 });
-  return { body, height: 454 };
+  body += text(20, 780, 'Residual stump: split after sample two', { width: 320, weight: 700 });
+  for (const [index, leaf] of leaves.entries()) {
+    const horizontal = index ? 260 : 100;
+    body += `<rect x="${horizontal - 55}" y="865" width="110" height="58" style="fill:${fill(index ? 'output' : 'warning')};stroke:${color(index ? 'output' : 'warning')};stroke-width:1.5"></rect>`
+      + text(horizontal, 900, leaf, { width: 96, anchor: 'middle', weight: 700 })
+      + text(horizontal, 985, `Half-step correction ${leaf * picture.shrinkage}`, { width: 140, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1115, 'Predictions move toward, not directly onto, targets', { width: 320, weight: 700 });
+  for (let group = 0; group < 2; group++) {
+    const vertical = 1240 + group * 150;
+    const target = picture.targets[group * 2];
+    const updated = after[group * 2];
+    body += text(20, vertical - 45, group ? 'Samples three and four' : 'Samples one and two', { width: 320, weight: 700 })
+      + line(position(0), vertical, position(8), vertical, 'neutral')
+      + circle(position(target), vertical, 6, 'output', true)
+      + circle(position(picture.initial), vertical, 6, 'input', true)
+      + arrowBetween([position(picture.initial), vertical], [position(updated), vertical], 'focus', tools, 3)
+      + text(20, vertical + 66, `Target ${target}; before five; after ${updated}`, { width: 320 });
+  }
+  body += text(20, 1550, 'Summed half-squared training loss: eighteen becomes 4.5', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1665, 'Quarter steps: 4.25, 4.25, 5.75, 5.75; SSE 20.25. Later rounds recompute gradients.', { width: 320 })
+    + text(20, 1790, 'Logistic loss at zero logits: probability 0.5 gives negative gradients minus/plus 0.5, not minus/plus three.', { width: 320, weight: 700 })
+    + text(20, 1930, 'Logistic trees update logits. A separate Newton leaf with gradient sum one, curvature 0.5 and penalty one has weight about minus 0.667, not minus 0.5.', { width: 320 })
+    + text(20, 2095, 'Training improvement does not establish held-out generalization.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 2195 };
+}
+
+function gradientNormAndStepContract(picture, model, tools) {
+  const { text, circle, line, color } = tools;
+  const clip = values => {
+    assert(values.every(Number.isFinite));
+    const norm = Math.hypot(...values);
+    const factor = norm ? Math.min(1, picture.radius / norm) : 1;
+    return values.map(value => value * factor);
+  };
+  const clipped = clip(picture.gradient);
+  const coordinate = picture.gradient.map(value => Math.max(-picture.radius, Math.min(picture.radius, value)));
+  const displacement = clipped.map(value => -picture.rate * value);
+  assert.deepEqual(clipped, [3, 4]);
+  assert.equal(Math.hypot(...clipped), picture.radius);
+  assert.deepEqual(clip([0, 0]), [0, 0]);
+  assert.deepEqual(clip([1, 1]), [1, 1]);
+  assert.throws(() => clip([Infinity, 1]));
+  assert.deepEqual(coordinate, [5, 5]);
+  assert(Math.hypot(...coordinate) > picture.radius);
+  assert(Math.abs(Math.hypot(...displacement) - .5) < 1e-12);
+  const wrongOrder = clip(picture.gradient.map(value => value * picture.lossScale)).map(value => value / picture.lossScale);
+  assert(Math.abs(Math.hypot(...wrongOrder) - .05) < 1e-12);
+  const point = values => [180 + values[0] * 15, 350 - values[1] * 15];
+  const origin = point([0, 0]);
+  let body = text(20, 27, 'One common factor caps the global gradient norm', { width: 320, weight: 700 })
+    + text(20, 110, 'Gradient components six and eight; norm ten; threshold five', { width: 320, weight: 700 })
+    + line(45, 350, 330, 350, 'neutral') + line(180, 160, 180, 485, 'neutral')
+    + `<circle cx="180" cy="350" r="${picture.radius * 15}" style="fill:none;stroke:${color('output')};stroke-width:2;stroke-dasharray:4 4"></circle>`
+    + arrowBetween(origin, point(picture.gradient), 'input', tools, 2)
+    + arrowBetween(point(picture.gradient), point(clipped), 'warning', tools, 3)
+    + arrowBetween(origin, point(clipped), 'output', tools, 3)
+    + circle(...point(picture.gradient), 6, 'input', true) + circle(...point(clipped), 6, 'output', true)
+    + circle(...point(coordinate), 6, 'warning', true)
+    + text(20, 560, 'Global clip: components three and four; norm five, same ray', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 665, 'Value clip: two fives, norm about 7.07; outside the same ball and a different direction', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 790, 'SGD at learning rate 0.1: displacement components minus 0.3 and minus 0.4; norm 0.5.', { width: 320 })
+    + text(20, 900, 'Adaptive or momentum updates can have a different displacement; inspect the actual update norm.', { width: 320, weight: 700 })
+    + text(20, 1020, 'Finish accumulation and synchronization. Aggregate unique parameter shards; replicas do not add coordinates.', { width: 320 });
+  for (const [index, label] of ['Unscale once', 'Reject nonfinite gradients', 'Global-norm clip', 'Optimizer step'].entries()) {
+    const vertical = 1190 + index * 150;
+    body += circle(50, vertical, 22, index === 1 ? 'warning' : 'input')
+      + text(50, vertical + 6, index + 1, { width: 36, anchor: 'middle', weight: 700 })
+      + text(100, vertical - 6, label, { width: 235, weight: 700 });
+    if (index < 3) body += arrowBetween([50, vertical + 31], [50, vertical + 110], 'neutral', tools);
+  }
+  body += text(20, 1770, 'Scale one hundred: clipping before unscale would leave norm 0.05, not five.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1890, 'A zero vector stays zero. Clipping is a finite-gradient constraint, not a remedy for infinity or a diagnosis of a loss spike.', { width: 320 });
+  return { body, height: 2030 };
 }
 
 function linkedScales(picture, model, tools) {
@@ -2582,6 +4079,63 @@ function densityUpdate(picture, model, tools) {
   return { body, height: 543 };
 }
 
+function dropoutModeAndSharedMask(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const training = randomBranch(picture, model, tools);
+  const nonlinearInput = 1;
+  const nonlinearOutputs = [0, nonlinearInput / picture.keep];
+  const squared = nonlinearOutputs.map(value => value ** 2);
+  const trainingMean = (1 - picture.keep) * squared[0] + picture.keep * squared[1];
+  const evaluation = nonlinearInput ** 2;
+  assert.deepEqual(nonlinearOutputs, [0, 2]);
+  assert.deepEqual(squared, [0, 4]);
+  assert.equal(trainingMean, 2);
+  assert.equal(evaluation, 1);
+  assert.notEqual(trainingMean, evaluation);
+  const channelInputs = [[[1, 1], [1, 1]], [[3, 3], [3, 3]]];
+  const channelMask = [1, 0];
+  const channelOutputs = channelInputs.map((channel, index) => channel.map(row => row.map(value => channelMask[index] * value / picture.keep)));
+  assert.deepEqual(channelOutputs, [[[2, 2], [2, 2]], [[0, 0], [0, 0]]]);
+  let body = training.body
+    + text(20, 602, 'Standard evaluation: no mask or extra scaling', { width: 320, weight: 700 })
+    + circle(80, 739, 29, 'input') + text(80, 745, picture.input, { width: 50, anchor: 'middle', weight: 700 })
+    + arrowBetween([117, 739], [243, 739], 'input', tools, 3)
+    + circle(280, 739, 29, 'output') + text(280, 745, picture.input, { width: 50, anchor: 'middle', weight: 700 })
+    + text(20, 839, 'Mode changes masking. Disabling gradients does not change mode.', { width: 320, weight: 700 })
+    + text(20, 969, 'Nonlinear counterexample: start with one, then square', { width: 320, weight: 700 });
+  for (const [index, output] of nonlinearOutputs.entries()) {
+    const horizontal = index ? 280 : 80;
+    body += text(horizontal, 1070, index ? '50% keep' : '50% drop', { width: 118, anchor: 'middle', weight: 700 })
+      + circle(horizontal, 1142, 28, index ? 'output' : 'neutral') + text(horizontal, 1148, output, { width: 48, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 1178], [horizontal, 1226], 'state', tools, 3)
+      + circle(horizontal, 1270, 34, 'state') + text(horizontal, 1276, 'square', { width: 60, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 1312], [horizontal, 1352], 'state', tools, 3)
+      + circle(horizontal, 1388, 28, 'output') + text(horizontal, 1394, squared[index], { width: 48, anchor: 'middle', weight: 700 });
+  }
+  for (const [index, value] of [trainingMean, evaluation].entries()) {
+    const vertical = 1568 + index * 160;
+    body += text(20, vertical - 48, index ? 'Square the evaluation output: one' : 'Average squared training outputs: two', { width: 320, weight: 700 })
+      + `<rect x="25" y="${vertical}" width="${value / 2 * 310}" height="36" data-picture-dropout-nonlinear="${value}" style="fill:${fill(index ? 'input' : 'warning')};stroke:${color(index ? 'input' : 'warning')};stroke-width:2"></rect>`;
+  }
+  body += text(20, 1838, 'Preserved activation expectation is not an exact nonlinear model average.', { width: 320, weight: 700 })
+    + text(20, 1961, 'One shared mask decision for each channel', { width: 320, weight: 700 });
+  for (const [channel, input] of channelInputs.entries()) {
+    const horizontal = channel ? 231 : 24;
+    const tone = channel ? 'warning' : 'input';
+    body += text(horizontal, 2048, channel ? 'Channel B' : 'Channel A', { width: 107, weight: 700 });
+    for (const [phase, values] of [input, channelOutputs[channel]].entries()) for (let row = 0; row < 2; row++) for (let column = 0; column < 2; column++) {
+      const vertical = 2097 + phase * 228 + row * 47;
+      const left = horizontal + column * 47;
+      body += `<rect x="${left}" y="${vertical}" width="43" height="43" data-picture-dropout-channel="${channel},${phase},${row},${column}" style="fill:${fill(phase ? tone : 'neutral')};stroke:${color(tone)};stroke-width:2"></rect>`
+        + text(left + 21.5, vertical + 28, values[row][column], { width: 38, anchor: 'middle', weight: 700 });
+    }
+    body += arrowBetween([horizontal + 69, 2194], [horizontal + 69, 2311], tone, tools, 3)
+      + text(horizontal, 2256, channel ? 'drop' : 'keep', { width: 60, weight: 700 });
+  }
+  body += text(20, 2487, 'This mask cannot keep only one B pixel. Independent position masks can; their correlations differ.', { width: 320, tone: 'soft' });
+  return { body, height: 2590 };
+}
+
 function randomBranch(picture, model, tools) {
   const { text, circle, line, number } = tools;
   const outputs = [0, picture.input / picture.keep];
@@ -2607,23 +4161,92 @@ function randomBranch(picture, model, tools) {
 }
 
 function splitObservation(picture, model, tools) {
-  const { text, circle, color, fill, number } = tools;
-  assert.deepEqual(picture.fractions, model.rows.map(row => row[1]));
-  assert.equal(picture.fractions.reduce((sum, value) => sum + value, 0), 1);
-  let body = text(20, 27, 'One observation. One unit of total mass.', { width: 320, weight: 700 })
-    + circle(180, 103, 30, 'focus', true)
-    + text(180, 109, '1', { width: 40, anchor: 'middle', size: 22, weight: 700 });
-  for (const [index, fraction] of picture.fractions.entries()) {
-    const horizontal = index ? 280 : 80;
-    const tone = index ? 'output' : 'input';
-    const radius = Math.sqrt(fraction) * 30;
-    body += arrowBetween([180, 141], [horizontal, 259 - radius], tone, tools, fraction * 10)
-      + `<circle data-picture-fraction="${fraction}" cx="${horizontal}" cy="275" r="${radius}" style="fill:${color(tone)};stroke:${color(tone)}"></circle>`
-      + text(horizontal, 335, fraction, { width: 120, anchor: 'middle', size: 26, weight: 700, tone })
-      + text(horizontal, 380, `Update ${index ? 'B' : 'A'}`, { width: 130, anchor: 'middle', weight: 700, tone });
+  const { text, circle, color, fill, line } = tools;
+  const density = (value, mean, variance) => Math.exp(-.5 * (value - mean) ** 2 / variance) / Math.sqrt(2 * Math.PI * variance);
+  const responsibilities = picture.points.map(point => {
+    const weights = picture.means.map((mean, component) => picture.priors[component] * density(point, mean, picture.variances[component]));
+    const total = weights.reduce((sum, weight) => sum + weight, 0);
+    return weights.map(weight => weight / total);
+  });
+  const counts = picture.means.map((unused, component) => responsibilities.reduce((sum, row) => sum + row[component], 0));
+  const means = counts.map((count, component) => picture.points.reduce((sum, point, index) => sum + responsibilities[index][component] * point, 0) / count);
+  const variances = counts.map((count, component) => picture.points.reduce((sum, point, index) => sum + responsibilities[index][component] * (point - means[component]) ** 2, 0) / count);
+  const priors = counts.map(count => count / picture.points.length);
+  const likelihood = (centers, spread, mixing) => picture.points.reduce((sum, point) => sum + Math.log(centers.reduce((total, mean, component) => total + mixing[component] * density(point, mean, spread[component]), 0)), 0);
+  assert(responsibilities.every(row => Math.abs(row.reduce((sum, value) => sum + value, 0) - 1) < 1e-12));
+  assert.deepEqual(responsibilities[1], [.5, .5]);
+  assert(Math.abs(counts.reduce((sum, count) => sum + count, 0) - 3) < 1e-12);
+  assert(counts.every(count => Math.abs(count - 1.5) < 1e-12));
+  assert(means[0] > 0 && means[1] < 4 && Math.abs(means[0] + means[1] - 4) < 1e-12);
+  assert(variances.every(variance => variance > 0));
+  assert(likelihood(means, variances, priors) >= likelihood(picture.means, picture.variances, picture.priors) - 1e-12);
+  let body = text(20, 27, 'Generate by component; infer its posterior from observed data', { width: 320, weight: 700 })
+    + text(20, 110, 'Toy: equal mixture weights; means zero and four; both variances four.', { width: 320 });
+  for (const [component, mean] of picture.means.entries()) {
+    const tone = component ? 'output' : 'input';
+    const points = Array.from({ length: 81 }, (unused, index) => {
+      const value = -3 + index / 80 * 10;
+      return `${20 + index / 80 * 320},${500 - density(value, mean, picture.variances[component]) * 1000}`;
+    });
+    body += `<polyline points="${points.join(' ')}" style="fill:none;stroke:${color(tone)};stroke-width:2.5"></polyline>`
+      + text(70 + component * 200, 585, `Mean ${mean}`, { width: 120, anchor: 'middle', weight: 700, tone });
   }
-  body += text(20, 442, 'Fractional updates, not two full observations', { width: 320, weight: 700 });
-  return { body, height: 488 };
+  body += line(20, 500, 340, 500, 'neutral');
+  for (const point of picture.points) body += circle(20 + (point + 3) / 10 * 320, 500, 5, 'focus', true)
+    + text(20 + (point + 3) / 10 * 320, 545, point, { width: 40, anchor: 'middle' });
+  body += text(20, 685, 'E-step: prior times Gaussian density, normalized across components', { width: 320, weight: 700 })
+    + text(20, 790, 'Each observed point keeps total mass one', { width: 320 });
+  for (const [index, point] of picture.points.entries()) {
+    const vertical = 895 + index * 155;
+    const [first, second] = responsibilities[index];
+    body += text(20, vertical + 23, point, { width: 35, weight: 700 })
+      + `<rect x="70" y="${vertical}" width="${first * 260}" height="35" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + `<rect x="${70 + first * 260}" y="${vertical}" width="${second * 260}" height="35" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+      + text(70, vertical + 88, `A ${(first * 100).toFixed(1)}%; B ${(second * 100).toFixed(1)}%`, { width: 260, weight: 700 });
+  }
+  body += text(20, 1430, 'M-step: fractional fitting, not duplicated full points', { width: 320, weight: 700 })
+    + text(20, 1540, `Effective counts: ${counts[0].toFixed(1)} and ${counts[1].toFixed(1)}; total three`, { width: 320, weight: 700 });
+  for (const [component, mean] of means.entries()) {
+    const vertical = 1650 + component * 155;
+    body += text(20, vertical, `Component ${component ? 'B' : 'A'}: mean ${mean.toFixed(3)}`, { width: 320, weight: 700 })
+      + text(20, vertical + 56, `Variance ${variances[component].toFixed(3)}; mixture weight ${priors[component].toFixed(1)}`, { width: 320 });
+  }
+  body += text(20, 1990, 'Recompute responsibilities after fitting. Covariance restrictions and component count change the model.', { width: 320, weight: 700 })
+    + text(20, 2110, 'Check held-out fit and initialization; regularize covariance collapse. This is not hard nearest-center assignment.', { width: 320 });
+  return { body, height: 2240 };
+}
+
+function observationUncertainty(picture, model, tools) {
+  const { text, color, fill, circle, number } = tools;
+  const entropy = probability => probability === 0 || probability === 1 ? 0
+    : -probability * Math.log2(probability) - (1 - probability) * Math.log2(1 - probability);
+  const residual = entropy(picture.flip);
+  const removed = 1 - residual;
+  assert(Math.abs(removed - model.rows[0][1]) < 1e-12);
+  assert.equal(entropy(.5), 1);
+  assert(Math.abs(residual + removed - 1) < 1e-12);
+  const routed = binaryChannel(picture, model, tools);
+  let body = routed.body
+    + text(20, 597, 'Before observing: one bit uncertain', { width: 320, weight: 700 })
+    + `<rect x="25" y="650" width="310" height="42" style="fill:${fill('input')};stroke:${color('input')};stroke-width:2"></rect>`
+    + text(20, 748, 'After observing this noisy channel', { width: 320, weight: 700 })
+    + `<rect x="25" y="798" width="${residual * 310}" height="42" data-picture-remaining-uncertainty="${residual}" style="fill:${fill('warning')};stroke:${color('warning')};stroke-width:2"></rect>`
+    + `<rect x="${25 + residual * 310}" y="798" width="${removed * 310}" height="42" data-picture-removed-uncertainty="${removed}" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></rect>`
+    + text(20, 888, `${number(residual)} bits remain`, { width: 142, weight: 700, tone: 'warning' })
+    + text(340, 888, `${number(removed)} bits removed`, { width: 160, anchor: 'end', weight: 700, tone: 'output' })
+    + text(20, 990, 'Removed share is the mutual information.', { width: 320, weight: 700 })
+    + text(20, 1094, 'Change: each outgoing path is equally likely', { width: 320, weight: 700 });
+  for (let input = 0; input < 2; input++) for (let output = 0; output < 2; output++) {
+    const from = [90, 1190 + input * 130];
+    const to = [270, 1190 + output * 130];
+    body += `<path data-picture-independent-channel="${input},${output}" data-picture-joint="0.25" d="M${from.join(' ')}C160 ${from[1]} 200 ${to[1]} ${to.join(' ')}" style="fill:none;stroke:${color(input === output ? 'input' : 'warning')};stroke-width:7.5;opacity:.75"></path>`;
+  }
+  for (let bit = 0; bit < 2; bit++) for (const horizontal of [65, 295]) body += circle(horizontal, 1190 + bit * 130, 24, bit ? 'output' : 'input')
+    + text(horizontal, 1197 + bit * 130, bit, { width: 40, anchor: 'middle', size: 22, weight: 700 });
+  body += text(20, 1394, 'Output now removes no uncertainty', { width: 320, weight: 700 })
+    + `<rect x="25" y="1440" width="310" height="42" style="fill:${fill('warning')};stroke:${color('warning')};stroke-width:2"></rect>`
+    + text(20, 1550, 'One bit remains; mutual information is zero.', { width: 320, weight: 700 });
+  return { body, height: 1620 };
 }
 
 function binaryChannel(picture, model, tools) {
@@ -2694,12 +4317,52 @@ function channelPooling(picture, model, tools) {
   return { body, height: 522 };
 }
 
+function convolutionAndPooling(picture, model, tools) {
+  const { text, color, fill, circle, line } = tools;
+  const patches = [0, 1].map(start => picture.image.flatMap(row => row.slice(start, start + 2)));
+  assert.deepEqual(patches, [[1, 2, 4, 5], [2, 3, 5, 6]]);
+  const responses = patches.map(patch => patch.reduce((sum, value, coordinate) => sum + value * picture.kernel[coordinate], 0));
+  assert.deepEqual(responses, [-4, -4]);
+  assert.equal(picture.kernel.length, 4);
+  const lowered = patchColumns(picture, { values: [[1, 2], [2, 3], [4, 5], [5, 6]] }, tools);
+  const pooled = channelPooling(picture, model, tools);
+  let body = lowered.body + text(20, 701, 'One filter, reused at both patch positions', { width: 320, weight: 700 });
+  for (const [coordinate, weight] of picture.kernel.entries()) {
+    const horizontal = 40 + coordinate % 2 * 47;
+    const vertical = 790 + Math.floor(coordinate / 2) * 47;
+    body += `<rect x="${horizontal}" y="${vertical}" width="47" height="47" data-picture-cnn-filter-weight="${coordinate}" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`
+      + text(horizontal + 23.5, vertical + 30, weight, { width: 41, anchor: 'middle', weight: 700 });
+  }
+  for (const [patch, response] of responses.entries()) {
+    const vertical = 926 + patch * 160;
+    body += (patch === 0 ? arrowBetween([87, 894], [242, vertical - 18], 'focus', tools, 2)
+      : line(87, 894, 350, 894, 'focus') + line(350, 894, 350, vertical, 'focus') + arrowBetween([350, vertical], [304, vertical], 'focus', tools, 2))
+      + `<g data-picture-cnn-patch-response="${patch}" data-picture-cnn-response="${response}">${circle(270, vertical, 27, 'output')}${text(270, vertical + 6, response, { width: 46, anchor: 'middle', weight: 700 })}</g>`
+      + text(20, vertical + 48, `Patch ${patch}: one response in the same channel`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1205, 'Four stored weights, two output positions', { width: 320, tone: 'soft' })
+    + text(20, 1290, 'Separate example: pool three spatial channels', { width: 320, weight: 700 })
+    + `<g transform="translate(0 1360)">${pooled.body}</g>`;
+  return { body, height: pooled.height + 1360 };
+}
+
 function sufficientCompression(picture, model, tools) {
   const { text, circle, line, color, fill } = tools;
   const successes = picture.outcomes.reduce((sum, value) => sum + value, 0);
   const count = picture.outcomes.length;
   assert.equal(successes / count, Number(model.rows.at(-1)[1].at(-1)));
-  let body = text(20, 27, 'Two orders, one Bernoulli likelihood', { width: 320, weight: 700 });
+  const permuted = picture.permutation.map(index => picture.outcomes[index]);
+  const likelihood = (values, probability) => values.reduce((product, value) => product * (value ? probability : 1 - probability), 1);
+  for (const probability of [.2, .6, .8]) assert(Math.abs(likelihood(picture.outcomes, probability) - likelihood(permuted, probability)) < 1e-12);
+  const probability = successes / count;
+  const natural = Math.log(probability / (1 - probability));
+  const logPartition = parameter => Math.log1p(Math.exp(parameter));
+  const step = 1e-5;
+  const modelMoment = (logPartition(natural + step) - logPartition(natural - step)) / (2 * step);
+  assert(Math.abs(modelMoment - probability) < 1e-8);
+  assert.equal(5 * probability, successes);
+  assert.equal(Math.log(1 / (1 - 1)), Infinity);
+  let body = text(20, 27, 'Two orders, one sufficient count; fit the model moment', { width: 320, weight: 700 });
   for (const [phase, order] of [picture.outcomes.map((_, index) => index), picture.permutation].entries()) {
     const vertical = 103 + phase * 101;
     for (const [position, index] of order.entries()) {
@@ -2712,15 +4375,59 @@ function sufficientCompression(picture, model, tools) {
   body += arrowBetween([105, 240], [160, 300], 'input', tools, 2) + arrowBetween([255, 240], [200, 300], 'input', tools, 2)
     + text(180, 337, `${successes} successes; ${count} trials`, { width: 300, anchor: 'middle', size: 22, weight: 700 });
   for (let index = 0; index < count; index++) body += `<rect x="${35 + index * 58}" y="375" width="58" height="34" style="fill:${fill(index < successes ? 'output' : 'neutral')};stroke:${color(index < successes ? 'output' : 'neutral')};stroke-width:1.75"></rect>`;
-  body += text(20, 458, `${successes} / ${count} = ${successes / count}`, { width: 320, size: 24, weight: 700, tone: 'output' })
-    + text(20, 505, 'Order is discarded; the sufficient counts remain.', { width: 320, tone: 'soft' });
-  return { body, height: 550 };
+  body += text(20, 458, 'Three successes among five trials', { width: 320, size: 18, weight: 700, tone: 'output' })
+    + text(20, 530, 'Order is discarded under this independent Bernoulli model.', { width: 320 })
+    + text(20, 635, 'Natural parameters tilt weights. The log-partition normalizes their probabilities.', { width: 320, weight: 700 });
+  for (const [index, chance] of [.2, .6, .8].entries()) {
+    const vertical = 790 + index * 190;
+    const expected = chance * count;
+    const tone = expected === successes ? 'output' : 'input';
+    body += text(20, vertical - 45, `Model chance ${chance * 100}%; expected successes ${expected}`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="320" height="36" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1"></rect>`
+      + `<rect x="20" y="${vertical}" width="${chance * 320}" height="36" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + line(20 + probability * 320, vertical - 10, 20 + probability * 320, vertical + 46, 'warning', true)
+      + text(20, vertical + 88, expected === successes ? 'Model count matches observed three' : 'Model count does not match observed three', { width: 320, tone });
+  }
+  body += text(20, 1350, 'Common zero-to-five count scale; red mark is the observed count.', { width: 320 })
+    + text(20, 1455, 'All successes: probability one is a boundary fit, not a finite interior natural parameter.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1575, 'Different assumed families can require different sufficient statistics.', { width: 320 });
+  return { body, height: 1675 };
 }
 
 function bitReassignment(picture, model, tools) {
   const { text, color, fill, line } = tools;
   assert.deepEqual(picture.formats[1], [1, model.rows[0][1], model.rows[1][1]]);
   assert(picture.formats.every(counts => counts.reduce((sum, value) => sum + value, 0) === 16));
+  const roundEven = value => {
+    const lower = Math.floor(value);
+    const fraction = value - lower;
+    return fraction > .5 || fraction === .5 && lower % 2 ? lower + 1 : lower;
+  };
+  const spacing = (exponent, fractionBits) => 2 ** (exponent - fractionBits);
+  const roundNormal = (value, exponentBits, fractionBits) => {
+    const exponent = Math.floor(Math.log2(value));
+    const step = spacing(exponent, fractionBits);
+    const rounded = roundEven(value / step) * step;
+    const bias = 2 ** (exponentBits - 1) - 1;
+    const maximum = (2 - 2 ** -fractionBits) * 2 ** (2 ** exponentBits - 2 - bias);
+    return rounded > maximum ? Infinity : rounded;
+  };
+  const rounded = picture.formats.map(([, exponent, fraction]) => roundNormal(picture.value, exponent, fraction));
+  assert.deepEqual(rounded, [1.0029296875, 1]);
+  assert.equal(spacing(0, 7) / spacing(0, 10), 8);
+  assert.equal(spacing(1, 7), .015625);
+  assert.equal(roundNormal(1 + .5 / 128, 8, 7), 1);
+  assert.equal(roundNormal(1 + 1.5 / 128, 8, 7), 1.015625);
+  assert.deepEqual(picture.formats.map(([, exponent, fraction]) => roundNormal(picture.large, exponent, fraction)), [Infinity, 70144]);
+  const quantize = (value, scale) => {
+    const code = Math.max(-128, Math.min(127, roundEven(value / scale)));
+    return { code, reconstructed: code * scale };
+  };
+  assert.equal(quantize(.26, .1).code, 3);
+  assert(Math.abs(quantize(.26, .1).reconstructed - .3) < 1e-12);
+  assert.equal(quantize(.26, .01).reconstructed, .26);
+  assert.equal(quantize(20, .1).code, 127);
+  assert(Math.abs(quantize(20, .1).reconstructed - 12.7) < 1e-12);
   const tones = ['neutral', 'input', 'output'];
   let body = text(20, 27, 'Sixteen slots. Three change jobs.', { width: 320, weight: 700 });
   for (const [format, counts] of picture.formats.entries()) {
@@ -2735,7 +4442,30 @@ function bitReassignment(picture, model, tools) {
   body += arrowBetween([170, 212], [170, 259], 'focus', tools, 3)
     + text(20, 446, 'Blue buys range. Green buys precision.', { width: 320, weight: 700 })
     + text(20, 493, 'The total bit budget never grows.', { width: 320, tone: 'soft' });
-  return { body, height: 533 };
+  body += text(20, 590, 'Nearest-even rounding of 1.003', { width: 320, weight: 700 })
+    + text(20, 655, 'Both rulers span one BF16 step above one; red marks the requested value.', { width: 320 });
+  const horizontal = value => 40 + (value - 1) / spacing(0, 7) * 280;
+  for (const [format, result] of rounded.entries()) {
+    const vertical = 820 + format * 260;
+    body += text(20, vertical - 70, format ? 'BF16: one wide step' : 'FP16: eight smaller steps', { width: 320, weight: 700 })
+      + line(40, vertical, 320, vertical, 'neutral');
+    for (let tick = 0; tick <= (format ? 1 : 8); tick++) {
+      const position = 40 + tick / (format ? 1 : 8) * 280;
+      body += line(position, vertical - 10, position, vertical + 10, 'input');
+    }
+    body += line(horizontal(picture.value), vertical - 32, horizontal(picture.value), vertical + 32, 'warning', true)
+      + `<circle cx="${horizontal(result)}" cy="${vertical}" r="5" style="fill:${color('output')}"></circle>`
+      + text(40, vertical + 46, '1', { width: 50, anchor: 'middle' })
+      + text(320, vertical + 46, '1.0078125', { width: 77, anchor: 'middle' })
+      + text(20, vertical + 108, `Stored: ${result}`, { width: 320, weight: 700, tone: 'output' });
+  }
+  body += text(20, 1310, 'At 70000: FP16 overflows; BF16 stores 70144, finite but inexact.', { width: 320, weight: 700 })
+    + text(20, 1420, 'Accumulation precision is a separate choice.', { width: 320 })
+    + text(20, 1510, 'Scaled INT8 is not an exponent/fraction layout', { width: 320, weight: 700 })
+    + text(20, 1615, 'Scale 0.1: 0.26 uses code 3 and reconstructs 0.3.', { width: 320 })
+    + text(20, 1710, 'Scale 0.01 retains 0.26, but narrows the signed-code range.', { width: 320 })
+    + text(20, 1815, 'At scale 0.1, value 20 clamps to code 127 and reconstructs 12.7. Finer local rounding cannot undo saturation.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1950 };
 }
 
 function targetRedistribution(picture, model, tools) {
@@ -2759,29 +4489,63 @@ function targetRedistribution(picture, model, tools) {
 
 function interpolationFreedom(picture, model, tools) {
   const { text, circle, line, color, fill, number } = tools;
-  const value = (input, gain) => input * (2 - input) + gain * input * (input - 1) * (input - 2);
-  const horizontal = input => 35 + input / 2 * 290;
-  const vertical = output => 320 - (output + .5) / 2.3 * 250;
-  const tones = ['input', 'output'];
-  let body = text(20, 27, 'Observed points pin the material in place', { width: 320, weight: 700 })
-    + line(35, vertical(0), 325, vertical(0));
-  for (const [family, gain] of picture.gains.entries()) {
-    const points = Array.from({ length: 81 }, (_, index) => [index / 40, value(index / 40, gain)]);
-    for (const input of picture.observed) assert.equal(value(input, gain), input === 1 ? 1 : 0);
-    const upper = points.map(([input, output]) => [horizontal(input), vertical(output + .035)]);
-    const lower = [...points].reverse().map(([input, output]) => [horizontal(input), vertical(output - .035)]);
-    body += `<path data-picture-ribbon="${family}" data-picture-parameter="${gain}" d="${[...upper, ...lower].map((point, index) => `${index ? 'L' : 'M'}${point.join(' ')}`).join('')}Z" style="fill:${fill(tones[family])};stroke:${color(tones[family])};stroke-width:2"></path>`;
+  const truth = input => input * (2 - input);
+  const broad = input => 4 * input * (input - .5) * (input - 1.5) * (input - 2);
+  const widths = Array.from({ length: picture.localModes }, (_, index) => .08 + index / (picture.localModes - 1) * .12);
+  const local = input => broad(input) * (1 + widths.reduce((sum, width) => sum + Math.exp(-((input - 1) ** 2) / (2 * width ** 2)), 0)) / (picture.localModes + 1);
+  const samples = [-1, 1].map(sign => picture.observed.map(input => truth(input) + (input === 1 ? sign * picture.noise : 0)));
+  const families = samples.map((sample, index) => {
+    const noise = (index ? 1 : -1) * picture.noise;
+    const mean = sample.reduce((sum, value) => sum + value, 0) / sample.length;
+    return [() => mean, input => truth(input) + noise * broad(input), input => truth(input) + noise * local(input)];
+  });
+  const errors = [0, 0, 0];
+  for (let point = 0; point <= 2000; point++) {
+    const input = point / 1000;
+    for (let phase = 0; phase < 3; phase++) for (const family of families) errors[phase] += (family[phase](input) - truth(input)) ** 2 / 4002;
   }
-  for (const input of picture.observed) body += circle(horizontal(input), vertical(value(input, 0)), 8, 'focus', true)
-    + text(horizontal(input), 359, input, { width: 70, anchor: input === 0 ? 'start' : input === 2 ? 'end' : 'middle', tone: 'soft' });
-  const results = picture.gains.map(gain => value(picture.probe, gain));
-  assert.deepEqual(results, [.75, 1.5]);
-  body += line(horizontal(picture.probe), vertical(results[1]), horizontal(picture.probe), vertical(results[0]), 'warning', true);
-  for (const [index, result] of results.entries()) body += circle(horizontal(picture.probe), vertical(result), 5, tones[index], true);
-  body += text(20, 412, 'Between the pins, predictions can separate', { width: 320, size: 18, weight: 700 })
-    + text(20, 468, 'At x = 0.5: 0.75 or 1.5', { width: 320, size: 20, weight: 700, tone: 'warning' })
-    + text(20, 516, 'Both have zero error on the observed pins.', { width: 320, tone: 'soft' });
-  return { body, height: 556 };
+  assert(errors[1] > errors[0] && errors[2] < errors[1], 'The declared nested families must actually show a second descent');
+  assert.equal(broad(1), 1);
+  assert.equal(local(1), 1);
+  assert(picture.noise / Math.sqrt(picture.localModes + 1) < picture.noise);
+  for (let sample = 0; sample < 2; sample++) for (const phase of [1, 2]) for (const [index, input] of picture.observed.entries()) assert(Math.abs(families[sample][phase](input) - samples[sample][index]) < 1e-12);
+  const horizontal = input => 35 + input / 2 * 290;
+  const tones = ['input', 'output'];
+  let body = text(20, 27, 'One unpredictable noisy input; two possible samples', { width: 320, weight: 700 })
+    + text(20, 82, 'Gray curve: truth. Colored fits: repeated samples.', { width: 320, tone: 'soft' });
+  const headings = ['Rigid fit: one feature', 'Interpolation: five features', 'Beyond: thirty-seven features'];
+  const endings = ['Biased center; modest spread', 'Center on truth; wide spread', 'Center on truth; narrow spread'];
+  for (let phase = 0; phase < 3; phase++) {
+    const top = 135 + phase * 295;
+    const vertical = output => top + 165 - (output + .3) / 2.4 * 120;
+    const path = operation => Array.from({ length: 161 }, (_, index) => `${index ? 'L' : 'M'}${horizontal(index / 80)} ${vertical(operation(index / 80))}`).join('');
+    const results = families.map(family => family[phase](picture.probe));
+    const center = (results[0] + results[1]) / 2;
+    const reference = truth(picture.probe);
+    const ruler = value => 35 + value * 290;
+    body += `<g data-picture-capacity-phase="${phase}" data-picture-test-error="${errors[phase]}" data-picture-probe-mean="${center}" data-picture-probe-truth="${reference}" data-picture-probe-spread="${Math.abs(results[1] - results[0])}">`
+      + text(20, top, headings[phase], { width: 320, weight: 700 })
+      + `<path d="${path(truth)}" style="fill:none;stroke:${color('soft')};stroke-width:1.5;stroke-dasharray:2 4"></path>`;
+    for (const [sample, family] of families.entries()) body += `<path data-picture-capacity-fit="${phase},${sample}" data-picture-probe-value="${results[sample]}" d="${path(family[phase])}" style="fill:none;stroke:${color(tones[sample])};stroke-width:2.5${sample ? ';stroke-dasharray:5 3' : ''}"></path>`;
+    for (const input of picture.observed) {
+      if (input === 1) {
+        body += line(horizontal(input), vertical(1 - picture.noise), horizontal(input), vertical(1 + picture.noise), 'warning', true);
+        for (const sample of samples) body += circle(horizontal(input), vertical(sample[picture.observed.indexOf(input)]), 4, 'warning', true);
+      } else body += circle(horizontal(input), vertical(truth(input)), 4, 'focus', true);
+    }
+    body += line(horizontal(picture.probe), top + 42, horizontal(picture.probe), top + 170, 'neutral', true)
+      + text(horizontal(picture.probe), top + 192, 'probe', { width: 70, anchor: 'middle', size: 14, tone: 'soft' })
+      + text(180, top + 192, 'noise', { width: 70, anchor: 'middle', size: 14, tone: 'warning' })
+      + line(35, top + 232, 325, top + 232)
+      + line(ruler(reference), top + 222, ruler(reference), top + 243, 'warning', true)
+      + line(ruler(results[0]), top + 232, ruler(results[1]), top + 232, 'output');
+    for (const [sample, result] of results.entries()) body += circle(ruler(result), top + 232, 4, tones[sample], true);
+    body += `<circle cx="${ruler(center)}" cy="${top + 232}" r="3" style="fill:${fill('neutral')};stroke:${color('text')};stroke-width:1.5"></circle>`
+      + text(20, top + 274, endings[phase], { width: 320, weight: 700 })
+      + '</g>';
+  }
+  body += text(20, 1035, 'Probe ruler: fixed truth tick, fit center, sample spread.', { width: 320, tone: 'soft' });
+  return { body, height: 1095 };
 }
 
 function likelihoodCandidates(picture, model, tools) {
@@ -2996,6 +4760,47 @@ function targetCorruption(picture, model, tools) {
   return { body, height: 644 };
 }
 
+function bidirectionalTargetCorruption(picture, model, tools) {
+  const { text, color, fill, line, number } = tools;
+  const corrupted = picture.tokens.map((token, index) => index === picture.selected ? 'MASK' : token);
+  assert.equal(picture.tokens[picture.selected], 'cat');
+  assert.equal(corrupted[picture.selected], 'MASK');
+  assert.deepEqual(corrupted.filter((_, index) => index !== picture.selected), ['the', 'sat']);
+  assert(Math.abs(picture.probabilities.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
+  let body = text(20, 27, 'Recover the original token using both context sides', { width: 320, weight: 700 })
+    + text(20, 84, 'Original: the cat sat', { width: 320, weight: 700 });
+  for (const [stage, tokens] of [picture.tokens, corrupted].entries()) {
+    const vertical = stage ? 270 : 110;
+    for (const [index, token] of tokens.entries()) {
+      const horizontal = 20 + index * 112;
+      const tone = index === picture.selected ? 'focus' : 'input';
+      body += `<rect x="${horizontal}" y="${vertical}" width="94" height="54" data-picture-bert-token-position="${index}" data-picture-bert-input-stage="${stage}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`
+        + text(horizontal + 47, vertical + 35, token, { width: 84, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 215, 'Corrupt the selected input; retain cat as target', { width: 320 })
+    + arrowBetween([67, 335], [113, 385], 'input', tools, 2)
+    + arrowBetween([179, 335], [180, 385], 'focus', tools, 2)
+    + arrowBetween([291, 335], [247, 385], 'input', tools, 2)
+    + `<rect x="85" y="393" width="190" height="64" data-picture-bert-context-sides="both" style="fill:${fill('state')};stroke:${color('state')};stroke-width:2"></rect>`
+    + text(180, 431, 'encoder', { width: 170, anchor: 'middle', weight: 700, size: 20 })
+    + line(180, 467, 350, 467, 'output') + line(350, 467, 350, 640, 'output')
+    + arrowBetween([350, 640], [315, 658], 'output', tools, 2)
+    + text(20, 525, 'Both sides can inform the masked position', { width: 320, weight: 700 })
+    + text(20, 600, 'Illustrative prediction at the selected position', { width: 320, weight: 700 });
+  let cumulative = 0;
+  for (const [candidate, probability] of picture.probabilities.entries()) {
+    const tone = ['output', 'input', 'neutral'][candidate];
+    body += `<rect x="${20 + cumulative * 320}" y="665" width="${probability * 320}" height="44" data-picture-bert-candidate="${candidate}" data-picture-bert-probability="${probability}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + text(20 + candidate * 112, 752, `${picture.candidates[candidate]} ${number(probability * 100)}%`, { width: 100, weight: 700, tone });
+    cumulative += probability;
+  }
+  const inventory = targetCorruption(picture, model, tools);
+  body += text(20, 814, 'Original target remains cat, not MASK', { width: 320, weight: 700 })
+    + `<g transform="translate(0 890)">${inventory.body}</g>`;
+  return { body, height: inventory.height + 890 };
+}
+
 function clusterResample(picture, model, tools) {
   const { text, circle, color, fill } = tools;
   const tones = ['input', 'state', 'output'];
@@ -3048,6 +4853,92 @@ function alignmentCollapse(picture, model, tools) {
   return { body, height: 598 };
 }
 
+function ctcCollapseAndMarginalize(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const collapse = path => path.filter((token, index) => index === 0 || token !== path[index - 1]).filter(token => token !== '_').join('');
+  const paths = Array.from({ length: picture.alphabet.length ** picture.path.length }, (unused, choices) => picture.path.map((unusedToken, frame) => picture.alphabet[choices >> frame & 1]));
+  const compatible = paths.filter(path => collapse(path) === picture.transcript);
+  assert.deepEqual(compatible.map(path => path.join('')).sort(), ['_a_a', 'a__a', 'a_a_', 'a_aa', 'aa_a'].sort());
+  const probability = 1 / paths.length;
+  const transcriptProbability = compatible.reduce(sum => sum + probability, 0);
+  assert.equal(transcriptProbability, .3125);
+  assert(transcriptProbability > probability);
+  const collapsed = alignmentCollapse(picture, model, tools);
+  let body = collapsed.body + text(20, 666, 'Train on transcript aa without choosing one path', { width: 320, weight: 700 })
+    + text(20, 749, 'Toy: each frame chooses a or blank with equal chance', { width: 320 })
+    + text(20, 829, 'Five of sixteen alignments collapse to aa', { width: 320, weight: 700 });
+  for (let frame = 0; frame < picture.path.length; frame++) body += text(20 + frame * 62, 899, frame + 1, { width: 56 });
+  body += text(270, 899, 'chance', { width: 70 });
+  for (const [alignment, path] of compatible.entries()) {
+    const vertical = 910 + alignment * 82;
+    for (const [frame, token] of path.entries()) {
+      const tone = token === '_' ? 'warning' : 'input';
+      body += `<rect x="${20 + frame * 62}" y="${vertical}" width="48" height="40" data-picture-ctc-compatible-alignment="${alignment}" data-picture-ctc-frame="${frame}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(44 + frame * 62, vertical + 27, token, { width: 42, anchor: 'middle', weight: 700, tone });
+    }
+    body += text(270, vertical + 27, probability, { width: 70, weight: 700 });
+  }
+  body += text(20, 1365, 'Add all five compatible alignment weights', { width: 320, weight: 700 });
+  for (const [alignment, path] of paths.entries()) {
+    const matches = collapse(path) === picture.transcript;
+    const tone = matches ? 'output' : 'neutral';
+    body += `<rect x="${20 + alignment % 8 * 40}" y="${1430 + Math.floor(alignment / 8) * 35}" width="40" height="35" data-picture-ctc-alignment-member="${alignment}" data-picture-ctc-compatible="${matches}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1545, 'Transcript chance: 31.25%', { width: 320, weight: 700 })
+    + text(20, 1610, 'One best path supplies only 6.25%', { width: 320, tone: 'soft' });
+  return { body, height: 1675 };
+}
+
+function patchProductAndBackward(picture, model, tools) {
+  const { text, circle, color, fill } = tools;
+  const columns = picture.outputGradients.map((unused, patch) => picture.image.flatMap(row => row.slice(patch, patch + 2)));
+  const responses = columns.map(column => column.reduce((sum, value, index) => sum + value * picture.kernel[index], 0));
+  const gradients = picture.image.map(row => row.map(() => 0));
+  const contributors = [];
+  for (const [patch, incoming] of picture.outputGradients.entries()) {
+    for (const [position, weight] of picture.kernel.entries()) {
+      const row = Math.floor(position / 2);
+      const column = patch + position % 2;
+      const contribution = incoming * weight;
+      gradients[row][column] += contribution;
+      if (row === 0 && column === 1) contributors.push(contribution);
+    }
+  }
+  assert.deepEqual(responses, [37, 47]);
+  assert.deepEqual(contributors, [2, 1]);
+  assert.deepEqual(gradients, [[1, 3, 2], [3, 7, 4]]);
+  const unfolded = patchColumns(picture, model, tools);
+  let body = unfolded.body + text(20, 670, 'One filter row is shared by both columns', { width: 320, weight: 700 });
+  for (const [position, weight] of picture.kernel.entries()) body += `<rect x="${20 + position * 80}" y="740" width="64" height="48" data-picture-im2col-filter="${position}" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`
+    + text(52 + position * 80, 771, weight, { width: 56, anchor: 'middle', weight: 700 });
+  body += text(20, 853, 'Take the matching products; add within each column', { width: 320 });
+  for (const [patch, response] of responses.entries()) {
+    const horizontal = 90 + patch * 180;
+    body += arrowBetween([horizontal, 896], [horizontal, 933], 'output', tools, 2)
+      + circle(horizontal, 970, 27, 'output') + text(horizontal, 976, response, { width: 48, anchor: 'middle', weight: 700 })
+      + text(horizontal, 1040, `Patch ${patch}`, { width: 130, anchor: 'middle' });
+  }
+  body += text(20, 1135, 'Backward: each response receives one incoming unit', { width: 320, weight: 700 })
+    + text(20, 1225, 'The two copies of source pixel 2 send gradients back', { width: 320 });
+  for (const [patch, contribution] of contributors.entries()) {
+    const horizontal = 90 + patch * 180;
+    const tone = patch ? 'output' : 'input';
+    body += text(horizontal, 1300, `${patch ? 'Right' : 'Left'} column`, { width: 150, anchor: 'middle', weight: 700, tone })
+      + circle(horizontal, 1355, 24, tone) + text(horizontal, 1361, contribution, { width: 43, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 1393], [patch ? 195 : 165, 1456], tone, tools, 2);
+  }
+  body += circle(180, 1490, 27, 'output') + text(180, 1496, gradients[0][1], { width: 48, anchor: 'middle', weight: 700 })
+    + text(20, 1560, 'Shared gradient: 3. Sum contributions; do not average.', { width: 320, weight: 700 })
+    + text(20, 1655, 'Accumulated image gradients', { width: 320, weight: 700 });
+  for (const [row, values] of gradients.entries()) for (const [column, value] of values.entries()) {
+    const tone = column === 1 ? 'output' : 'neutral';
+    body += `<rect x="${54 + column * 80}" y="${1690 + row * 64}" width="80" height="64" data-picture-im2col-image-gradient="${row},${column}" data-picture-im2col-gradient-value="${value}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + text(94 + column * 80, 1730 + row * 64, value, { width: 65, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1885, 'Implicit kernels avoid storing all columns. Overlap still accumulates.', { width: 320, tone: 'soft' });
+  return { body, height: 1980 };
+}
+
 function patchColumns(picture, model, tools) {
   const { text, color, fill } = tools;
   let body = text(20, 27, 'Overlapping patches reuse the same pixels', { width: 320, weight: 700 });
@@ -3088,7 +4979,29 @@ function sharedMemory(picture, model, tools) {
   }
   assert.equal(picture.groups * picture.perGroup, 8);
   body += text(20, 571, 'Two stores; eight independently computed outputs.', { width: 320, tone: 'soft' });
-  return { body, height: 619 };
+  const cacheMiB = heads => 2 * picture.layers * picture.tokens * heads * picture.headWidth * picture.elementBytes / 1024 ** 2;
+  assert.deepEqual([8, 2, 1].map(cacheMiB), [64, 16, 8]);
+  body += text(20, 710, 'Toy cache: one sequence, 32 layers, 1024 tokens, width 64 per head, two bytes per scalar. Count both K and V.', { width: 320, weight: 700 });
+  for (const [index, [name, heads]] of [['MHA', 8], ['GQA', 2], ['MQA', 1]].entries()) {
+    const vertical = 930 + index * 190;
+    const bytes = cacheMiB(heads);
+    body += text(20, vertical - 45, `${name}: ${heads} KV heads, ${bytes} MiB`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="${bytes / 64 * 320}" height="35" style="fill:${fill(index === 1 ? 'output' : 'input')};stroke:${color(index === 1 ? 'output' : 'input')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1430, 'Same zero-to-64-MiB scale. All variants retain eight query outputs.', { width: 320, weight: 700 })
+    + text(20, 1550, 'Scalar toy inside one group: shared keys one and zero; shared values ten and twenty.', { width: 320 });
+  const outputs = [1, -1].map(query => {
+    const firstWeight = Math.exp(query) / (Math.exp(query) + 1);
+    return { query, firstWeight, output: firstWeight * 10 + (1 - firstWeight) * 20 };
+  });
+  assert(outputs[0].output < outputs[1].output);
+  assert(Math.abs(outputs[0].output - 12.68941421369995) < 1e-12);
+  for (const [index, result] of outputs.entries()) {
+    const vertical = 1710 + index * 180;
+    body += text(20, vertical, `Query ${result.query}: first-value weight ${result.firstWeight.toFixed(3)}, output ${result.output.toFixed(3)}`, { width: 320, weight: 700, tone: index ? 'output' : 'input' });
+  }
+  body += text(20, 2085, 'Sharing cache does not remove query-score/value work. Avoid physically materializing repeated KV copies. Quality, latency and MHA conversion need separate validation.', { width: 320, tone: 'warning' });
+  return { body, height: 2260 };
 }
 
 function featurePartition(picture, model, tools) {
@@ -3131,23 +5044,52 @@ function cacheFrontier(picture, model, tools) {
 }
 
 function causalFrontier(picture, model, tools) {
-  const { text, circle, line, color } = tools;
-  assert.equal(picture.weights.reduce((sum, weight) => sum + weight, 0), 1);
-  assert(picture.weights.slice(picture.query + 1).every(weight => weight === 0));
+  const { text, circle, line, color, fill } = tools;
+  const scores = picture.keys.map(key => key.reduce((sum, value, index) => sum + value * picture.queryVector[index], 0) / Math.sqrt(picture.queryVector.length));
+  const allowed = scores.map((unused, index) => index <= picture.query);
+  const softmax = (values, keep) => {
+    const visible = values.filter((unused, index) => keep[index]);
+    assert(visible.length > 0);
+    const maximum = Math.max(...visible);
+    const masses = values.map((value, index) => keep[index] ? Math.exp(value - maximum) : 0);
+    const denominator = masses.reduce((sum, value) => sum + value, 0);
+    return masses.map(value => value / denominator);
+  };
+  const weights = softmax(scores, allowed);
+  const output = values => values.reduce((sum, value, index) => sum + value * weights[index], 0);
+  assert.deepEqual(scores, [0, 1, 2, 18, 20]);
+  assert(Math.abs(weights.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
+  assert(weights.slice(picture.query + 1).every(weight => weight === 0));
+  assert.equal(output([2, 4, 8, 100000000, 1000000000]), output(picture.values));
+  assert.deepEqual(softmax([0, 1, 2, -1000, 1000], allowed), weights);
+  assert(softmax(scores.map((value, index) => allowed[index] ? value : 0), scores.map(() => true))[3] > 0);
+  assert.throws(() => softmax(scores, scores.map(() => false)));
   let body = text(20, 27, 'Future values cannot cross the time barrier', { width: 320, weight: 700 })
-    + text(20, 86, 'Query at position two', { width: 320, weight: 700, tone: 'focus' })
+    + text(20, 86, 'Toy query at position two; feature width four', { width: 320, weight: 700, tone: 'focus' })
     + line(226, 127, 226, 400, 'warning', true);
-  for (const [position, weight] of picture.weights.entries()) {
+  for (const [position, weight] of weights.entries()) {
     const horizontal = 40 + position * 69;
     const tone = weight ? 'input' : 'neutral';
     body += circle(horizontal, 176, 17, tone) + text(horizontal, 182, position, { width: 30, anchor: 'middle', weight: 700 });
     if (weight) body += arrowBetween([horizontal, 198], [horizontal, 292], 'input', tools, 2 + weight * 12);
     else body += line(horizontal, 233, horizontal, 275, 'warning', true) + line(horizontal - 7, 273, horizontal + 7, 287, 'warning') + line(horizontal + 7, 273, horizontal - 7, 287, 'warning');
-    body += text(horizontal, 350, weight, { width: 62, anchor: 'middle', weight: 700, tone: weight ? 'input' : 'warning' });
+    body += text(horizontal, 350, weight.toFixed(3), { width: 62, anchor: 'middle', weight: 700, tone: weight ? 'input' : 'warning' });
   }
   body += text(20, 441, 'Allowed weights sum to one; future weights are zero.', { width: 320, weight: 700 })
     + text(20, 507, 'Mask the logits before normalizing the visible prefix.', { width: 320, tone: 'soft' });
-  return { body, height: 561 };
+  body += text(20, 645, 'Query components all one. Dot products divided by the square root of width give scores zero, one, two, eighteen, twenty.', { width: 320 })
+    + text(20, 795, 'True means allowed. Replace future scores with negative infinity before stable key-axis softmax; subtract the allowed maximum before exponentiating.', { width: 320, weight: 700 })
+    + text(20, 965, 'Toy scalar values two, four, eight, one hundred, one thousand. Only the first three have contribution routes.', { width: 320 });
+  for (let index = 0; index <= picture.query; index++) {
+    const vertical = 1150 + index * 160;
+    const contribution = weights[index] * picture.values[index];
+    body += text(20, vertical, `Key ${index}: value ${picture.values[index]}, contribution ${contribution.toFixed(3)}`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 45}" width="${contribution / 8 * 320}" height="25" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1690, `Add contributions: scalar output ${output(picture.values).toFixed(3)}. Vector values use the same weights per feature.`, { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1840, 'Raise future values to one hundred million and one billion, or change future scores: output is unchanged through this mask.', { width: 320 })
+    + text(20, 1990, 'Zeroing future logits leaves positive weight. Fully masked rows need an explicit policy; this reference assumes at least one allowed key. Keep batch/head/time/feature axes and suitable arithmetic precision.', { width: 320, tone: 'warning' });
+  return { body, height: 2220 };
 }
 
 function clippedImageMass(picture, model, tools) {
@@ -3186,20 +5128,56 @@ function removeStructure(picture, model, tools) {
 }
 
 function relabelPopulation(picture, model, tools) {
-  const { text, circle } = tools;
-  let body = text(20, 27, 'The inputs match; their label rules reverse', { width: 320, weight: 700 });
+  const { text, circle, line, color, fill } = tools;
+  const risk = (mass, errors) => mass.reduce((sum, share, bin) => sum + share * errors[bin], 0);
+  const weights = picture.targetMass.map((share, bin) => share / picture.sourceMass[bin]);
+  assert.deepEqual(weights, [.25, 4]);
+  for (const [actual, expected] of [[risk(picture.sourceMass, picture.errors), .16], [risk(picture.targetMass, picture.errors), .34], [risk(picture.targetMass, picture.changedErrors), .58]]) assert(Math.abs(actual - expected) < 1e-12);
+  assert(Math.abs(picture.sourceMass.reduce((sum, share, bin) => sum + share * weights[bin] * picture.errors[bin], 0) - .34) < 1e-12);
+  assert.deepEqual(picture.labels.map(labels => labels.filter((label, index) => label !== picture.inputs[index]).length / labels.length), [0, 1]);
+  assert.deepEqual(picture.labels.map(labels => labels.reduce((sum, value) => sum + value, 0)), [2, 2]);
+  let body = text(20, 27, '1. Keep conditional errors; change the mixture', { width: 320, weight: 700 })
+    + text(20, 111, 'Blue bin zero: 10% error. Green bin one: 40% error. A red cross marks an error.', { width: 320 });
+  for (const [domain, mass] of [picture.sourceMass, picture.targetMass].entries()) {
+    const vertical = 240 + domain * 420;
+    body += text(20, vertical - 56, domain ? 'Target: twenty blue, eighty green' : 'Source: eighty blue, twenty green', { width: 320, weight: 700 });
+    let member = 0;
+    let mistakes = 0;
+    for (const [bin, share] of mass.entries()) {
+      const members = Math.round(share * 100);
+      const errors = members * picture.errors[bin];
+      assert(Number.isInteger(errors));
+      for (let local = 0; local < members; local++, member++) {
+        const horizontal = 43 + member % 10 * 30;
+        const row = vertical + Math.floor(member / 10) * 23;
+        const tone = bin ? 'output' : 'input';
+        const wrong = local < errors;
+        mistakes += Number(wrong);
+        body += `<g data-picture-domain-case="${domain},${member}" data-picture-domain-bin="${bin}" data-picture-domain-error="${wrong}"><rect x="${horizontal - 7}" y="${row - 7}" width="14" height="14" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>${wrong ? line(horizontal - 5, row - 5, horizontal + 5, row + 5, 'warning') + line(horizontal - 5, row + 5, horizontal + 5, row - 5, 'warning') : ''}</g>`;
+      }
+    }
+    assert.equal(member, 100);
+    assert.equal(mistakes, domain ? 34 : 16);
+    body += text(20, vertical + 268, `${mistakes} errors per hundred; same within-bin rates`, { width: 320, weight: 700, tone: 'warning' });
+  }
+  body += text(20, 1009, 'Weights one-quarter and four recover target risk only under the stated invariance and support assumptions.', { width: 320, tone: 'soft' });
+  let contrast = text(20, 27, '2. Same inputs; opposite conditional label rules', { width: 320, weight: 700 });
   for (const [domain, labels] of picture.labels.entries()) {
     const vertical = 151 + domain * 212;
-    body += text(20, vertical - 59, `Domain ${domain ? 'B' : 'A'}: two zeros, two ones`, { width: 320, weight: 700 });
+    contrast += text(20, vertical - 59, `Domain ${domain ? 'B' : 'A'}: two zeros, two ones`, { width: 320, weight: 700 });
     for (const [index, label] of labels.entries()) {
       const horizontal = 55 + index * 83;
       const tone = label ? 'output' : 'input';
-      body += `<g data-picture-domain-member="${index}" data-picture-domain="${domain}">${circle(horizontal, vertical, 22, tone)}${text(horizontal, vertical + 7, picture.inputs[index], { width: 40, anchor: 'middle', size: 22, weight: 700 })}</g>`
+      contrast += `<g data-picture-domain-member="${index}" data-picture-domain="${domain}">${circle(horizontal, vertical, 22, tone)}${text(horizontal, vertical + 7, picture.inputs[index], { width: 40, anchor: 'middle', size: 22, weight: 700 })}</g>`
         + text(horizontal, vertical + 64, `y=${label}`, { width: 75, anchor: 'middle', tone, weight: 700 });
     }
   }
-  body += text(20, 489, 'Equal input frequencies cannot reveal this label shift.', { width: 320, tone: 'soft' });
-  return { body, height: 540 };
+  contrast += text(20, 489, 'Conditional shift, not class-prior label shift: both class frequencies stay equal.', { width: 320, tone: 'soft' });
+  body += `<g transform="translate(0 1145)">${contrast}</g>`
+    + text(20, 1768, '3. Changed errors or missing support break the calculation', { width: 320, weight: 700 })
+    + text(20, 1853, 'If green-bin error rises to 70%, actual target error is 58 per hundred. The old weights still predict 34.', { width: 320, tone: 'warning' })
+    + text(20, 1982, 'If source bin one has no labels, weights cannot supply its target error. Collect justified evidence or restrict the claim.', { width: 320, tone: 'soft' });
+  return { body, height: 2085 };
 }
 
 function centeredGroup(picture, model, tools) {
@@ -3239,6 +5217,56 @@ function axisPooling(picture, model, tools) {
     }
   }
   return { body, height: 617 };
+}
+
+function normalizationAndCompanions(picture, model, tools) {
+  const { text, circle, number } = tools;
+  const statistics = values => {
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const scale = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
+    return { mean, scale };
+  };
+  const normalize = values => {
+    const { mean, scale } = statistics(values);
+    return values.map(value => (value - mean) / scale);
+  };
+  const samples = [picture.values, [picture.values[0], picture.companion]];
+  const batches = samples.map(values => values[0].map((_, column) => normalize(values.map(row => row[column]))[0]));
+  const layers = samples.map(values => normalize(values[0]));
+  assert.deepEqual(batches, [[-1, -1], [1, 1]]);
+  assert.deepEqual(layers, [[-1, 1], [-1, 1]]);
+  const pooled = axisPooling(picture, model, tools);
+  let body = pooled.body + text(20, 677, 'First example stays 1, 3', { width: 320, weight: 700 });
+  for (const [condition, sample] of samples.entries()) {
+    const vertical = 812 + condition * 275;
+    body += text(20, vertical - 42, `Companion example: ${sample[1].join(', ')}`, { width: 320, weight: 700 })
+      + text(20, vertical + 26, 'BatchNorm', { width: 145, weight: 700, tone: 'input' })
+      + text(200, vertical + 26, 'LayerNorm', { width: 145, weight: 700, tone: 'output' });
+    for (const [kind, values] of [batches[condition], layers[condition]].entries()) for (const [column, value] of values.entries()) {
+      const horizontal = 60 + kind * 165 + column * 70;
+      const tone = kind ? 'output' : 'input';
+      body += `<g data-picture-normalization-condition="${condition}" data-picture-normalization-kind="${kind}" data-picture-normalization-column="${column}" data-picture-normalization-output="${value}">${circle(horizontal, vertical + 82, 27, tone)}${text(horizontal, vertical + 88, value, { width: 48, anchor: 'middle', weight: 700 })}</g>`;
+    }
+  }
+  const rms = Math.sqrt(picture.values[0].reduce((sum, value) => sum + value ** 2, 0) / picture.values[0].length);
+  const scaled = picture.values[0].map(value => value / rms);
+  assert(scaled.every(value => value > 0));
+  body += text(20, 1238, 'BatchNorm flips; LayerNorm remains -1, 1', { width: 320, weight: 700 })
+    + text(20, 1320, 'RMSNorm: scale without centering', { width: 320, weight: 700 });
+  for (const [column, value] of scaled.entries()) {
+    const horizontal = 70 + column * 145;
+    body += circle(horizontal, 1400, 29, 'focus') + text(horizontal, 1406, number(value), { width: 54, anchor: 'middle', weight: 700 });
+  }
+  const saved = statistics(picture.values.map(row => row[0]));
+  const evaluated = (picture.evaluationValue - saved.mean) / saved.scale;
+  assert.equal(evaluated, 3);
+  body += text(20, 1460, 'No centering: both outputs stay positive', { width: 320, tone: 'soft' })
+    + text(20, 1548, 'Evaluation: BatchNorm reuses saved statistics', { width: 320, weight: 700 })
+    + text(20, 1625, `Saved column mean ${saved.mean}; scale ${saved.scale}`, { width: 320 })
+    + circle(60, 1700, 27, 'input') + text(60, 1706, picture.evaluationValue, { width: 48, anchor: 'middle', weight: 700 })
+    + arrowBetween([99, 1700], [251, 1700], 'state', tools, 2)
+    + circle(290, 1700, 27, 'output') + text(290, 1706, evaluated, { width: 48, anchor: 'middle', weight: 700 });
+  return { body, height: 1760 };
 }
 
 function countPooling(picture, model, tools) {
@@ -3342,6 +5370,72 @@ function orderingCredit(picture, model, tools) {
   return { body, height: 595 };
 }
 
+function tokenFilterAndSequence(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const probabilities = picture.counts.map(count => count / 100);
+  assert.equal(probabilities.reduce((sum, value) => sum + value, 0), 1);
+  const heated = probabilities.map(probability => probability ** (1 / picture.temperature));
+  const heatedTotal = heated.reduce((sum, value) => sum + value, 0);
+  const warmed = heated.map(value => value / heatedTotal);
+  assert(warmed[0] < probabilities[0] && warmed[4] > probabilities[4]);
+  const tones = ['input', 'focus', 'output', 'state', 'warning'];
+  const bar = (shares, vertical, selected = shares.length) => {
+    let left = 20;
+    let body = '';
+    for (const [index, share] of shares.entries()) {
+      const tone = index < selected ? tones[index] : 'neutral';
+      body += `<rect data-picture-decoding-token="${picture.tokens[index]}" data-picture-decoding-share="${share}" x="${left}" y="${vertical}" width="${share * 320}" height="42" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+      if (share * 320 > 12) body += text(left + share * 160, vertical + 27, picture.tokens[index], { width: Math.max(12, share * 320 - 2), anchor: 'middle', weight: 700 });
+      left += share * 320;
+    }
+    return body;
+  };
+  let body = text(20, 27, 'Keep token identity through a declared decoding pipeline', { width: 320, weight: 700 });
+  for (const [index, shares] of [probabilities, warmed].entries()) {
+    const vertical = 150 + index * 260;
+    body += text(20, vertical - 54, index ? 'Temperature two: flatten the same allowed tokens' : 'Temperature one: original probabilities', { width: 320, weight: 700 }) + bar(shares, vertical);
+    for (const [token, share] of shares.entries()) body += text(22 + token * 65, vertical + 96, `${picture.tokens[token]} ${share.toFixed(3)}`, { width: 59, size: 14, tone: tones[token] });
+  }
+  body += text(20, 618, 'Below, keep temperature one and compare two filters.', { width: 320, weight: 700 });
+  const filtered = [];
+  for (const [index, count] of picture.selected.entries()) {
+    const vertical = 776 + index * 335;
+    const mass = probabilities.slice(0, count).reduce((sum, value) => sum + value, 0);
+    const shares = probabilities.slice(0, count).map(value => value / mass);
+    assert(Math.abs(shares.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
+    filtered.push(shares);
+    if (index) assert(mass >= .8 && mass - probabilities[count - 1] < .8);
+    body += text(20, vertical - 68, index ? 'Top-p 0.8: A, B, C cross the required mass' : 'Top-k two: keep A and B', { width: 320, weight: 700 }) + bar(probabilities, vertical, count)
+      + text(20, vertical + 94, `Retained mass ${mass.toFixed(2)}; gray tokens cannot be sampled`, { width: 320, weight: 700 })
+      + bar(shares, vertical + 156);
+    for (const [token, share] of shares.entries()) body += text(22 + token * 105, vertical + 246, `${picture.tokens[token]} ${share.toFixed(3)}`, { width: 97, tone: tones[token] });
+  }
+  const sample = filtered[0].findIndex((share, index, shares) => picture.samplePosition < shares.slice(0, index + 1).reduce((sum, value) => sum + value, 0));
+  assert.equal(picture.tokens[sample], 'B');
+  body += text(20, 1478, 'Sample one retained token; append it to the prefix', { width: 320, weight: 700 })
+    + circle(75, 1590, 29, 'input') + text(75, 1596, 'prefix', { width: 53, anchor: 'middle', weight: 700 })
+    + arrowBetween([113, 1590], [235, 1590], 'output', tools, 3)
+    + circle(278, 1590, 35, 'output') + text(278, 1596, 'prefix B', { width: 66, anchor: 'middle', weight: 700 })
+    + text(20, 1680, 'Toy draw selects B. The next distribution uses this new prefix.', { width: 320, weight: 700 });
+  const scores = picture.firstChoices.map((share, index) => share * picture.continuations[index]);
+  assert(Math.abs(scores[0] - .3) < 1e-12 && Math.abs(scores[1] - .36) < 1e-12);
+  assert(picture.firstChoices[0] > picture.firstChoices[1] && scores[0] < scores[1]);
+  body += text(20, 1820, 'Separate two-token toy: stop after two tokens', { width: 320, weight: 700 });
+  for (let branch = 0; branch < 2; branch++) {
+    const vertical = 1965 + branch * 245;
+    const tone = branch ? 'output' : 'warning';
+    const token = branch ? 'B' : 'A';
+    body += text(20, vertical - 61, `First ${token}: chance ${picture.firstChoices[branch]}`, { width: 320, weight: 700 })
+      + circle(55, vertical, 24, tone) + text(55, vertical + 6, token, { width: 41, anchor: 'middle', weight: 700 })
+      + arrowBetween([87, vertical], [272, vertical], tone, tools, 2)
+      + text(180, vertical - 27, `Best next X: ${picture.continuations[branch]}`, { width: 159, anchor: 'middle', weight: 700 })
+      + circle(305, vertical, 24, tone) + text(305, vertical + 6, 'X', { width: 41, anchor: 'middle', weight: 700 })
+      + text(20, vertical + 91, `${token}X complete score: ${scores[branch].toFixed(2)}`, { width: 320, weight: 700, tone });
+  }
+  body += text(20, 2395, 'Greedy starts A; retaining B reveals the better complete score. A finite beam can still miss other paths.', { width: 320, weight: 700 });
+  return { body, height: 2500 };
+}
+
 function massCutoffs(picture, model, tools) {
   const { text, circle, color } = tools;
   assert.equal(picture.counts.reduce((sum, value) => sum + value, 0), 100);
@@ -3364,7 +5458,7 @@ function massCutoffs(picture, model, tools) {
 }
 
 function jointPaths(picture, model, tools) {
-  const { text, color, fill, number } = tools;
+  const { text, circle, color, fill, number } = tools;
   assert.equal(picture.masses.reduce((sum, value) => sum + value, 0), 1);
   const rowTotals = [picture.masses[0] + picture.masses[1], picture.masses[2] + picture.masses[3]];
   const columnTotals = [picture.masses[0] + picture.masses[2], picture.masses[1] + picture.masses[3]];
@@ -3380,28 +5474,73 @@ function jointPaths(picture, model, tools) {
   }
   body += text(20, 539, `Marginals choose A ${number(rowTotals[0])}, then B ${number(columnTotals[1])}`, { width: 320, weight: 700, tone: 'warning' })
     + text(20, 604, 'Largest whole path: AA 0.35, not AB 0.30', { width: 320, weight: 700, tone: 'output' });
-  return { body, height: 657 };
+  const incoming = [[picture.masses[0], picture.masses[2]], [picture.masses[1], picture.masses[3]]];
+  const predecessors = incoming.map(values => values.indexOf(Math.max(...values)));
+  const viterbi = incoming.map(values => Math.max(...values));
+  assert.deepEqual(predecessors, [0, 0]);
+  assert.deepEqual(viterbi, [.35, .3]);
+  assert.equal(viterbi.indexOf(Math.max(...viterbi)), 0);
+  body += text(20, 735, 'Toy two-step chain: first-state masses 0.65 and 0.35; unit observation factors.', { width: 320 });
+  for (const [state, values] of incoming.entries()) {
+    const vertical = 940 + state * 360;
+    for (const [previous, value] of values.entries()) {
+      const horizontal = previous ? 265 : 85;
+      body += text(horizontal, vertical - 45, `From ${previous ? 'B' : 'A'}: ${value}`, { width: 140, anchor: 'middle', weight: 700 })
+        + arrowBetween([horizontal, vertical], [previous ? 197 : 163, vertical + 103], previous === predecessors[state] ? 'output' : 'input', tools);
+    }
+    body += circle(180, vertical + 135, 25, 'state')
+      + text(180, vertical + 141, state ? 'B' : 'A', { width: 40, anchor: 'middle', weight: 700 })
+      + text(20, vertical + 215, `Sum ${number(columnTotals[state])}; max ${viterbi[state]}; keep predecessor A`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1630, 'The B maximum ties; declared tie order keeps A. Choose final A at 0.35, then follow its stored predecessor to recover AA.', { width: 320, weight: 700 })
+    + text(20, 1785, 'Forward keeps the summed mass at each state. Backward starts with terminal ones and sums future transition/emission mass in reverse.', { width: 320 })
+    + text(20, 1940, 'Normalize forward/backward products for each time. This toy has no informative emission, so its first marginal remains 0.65 and 0.35.', { width: 320 })
+    + text(20, 2100, 'Dense two-state recurrences cost four incoming terms per time, not enumeration of every full path. Backpointers preserve the winning history.', { width: 320 });
+  const floatLikelihood = (emission, length) => Array.from({ length }).reduce(total => Math.fround(total * Math.fround(emission)), Math.fround(1));
+  assert(floatLikelihood(.9, 100) > 0);
+  assert.equal(floatLikelihood(.001, 16), 0);
+  assert(Number.isFinite(16 * Math.log(.001)));
+  body += text(20, 2260, 'Unscaled float32 control: one-state emission 0.9 repeated one hundred times stays positive; 0.001 repeated sixteen times underflows to zero.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 2440, 'Use log-sum-exp or scaled messages with accumulated log-normalizers. An all-impossible state vector has no finite normalized posterior.', { width: 320 });
+  return { body, height: 2590 };
 }
 
 function iterativeStep(picture, model, tools) {
-  const { text, circle, line, number } = tools;
-  const horizontal = value => 180 + value * 76;
-  let body = text(20, 27, 'Same quadratic; different update distances', { width: 320, weight: 700 });
+  const { text, circle, line, color } = tools;
+  const horizontal = value => 180 + value * 60;
+  const trajectories = picture.rates.map(rate => Array.from({ length: picture.steps + 1 }, (unused, step) => (1 - picture.gradientScale * rate) ** step));
+  const losses = trajectories.map(values => values.map(value => 5 * value ** 2));
+  assert.deepEqual(trajectories, [[1, 0, 0], [1, -1, 1], [1, -1.5, 2.25]]);
+  assert.deepEqual(losses, [[5, 0, 0], [5, 5, 5], [5, 11.25, 25.3125]]);
+  assert.equal(1 - 20 * .1, -1);
+  let body = text(20, 27, 'Same exact SGD fixture; three different outcomes', { width: 320, weight: 700 })
+    + text(20, 115, 'Start at coordinate one. Loss is five times its square; gradient ten times the coordinate. No momentum or noise.', { width: 320 });
   for (const [lane, rate] of picture.rates.entries()) {
-    const vertical = 171 + lane * 211;
-    const gain = 1 - 2 * rate;
+    const vertical = 330 + lane * 340;
     const tone = lane === 2 ? 'warning' : lane === 1 ? 'output' : 'input';
-    body += text(20, vertical - 82, `Rate ${rate}: multiply the coordinate by ${number(gain)}`, { width: 320, weight: 700, tone })
-      + line(35, vertical, 325, vertical) + line(180, vertical - 50, 180, vertical + 51, 'neutral', true);
+    body += text(20, vertical - 80, `Rate ${rate}: ${['reaches the minimum', 'finite oscillation, no progress', 'crosses and moves farther'][lane]}`, { width: 320, weight: 700, tone })
+      + line(35, vertical, 325, vertical) + line(180, vertical - 45, 180, vertical + 65, 'neutral', true);
     for (let step = 0; step <= picture.steps; step++) {
-      const value = gain ** step;
-      body += `<g data-picture-update-step="${lane},${step}" data-picture-coordinate="${value}">${circle(horizontal(value), vertical - 30 + step * 20, 5, tone, true)}</g>`;
-      if (step) body += arrowBetween([horizontal(gain ** (step - 1)), vertical - 50 + step * 20], [horizontal(value), vertical - 30 + step * 20], tone, tools);
+      const value = trajectories[lane][step];
+      const top = vertical - 30 + step * 40;
+      body += `<g data-picture-update-step="${lane},${step}" data-picture-coordinate="${value}">${circle(horizontal(value), top, 5, tone, true)}</g>`;
+      if (step) body += arrowBetween([horizontal(trajectories[lane][step - 1]), top - 40], [horizontal(value), top], tone, tools);
     }
+    body += text(20, vertical + 120, `Coordinates: ${trajectories[lane].join(', ')}. Losses: ${losses[lane].join(', ')}.`, { width: 320, weight: 700, tone });
   }
-  assert(Math.abs(1 - 2 * picture.rates[0]) < 1 && Math.abs(1 - 2 * picture.rates[1]) < 1 && Math.abs(1 - 2 * picture.rates[2]) > 1);
-  body += text(20, 700, 'Oscillation can contract; oversized steps grow.', { width: 320, tone: 'soft' });
-  return { body, height: 750 };
+  body += text(20, 1270, 'Double the curvature: the old rate 0.1 now oscillates without progress. Recompute the update; do not transfer the old bound.', { width: 320, weight: 700 })
+    + text(20, 1435, 'Separate schedule fixture: one thousand steps, one hundred warmup, peak 0.001, final 0.0001.', { width: 320 });
+  const schedule = step => step <= 100 ? .001 * step / 100 : .0001 + .0009 / 2 * (1 + Math.cos(Math.PI * (step - 100) / 900));
+  const checkpoints = [50, 100, 550, 1000];
+  assert(checkpoints.every((step, index) => Math.abs(schedule(step) - [.0005, .001, .00055, .0001][index]) < 1e-14));
+  const point = step => [35 + step / 1000 * 290, 1830 - schedule(step) / .001 * 220];
+  body += line(35, 1830, 325, 1830)
+    + `<path d="${Array.from({ length: 101 }, (unused, index) => `${index ? 'L' : 'M'}${point(index * 10).join(' ')}`).join('')}" style="fill:none;stroke:${color('input')};stroke-width:2.5"></path>`;
+  for (const step of [0, 500, 1000]) body += text(point(step)[0], 1880, step, { width: 65, anchor: 'middle' });
+  for (const [index, step] of checkpoints.entries()) body += text(20, 1980 + index * 75, `Position ${step}: rate ${schedule(step).toFixed(5)}`, { width: 320, weight: 700 });
+  body += text(20, 2320, 'A sweep changes weights along its path. Reload model, optimizer and schedule state; control data order, randomness and total budget.', { width: 320, weight: 700 })
+    + text(20, 2470, 'Mean versus summed loss changes gradient scale. Adam moments change the update. A smaller rate cannot repair wrong labels or a broken backward pass.', { width: 320, tone: 'warning' });
+  return { body, height: 2630 };
 }
 
 function constraintContact(picture, model, tools) {
@@ -3551,6 +5690,16 @@ function oneSidedPlateau(picture, model, tools) {
 
 function conditioningPaths(picture, model, tools) {
   const { text, circle, line, color } = tools;
+  const pairs = [[0, 0], [0, 1], [1, 0], [1, 1]];
+  const survivors = pairs.filter(pair => pair.some(Boolean));
+  const chance = cases => cases.filter(pair => pair[0] === 1).length / cases.length;
+  assert.equal(survivors.length / pairs.length, .75);
+  assert.equal(chance(survivors), 2 / 3);
+  assert.equal(chance(survivors.filter(pair => pair[1] === 1)), .5);
+  assert.equal(chance(survivors.filter(pair => pair[1] === 0)), 1);
+  assert(Math.abs(.8 * .9 + .2 * .1 - .74) < 1e-12);
+  const unfaithfulMasses = pairs.map(() => .25 * .5 / .5);
+  assert.deepEqual(unfaithfulMasses, [.25, .25, .25, .25]);
   let body = text(20, 27, 'Conditioning depends on the path motif', { width: 320, weight: 700 });
   for (let lane = 0; lane < 4; lane++) {
     const collider = lane >= 2;
@@ -3565,7 +5714,36 @@ function conditioningPaths(picture, model, tools) {
     if (!open) body += line(140, vertical + 34, 156, vertical + 50, 'warning') + line(156, vertical + 34, 140, vertical + 50, 'warning');
     else body += line(53, vertical + 42, 242, vertical + 42, 'output', true);
   }
-  return { body, height: 667 };
+  body += text(20, 735, 'Actual collider: independent fair A and B; C is their OR. Two digits below mean A then B.', { width: 320, weight: 700 });
+  for (let stage = 0; stage < 2; stage++) {
+    const top = 905 + stage * 320;
+    body += text(20, top - 60, stage ? 'Observe C one: remove 00, then normalize' : 'Before evidence: four equal input cases', { width: 320, weight: 700 });
+    for (const [index, pair] of pairs.entries()) {
+      const horizontal = 25 + index * 83;
+      const rejected = stage && index === 0;
+      body += `<rect x="${horizontal}" y="${top}" width="61" height="65" style="fill:none;stroke:${color(rejected ? 'warning' : 'input')};stroke-width:1.5${rejected ? ';stroke-dasharray:4 4' : ''}"></rect>`
+        + text(horizontal + 30.5, top + 39, pair.join(''), { width: 53, anchor: 'middle', weight: 700 });
+      if (rejected) body += line(horizontal + 7, top + 7, horizontal + 54, top + 58, 'warning') + line(horizontal + 54, top + 7, horizontal + 7, top + 58, 'warning');
+      body += text(horizontal + 30.5, top + 115, rejected ? 'zero' : stage ? 'third' : 'quarter', { width: 75, anchor: 'middle', tone: rejected ? 'warning' : 'input' });
+    }
+  }
+  body += text(20, 1435, 'Two of three surviving cases have A one: chance two thirds.', { width: 320, weight: 700 });
+  for (const [index, condition] of [1, 0].entries()) {
+    const top = 1590 + index * 290;
+    const cases = survivors.filter(pair => pair[1] === condition);
+    body += text(20, top - 55, `Also observe B ${condition}`, { width: 320, weight: 700 });
+    for (const [position, pair] of cases.entries()) {
+      const horizontal = cases.length === 1 ? 120 : 40 + position * 160;
+      body += `<rect x="${horizontal}" y="${top}" width="120" height="55" style="fill:none;stroke:${color('output')};stroke-width:1.5"></rect>`
+        + text(horizontal + 60, top + 35, pair.join(''), { width: 105, anchor: 'middle', weight: 700 });
+    }
+    body += text(20, top + 115, condition ? 'Chance A one becomes one half' : 'A one is forced in the only remaining case', { width: 320, weight: 700, tone: 'output' });
+  }
+  body += text(20, 2100, 'If D copies C, observing D one retains the same three cases. A one again has chance two thirds.', { width: 320 })
+    + text(20, 2230, 'Chain control: fair A, then copying chances 0.8 and 0.9. Before observing M, B one given A one has chance 0.74. Given M one, B one has chance 0.9 for either A.', { width: 320 })
+    + text(20, 2420, 'Active does not force association. Make C a fair coin for every input pair: conditioning on C leaves all four pairs equally likely and A and B independent.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 2600, 'Block every path for graphical separation. Graph factors alone are not a proof of causal direction.', { width: 320 });
+  return { body, height: 2730 };
 }
 
 function confoundingIntervention(picture, model, tools) {
@@ -3586,7 +5764,7 @@ function confoundingIntervention(picture, model, tools) {
 
 function actorCriticRoutes(picture, model, tools) {
   const { text, circle, line } = tools;
-  let body = text(20, 27, 'Both heads update the shared trunk', { width: 320, weight: 700 });
+  let body = text(20, 27, 'Backward: both heads update shared features', { width: 320, weight: 700 });
   const nodes = [{ point: [74, 137], name: 'Actor', tone: 'input' }, { point: [284, 137], name: 'Critic', tone: 'output' }, { point: [180, 332], name: 'Shared', tone: 'state' }, { point: [284, 470], name: 'Adv.', tone: 'warning' }];
   for (const node of nodes) body += circle(...node.point, 31, node.tone) + text(node.point[0], node.point[1] + 6, node.name, { width: 59, anchor: 'middle', size: 15, weight: 700 });
   body += arrowBetween([90, 166], [163, 302], 'input', tools, 3)
@@ -3596,58 +5774,153 @@ function actorCriticRoutes(picture, model, tools) {
     + line(305, 366, 327, 388, 'warning') + line(327, 366, 305, 388, 'warning')
     + text(20, 469, 'Actor-to-advantage gradient stops', { width: 217, weight: 700, tone: 'warning' })
     + text(20, 555, 'Shared-feature gradients remain active.', { width: 320, tone: 'soft' });
-  return { body, height: 606 };
+  const backward = body;
+  assert(Math.abs(picture.probabilities.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
+  assert.equal(picture.realizedReturn - picture.baseline, 1);
+  body = text(20, 27, 'Forward: shared state feeds two different jobs', { width: 320, weight: 700 })
+    + circle(180, 115, 28, 'state') + text(180, 121, 'State', { width: 50, anchor: 'middle', weight: 700 })
+    + arrowBetween([164, 144], [94, 215], 'input', tools, 3)
+    + arrowBetween([196, 144], [266, 215], 'output', tools, 3)
+    + circle(80, 245, 31, 'input') + text(80, 251, 'Actor', { width: 55, anchor: 'middle', weight: 700 })
+    + circle(280, 245, 31, 'output') + text(280, 251, 'Critic', { width: 55, anchor: 'middle', weight: 700 });
+  for (const [action, probability] of picture.probabilities.entries()) {
+    const horizontal = 43 + action * 81;
+    body += arrowBetween([80, 279], [horizontal, 376], 'input', tools)
+      + `<g data-picture-actor-action="${action}" data-picture-actor-probability="${probability}">${circle(horizontal, 405, 27, 'input')}${text(horizontal, 411, `${probability * 100}%`, { width: 48, anchor: 'middle', weight: 700 })}</g>`
+      + text(horizontal, 455, action ? 'right' : 'left', { width: 70, anchor: 'middle', tone: 'input' });
+  }
+  body += arrowBetween([280, 279], [280, 375], 'output', tools)
+    + circle(280, 405, 27, 'output') + text(280, 411, picture.baseline, { width: 45, anchor: 'middle', weight: 700, tone: 'output' })
+    + text(280, 455, 'baseline', { width: 100, anchor: 'middle', tone: 'output' })
+    + text(20, 510, 'Compare return with the state’s baseline', { width: 320, weight: 700 })
+    + line(55, 565, 295, 565, 'neutral')
+    + circle(55, 565, 3, 'neutral', true) + circle(295, 565, 3, 'neutral', true)
+    + circle(55 + picture.baseline * 60, 565, 7, 'output', true)
+    + circle(55 + picture.realizedReturn * 60, 565, 7, 'focus', true)
+    + text(55, 604, '0', { width: 25, anchor: 'middle', tone: 'soft' })
+    + text(295, 604, '4', { width: 25, anchor: 'middle', tone: 'soft' })
+    + text(175, 604, 'baseline 2', { width: 105, anchor: 'end', tone: 'output' })
+    + text(235, 604, 'return 3', { width: 65, anchor: 'start', tone: 'focus' })
+    + `<g data-picture-actor-advantage="${picture.realizedReturn - picture.baseline}">${line(175, 632, 235, 632, 'focus')}${line(175, 626, 175, 638, 'focus')}${line(235, 626, 235, 638, 'focus')}${text(205, 667, 'one better', { width: 130, anchor: 'middle', weight: 700, tone: 'focus' })}</g>`
+    + `<g transform="translate(0 730)">${backward}</g>`;
+  return { body, height: 1336 };
 }
 
 function reverseFanout(picture, model, tools) {
-  const { text, circle } = tools;
-  let body = text(20, 27, 'One loss sends one accumulated reverse flow', { width: 320, weight: 700 })
-    + circle(180, 115, 27, 'focus') + text(180, 121, 'Loss', { width: 48, anchor: 'middle', weight: 700 })
-    + arrowBetween([180, 146], [180, 233], 'state', tools, 3)
-    + text(340, 202, 'dL/du = 2', { width: 119, anchor: 'end', weight: 700, tone: 'state' })
-    + circle(180, 265, 27, 'state') + text(180, 271, 'u', { width: 48, anchor: 'middle', weight: 700 });
-  for (let branch = 0; branch < 2; branch++) {
-    const horizontal = branch ? 282 : 78;
-    const gradient = 2 * (branch ? 3 : 1);
-    body += arrowBetween([180, 297], [horizontal, 390], branch ? 'output' : 'input', tools, 3)
-      + circle(horizontal, 423, 28, branch ? 'output' : 'input')
-      + text(horizontal, 429, branch ? 'b' : 'a', { width: 45, anchor: 'middle', weight: 700 })
-      + text(horizontal, 503, `gradient ${gradient}`, { width: 142, anchor: 'middle', weight: 700, tone: branch ? 'output' : 'input' });
-  }
-  return { body, height: 552 };
+  const { text, circle, line } = tools;
+  const forward = input => input * input + input;
+  const contributions = input => [input, input, 1];
+  const gradient = input => contributions(input).reduce((sum, value) => sum + value, 0);
+  assert.equal(forward(picture.input), 6);
+  assert.deepEqual(contributions(picture.input), [2, 2, 1]);
+  assert.equal(gradient(picture.input), 5);
+  assert.equal(forward(3), 12);
+  assert.deepEqual(contributions(3), [3, 3, 1]);
+  assert.equal(gradient(3), 7);
+  const nudge = 1e-5;
+  assert(Math.abs((forward(picture.input + nudge) - forward(picture.input - nudge)) / (2 * nudge) - gradient(picture.input)) < 1e-9);
+  let body = text(20, 27, 'Forward: save each value and each use', { width: 320, weight: 700 })
+    + text(20, 90, 'One shared input, value two', { width: 320, tone: 'input' })
+    + circle(180, 151, 28, 'input') + text(180, 157, picture.input, { width: 48, anchor: 'middle', weight: 700 })
+    + arrowBetween([153, 166], [77, 312], 'input', tools, 3)
+    + arrowBetween([177, 182], [121, 310], 'input', tools, 3)
+    + text(20, 250, '2', { width: 38, weight: 700, tone: 'input' })
+    + text(177, 268, '2', { width: 38, weight: 700, tone: 'input' })
+    + line(212, 151, 305, 151, 'input') + line(305, 151, 305, 526, 'input')
+    + arrowBetween([305, 526], [215, 526], 'input', tools, 3)
+    + text(260, 440, '2', { width: 38, anchor: 'middle', weight: 700, tone: 'input' })
+    + circle(100, 345, 32, 'state') + text(100, 351, 'times', { width: 55, anchor: 'middle', size: 14, weight: 700 })
+    + arrowBetween([132, 368], [165, 491], 'state', tools, 3)
+    + text(20, 430, 'Product 4 saved', { width: 102, weight: 700, tone: 'state' })
+    + circle(180, 526, 30, 'output') + text(180, 532, 'add', { width: 49, anchor: 'middle', weight: 700 })
+    + arrowBetween([180, 560], [180, 633], 'output', tools, 3)
+    + circle(180, 667, 30, 'focus') + text(180, 673, 'loss', { width: 49, anchor: 'middle', weight: 700 })
+    + text(245, 673, '6 saved', { width: 90, weight: 700, tone: 'focus' })
+    + text(20, 785, 'Reverse: one seed, all routes accumulate', { width: 320, weight: 700 })
+    + circle(180, 887, 30, 'focus') + text(180, 893, 'loss', { width: 49, anchor: 'middle', weight: 700 })
+    + text(20, 893, 'Seed 1', { width: 105, weight: 700, tone: 'focus' })
+    + arrowBetween([180, 921], [180, 1003], 'focus', tools, 3)
+    + circle(180, 1037, 30, 'output') + text(180, 1043, 'add', { width: 49, anchor: 'middle', weight: 700 })
+    + arrowBetween([161, 1063], [115, 1169], 'state', tools, 3)
+    + text(20, 1109, '1', { width: 38, weight: 700, tone: 'state' })
+    + circle(100, 1205, 32, 'state') + text(100, 1211, 'times', { width: 55, anchor: 'middle', size: 14, weight: 700 })
+    + line(212, 1037, 305, 1037, 'output') + line(305, 1037, 305, 1422, 'output')
+    + arrowBetween([305, 1422], [215, 1422], 'output', tools, 3)
+    + text(260, 1320, '1', { width: 38, anchor: 'middle', weight: 700, tone: 'output' })
+    + arrowBetween([78, 1232], [151, 1398], 'input', tools, 3)
+    + arrowBetween([109, 1241], [178, 1387], 'input', tools, 3)
+    + text(45, 1314, '2', { width: 38, anchor: 'middle', weight: 700, tone: 'input' })
+    + text(205, 1341, '2', { width: 38, anchor: 'middle', weight: 700, tone: 'input' })
+    + circle(180, 1422, 30, 'input') + text(180, 1428, 'input', { width: 50, anchor: 'middle', size: 14, weight: 700 })
+    + text(20, 1518, 'All three uses reach this same input. Total gradient: five.', { width: 320, weight: 700, tone: 'input' })
+    + text(20, 1612, 'The optimizer update is a separate operation.', { width: 320, tone: 'soft' });
+  return { body, height: 1680 };
 }
 
 function forwardBypass(picture, model, tools) {
   const { text, circle } = tools;
   let body = text(20, 27, 'Keep the raw stream; add a learned correction', { width: 320, weight: 700 })
-    + circle(180, 104, 26, 'input') + text(180, 110, 'x', { width: 44, anchor: 'middle', weight: 700 });
+    + circle(180, 104, 26, 'input') + text(180, 110, 'input', { width: 44, anchor: 'middle', weight: 700 });
   body += arrowBetween([159, 129], [75, 228], 'input', tools, 3)
     + arrowBetween([201, 129], [285, 228], 'state', tools)
-    + text(74, 280, 'Unchanged x', { width: 126, anchor: 'middle', weight: 700, tone: 'input' })
-    + text(285, 280, 'Norm, then F', { width: 120, anchor: 'middle', weight: 700, tone: 'state' })
+    + text(74, 280, 'Raw stream', { width: 126, anchor: 'middle', weight: 700, tone: 'input' })
+    + text(285, 280, 'Normalized branch', { width: 120, anchor: 'middle', weight: 700, tone: 'state' })
     + arrowBetween([75, 319], [162, 416], 'input', tools, 3)
     + arrowBetween([285, 319], [199, 416], 'output', tools)
-    + circle(180, 449, 27, 'output') + text(180, 455, '+', { width: 48, anchor: 'middle', size: 28, weight: 700 })
-    + text(20, 534, 'x + F(norm(x)); not F(norm(x)) alone', { width: 320, weight: 700 })
-    + text(20, 591, 'A zero correction leaves the original x intact.', { width: 320, tone: 'soft' });
+    + circle(180, 449, 27, 'output') + text(180, 455, 'join', { width: 48, anchor: 'middle', size: 14, weight: 700 })
+    + text(20, 534, 'Original stream with its learned correction', { width: 320, weight: 700 })
+    + text(20, 591, 'A zero correction leaves the original input intact.', { width: 320, tone: 'soft' });
   return { body, height: 644 };
 }
 
 function dependentGeneration(picture, model, tools) {
-  const { text, circle } = tools;
-  let body = text(20, 27, 'Training samples a time; generation follows time', { width: 320, weight: 700 });
-  for (let stage = 0; stage < 2; stage++) {
-    const vertical = 157 + stage * 239;
-    const tokens = stage ? ['z3', 'z2', 'z1', 'x0'] : ['x0', 't', 'xt', 'loss'];
-    body += text(20, vertical - 58, stage ? 'Generation: each output feeds the next step' : 'Training: choose one noise time for this example', { width: 320, weight: 700 });
-    for (const [index, token] of tokens.entries()) {
-      const horizontal = 50 + index * 84;
-      body += circle(horizontal, vertical, 24, stage ? 'output' : 'input') + text(horizontal, vertical + 6, token, { width: 44, anchor: 'middle', size: 16, weight: 700 });
-      if (index) body += arrowBetween([horizontal - 56, vertical], [horizontal - 28, vertical], stage ? 'output' : 'input', tools);
-    }
+  const { text, circle, line } = tools;
+  assert(picture.retainedVariance > 0 && picture.retainedVariance < 1);
+  const signalScale = Math.sqrt(picture.retainedVariance);
+  const noiseScale = Math.sqrt(1 - picture.retainedVariance);
+  const signal = signalScale * picture.clean;
+  const corruption = noiseScale * picture.noise;
+  const noisy = signal + corruption;
+  const squaredError = (picture.noise - picture.predictedNoise) ** 2;
+  const recover = prediction => (noisy - noiseScale * prediction) / signalScale;
+  const estimate = recover(picture.predictedNoise);
+  for (const [actual, expected] of [[signal, 1.6], [corruption, -.6], [noisy, 1], [squaredError, .25], [estimate, 1.625], [recover(picture.noise), picture.clean]]) assert(Math.abs(actual - expected) < 1e-12);
+  assert(Math.abs(squaredError - (estimate - picture.clean) ** 2 * picture.retainedVariance / (1 - picture.retainedVariance)) < 1e-12);
+  const coordinate = value => 38 + value * 125;
+  let body = text(20, 27, '1. Corrupt data at one sampled time', { width: 320, weight: 700 })
+    + text(20, 104, 'Clean value two; retained variance share 0.64', { width: 320 })
+    + text(20, 182, 'Retained clean signal: 1.6', { width: 320, weight: 700, tone: 'input' })
+    + arrowBetween([coordinate(0), 231], [coordinate(signal), 231], 'input', tools, 4)
+    + line(coordinate(signal), 231, coordinate(signal), 286, 'neutral', true)
+    + arrowBetween([coordinate(signal), 286], [coordinate(noisy), 286], 'warning', tools, 4)
+    + text(20, 345, 'Independent noise contribution: minus 0.6', { width: 320, tone: 'warning' })
+    + line(coordinate(0), 410, coordinate(2), 410, 'neutral');
+  for (const tick of [0, 1, 2]) body += line(coordinate(tick), 404, coordinate(tick), 416, 'neutral') + text(coordinate(tick), 447, tick, { width: 38, anchor: 'middle' });
+  body += circle(coordinate(noisy), 410, 7, 'output', true)
+    + text(20, 493, 'Model input: noisy value one and sampled time', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 585, '2. Compare predicted noise with its target', { width: 320, weight: 700 })
+    + text(20, 657, 'Training-only target: minus one', { width: 320, tone: 'warning' })
+    + line(60, 715, 300, 715, 'neutral')
+    + circle(60, 715, 8, 'warning') + circle(180, 715, 7, 'state', true)
+    + text(60, 753, '-1', { width: 50, anchor: 'middle' }) + text(300, 753, '0', { width: 38, anchor: 'middle' })
+    + line(60, 784, 180, 784, 'state') + line(60, 777, 60, 791, 'state') + line(180, 777, 180, 791, 'state')
+    + text(20, 838, 'Predicted noise: minus one-half. Squared error: 0.25.', { width: 320, weight: 700, tone: 'state' })
+    + text(20, 941, '3. Undo the same corruption to estimate clean data', { width: 320, weight: 700 })
+    + text(20, 1019, 'Predicted noise gives clean estimate 1.625', { width: 320, tone: 'state' })
+    + line(coordinate(0), 1090, coordinate(2), 1090, 'neutral')
+    + circle(coordinate(estimate), 1090, 7, 'state', true) + circle(coordinate(picture.clean), 1090, 8, 'input')
+    + text(coordinate(0), 1128, '0', { width: 38, anchor: 'middle' }) + text(coordinate(2), 1128, '2', { width: 38, anchor: 'middle' })
+    + text(20, 1186, 'The true noise would recover the original two.', { width: 320, weight: 700, tone: 'input' })
+    + text(20, 1293, '4. Generate through dependent reverse states', { width: 320, weight: 700 })
+    + text(20, 1370, 'Illustrative states at times three, two, one, zero', { width: 320 });
+  for (let step = 0; step < 4; step++) {
+    const horizontal = 50 + step * 84;
+    body += circle(horizontal, 1455, 24, 'output') + text(horizontal, 1461, 3 - step, { width: 42, anchor: 'middle', weight: 700 });
+    if (step) body += arrowBetween([horizontal - 56, 1455], [horizontal - 28, 1455], 'output', tools);
   }
-  body += text(20, 522, 'The reverse chain retains predecessor dependencies.', { width: 320, tone: 'soft' });
-  return { body, height: 575 };
+  body += text(20, 1532, 'Each next state needs its predecessor, denoiser output and declared sampler coefficients.', { width: 320, weight: 700 })
+    + text(20, 1640, 'Transition noise depends on the sampler. A clean estimate alone is not the next state.', { width: 320, tone: 'soft' });
+  return { body, height: 1725 };
 }
 
 function hiddenEmissions(picture, model, tools) {
@@ -3663,6 +5936,89 @@ function hiddenEmissions(picture, model, tools) {
   body += text(20, 434, 'Each observation is a local child of its hidden state.', { width: 320, weight: 700 })
     + text(20, 501, 'There is no direct observation-to-observation edge.', { width: 320, tone: 'soft' });
   return { body, height: 553 };
+}
+
+function coinPosteriorsAndFixedBound(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  const groupLikelihood = (heads, probability) => (heads === 1 ? 2 : 1) * probability ** heads * (1 - probability) ** (picture.tosses - heads);
+  const responsibilities = picture.heads.map(heads => {
+    const weights = picture.initialWeights.map((weight, coin) => weight * groupLikelihood(heads, picture.headProbabilities[coin]));
+    const total = weights.reduce((sum, value) => sum + value, 0);
+    return weights.map(value => value / total);
+  });
+  assert.deepEqual(responsibilities, [[.9, .1], [.5, .5]]);
+  const groups = picture.initialWeights.map((_, coin) => responsibilities.reduce((sum, row) => sum + row[coin], 0));
+  const heads = picture.initialWeights.map((_, coin) => responsibilities.reduce((sum, row, group) => sum + row[coin] * picture.heads[group], 0));
+  const tosses = groups.map(group => group * picture.tosses);
+  const newWeights = groups.map(group => group / picture.heads.length);
+  const newProbabilities = heads.map((head, coin) => head / tosses[coin]);
+  for (const [actual, expected] of [[groups, [1.4, .6]], [heads, [2.3, .7]], [tosses, [2.8, 1.2]], [newWeights, [.7, .3]], [newProbabilities, [23 / 28, 7 / 12]]]) assert(actual.every((value, index) => Math.abs(value - expected[index]) < 1e-12));
+  assert(Math.abs(groups.reduce((sum, value) => sum + value, 0) - 2) < 1e-12);
+  assert(Math.abs(heads.reduce((sum, value) => sum + value, 0) - 3) < 1e-12);
+  assert(Math.abs(tosses.reduce((sum, value) => sum + value, 0) - 4) < 1e-12);
+  const parameters = fraction => ({ weights: picture.initialWeights.map((weight, coin) => weight + fraction * (newWeights[coin] - weight)), probabilities: picture.headProbabilities.map((probability, coin) => probability + fraction * (newProbabilities[coin] - probability)) });
+  const objectives = fraction => {
+    const state = parameters(fraction);
+    let likelihood = 0;
+    let bound = 0;
+    for (const [group, headCount] of picture.heads.entries()) {
+      const joint = state.weights.map((weight, coin) => weight * groupLikelihood(headCount, state.probabilities[coin]));
+      likelihood += Math.log(joint.reduce((sum, value) => sum + value, 0));
+      bound += joint.reduce((sum, value, coin) => sum + responsibilities[group][coin] * (Math.log(value) - Math.log(responsibilities[group][coin])), 0);
+    }
+    assert(likelihood + 1e-12 >= bound);
+    return { likelihood, bound };
+  };
+  const old = objectives(0);
+  const next = objectives(1);
+  assert(Math.abs(old.likelihood - old.bound) < 1e-12);
+  assert(next.likelihood > next.bound && next.bound > old.likelihood);
+  assert(Math.abs(Math.exp(next.likelihood) - .20172548185941046) < 1e-8);
+  let body = text(20, 27, 'E-step: keep current coin parameters fixed', { width: 320, weight: 700 })
+    + text(20, 111, 'Equal mixture shares; head chances A 75%, B 25%', { width: 320, weight: 700 });
+  for (const [group, row] of responsibilities.entries()) {
+    const vertical = 257 + group * 330;
+    body += text(20, vertical - 71, `Group ${group + 1}: ${picture.heads[group]} heads in two tosses`, { width: 320, weight: 700 });
+    for (let toss = 0; toss < picture.tosses; toss++) body += circle(65 + toss * 66, vertical, 20, 'neutral') + text(65 + toss * 66, vertical + 6, toss < picture.heads[group] ? 'H' : 'T', { width: 34, anchor: 'middle', weight: 700 });
+    body += `<rect x="25" y="${vertical + 75}" width="${row[0] * 310}" height="38" data-picture-em-responsibility="${group},A,${row[0]}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:2"></rect>`
+      + `<rect x="${25 + row[0] * 310}" y="${vertical + 75}" width="${row[1] * 310}" height="38" data-picture-em-responsibility="${group},B,${row[1]}" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></rect>`
+      + text(20, vertical + 162, `A: ${number(row[0])}`, { width: 140, weight: 700, tone: 'input' })
+      + text(340, vertical + 162, `B: ${number(row[1])}`, { width: 140, anchor: 'end', weight: 700, tone: 'output' });
+  }
+  body += text(20, 851, 'Bars split one group membership. Toss order is ignored; no group is counted twice.', { width: 320, tone: 'soft' })
+    + text(20, 973, 'M-step: freeze those memberships', { width: 320, weight: 700 });
+  for (const [row, values] of [groups, heads, tosses].entries()) {
+    const vertical = 1097 + row * 155;
+    body += text(20, vertical, ['Expected groups', 'Expected heads', 'Expected tosses'][row], { width: 320, weight: 700 })
+      + text(20, vertical + 58, `A: ${number(values[0])}`, { width: 140, weight: 700, tone: 'input' })
+      + text(340, vertical + 58, `B: ${number(values[1])}`, { width: 140, anchor: 'end', weight: 700, tone: 'output' });
+  }
+  for (let coin = 0; coin < 2; coin++) {
+    const vertical = 1589 + coin * 207;
+    const tone = coin ? 'output' : 'input';
+    body += text(20, vertical - 62, `${coin ? 'B' : 'A'}: ${number(heads[coin])} heads among ${number(tosses[coin])} tosses`, { width: 320, weight: 700 })
+      + `<rect x="25" y="${vertical}" width="${tosses[coin] / 3 * 310}" height="40" style="fill:none;stroke:${color(tone)};stroke-width:2"></rect>`
+      + `<rect x="25" y="${vertical}" width="${heads[coin] / 3 * 310}" height="40" data-picture-em-expected-heads="${heads[coin]}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`
+      + text(20, vertical + 98, `Updated head chance: ${number(newProbabilities[coin])}`, { width: 320, weight: 700, tone });
+  }
+  body += text(20, 1977, 'Updated mixture shares: A 70%, B 30%', { width: 320, weight: 700 })
+    + `<rect x="25" y="2023" width="217" height="38" style="fill:${fill('input')};stroke:${color('input')};stroke-width:2"></rect>`
+    + `<rect x="242" y="2023" width="93" height="38" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></rect>`
+    + text(20, 2157, 'Actual update: solid observed likelihood', { width: 320, weight: 700 })
+    + text(20, 2227, 'Dashed bound keeps the old posterior fixed', { width: 320, weight: 700 });
+  const samples = Array.from({ length: 61 }, (_, index) => { const fraction = index / 60; return { fraction, ...objectives(fraction) }; });
+  const point = (fraction, value) => [35 + fraction * 290, 2550 - (value - old.likelihood) * 360];
+  body += line(35, 2578, 325, 2578) + line(35, 2578, 35, 2320);
+  for (const [index, key] of ['likelihood', 'bound'].entries()) body += `<path d="M${samples.map(sample => point(sample.fraction, sample[key]).join(' ')).join('L')}" style="fill:none;stroke:${color(index ? 'warning' : 'input')};stroke-width:2.5;${index ? 'stroke-dasharray:7 5' : ''}"></path>`;
+  body += circle(...point(0, old.likelihood), 5, 'state', true)
+    + circle(...point(1, next.likelihood), 5, 'input', true)
+    + line(...point(1, next.bound), ...point(1, next.likelihood), 'output', true)
+    + text(20, 2632, 'Old parameters', { width: 138, weight: 700 }) + text(340, 2632, 'Updated', { width: 138, anchor: 'end', weight: 700 })
+    + text(20, 2720, `Old log likelihood: ${number(old.likelihood)}`, { width: 320, weight: 700 })
+    + text(20, 2780, `New fixed bound: ${number(next.bound)}`, { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 2840, `New log likelihood: ${number(next.likelihood)}`, { width: 320, weight: 700, tone: 'input' })
+    + text(20, 2920, 'Next exact E closes the new gap. Nondecrease does not identify components or prove a global optimum.', { width: 320, tone: 'soft' });
+  return { body, height: 3030 };
 }
 
 function boundClimb(picture, model, tools) {
@@ -3699,18 +6055,95 @@ function complexTurn(picture, model, tools) {
   return { body, height: 608 };
 }
 
-function uncertaintyChoice(picture, model, tools) {
-  const { text, circle, line, number } = tools;
-  const horizontal = value => 35 + (value - .5) / .3 * 290;
-  let body = text(20, 27, 'One pair of arms; three choice rules', { width: 320, weight: 700 });
-  for (const [stage, values] of picture.values.entries()) {
-    const vertical = 142 + stage * 177;
-    body += text(20, vertical - 57, ['Estimated mean: choose A', 'Mean plus bonus: choose B', 'One posterior draw: choose B'][stage], { width: 320, weight: 700 }) + line(35, vertical, 325, vertical);
-    const winner = values[0] > values[1] ? 0 : 1;
-    for (const [arm, value] of values.entries()) body += circle(horizontal(value), vertical, 7, arm ? 'output' : 'input', true)
-      + text(horizontal(value), vertical + (arm === winner ? -18 : 40), `${arm ? 'B' : 'A'} ${value}`, { width: 107, anchor: 'middle', weight: 700, tone: arm ? 'output' : 'input' });
+function gpMeanNoiseEnvelope(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const posterior = (input, noise, observed) => {
+    const covariance = Math.exp(-(input ** 2) / 2);
+    return { mean: covariance * observed / (1 + noise), variance: 1 - covariance ** 2 / (1 + noise) };
+  };
+  assert.deepEqual(posterior(0, 0, picture.observed), { mean: 1, variance: 0 });
+  assert.deepEqual(posterior(0, picture.noise, picture.observed), { mean: .5, variance: .5 });
+  assert.equal(posterior(0, picture.noise, picture.observed).variance + picture.noise, 1.5);
+  assert.equal(posterior(1, 0, 2).mean, posterior(1, 0, 1).mean * 2);
+  assert.equal(posterior(1, 0, 2).variance, posterior(1, 0, 1).variance);
+  assert(posterior(3, 0, 1).variance > .999);
+  const horizontal = input => 35 + (input + 3) / 6 * 290;
+  const samples = Array.from({ length: 121 }, (unused, index) => -3 + index / 20);
+  let body = text(20, 27, 'Condition the mean and latent-function uncertainty together', { width: 320, weight: 700 })
+    + text(20, 115, 'Toy: zero prior mean, unit RBF kernel, lengthscale one. Observe value one at input zero.', { width: 320 });
+  for (let stage = 0; stage < 3; stage++) {
+    const top = 300 + stage * 520;
+    const ordinate = value => top + 200 - value * 75;
+    const values = samples.map(input => stage ? posterior(input, stage === 2 ? picture.noise : 0, picture.observed) : { mean: 0, variance: 1 });
+    const upper = samples.map((input, index) => [horizontal(input), ordinate(values[index].mean + Math.sqrt(values[index].variance))]);
+    const lower = samples.map((input, index) => [horizontal(input), ordinate(values[index].mean - Math.sqrt(values[index].variance))]).reverse();
+    const outline = [...upper, ...lower];
+    body += text(20, top - 55, ['Prior: flat mean, unit latent standard deviation', 'Noiseless observation: mean reaches one; band pinches shut', 'Noise variance one: partial mean response; band stays open'][stage], { width: 320, weight: 700 })
+      + `<path d="${outline.map((point, index) => `${index ? 'L' : 'M'}${point.join(' ')}`).join('')}Z" style="fill:${fill(stage ? 'output' : 'input')};stroke:${color(stage ? 'output' : 'input')};stroke-width:1.5"></path>`
+      + line(35, ordinate(0), 325, ordinate(0), 'neutral', true)
+      + `<path d="${samples.map((input, index) => `${index ? 'L' : 'M'}${horizontal(input)} ${ordinate(values[index].mean)}`).join('')}" style="fill:none;stroke:${color('input')};stroke-width:2.5"></path>`;
+    if (stage) body += circle(horizontal(0), ordinate(picture.observed), 6, 'focus', true);
+    for (const input of [-3, 0, 3]) body += text(horizontal(input), top + 365, input, { width: 60, anchor: 'middle' });
+    body += text(20, top + 410, 'Shared scales. Blue mean; one latent standard deviation band.', { width: 320 });
   }
-  return { body, height: 582 };
+  body += text(20, 1885, 'At observed input: noisy mean 0.5, latent variance 0.5. Future-observation variance adds noise and becomes 1.5.', { width: 320, weight: 700 })
+    + text(20, 2035, 'Change observed value from one to two with the same kernel and noise: mean doubles; covariance is unchanged.', { width: 320 })
+    + text(20, 2175, 'Similarity, not distance alone, controls information transfer. Another kernel can connect distant inputs.', { width: 320 })
+    + text(20, 2310, 'General exact inference solves the noisy covariance system; do not form an explicit inverse. Dense training has cubic time and quadratic storage.', { width: 320 })
+    + text(20, 2470, 'A misspecified kernel can give misleading bands. These are conditional model uncertainties, not automatic empirical calibration.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 2610 };
+}
+
+function uncertaintyChoice(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const assignments = picture.means.map((unused, index) => picture.epsilon / picture.means.length + (index === 0 ? 1 - picture.epsilon : 0));
+  const indices = (counts, time) => picture.means.map((mean, index) => mean + picture.bonus * Math.sqrt(Math.log(time) / counts[index]));
+  const scores = indices(picture.counts, picture.time);
+  const winner = values => values.indexOf(Math.max(...values));
+  assert.equal(picture.counts.reduce((sum, count) => sum + count, 0), picture.time);
+  assert(assignments.every((value, index) => Math.abs(value - [.8, .1, .1][index]) < 1e-12));
+  assert(scores.every((value, index) => Math.abs(value - [.684489, .753933, .441202][index]) < 1e-6));
+  assert.equal(winner(scores), 1);
+  assert.equal(winner(picture.draws), 1);
+  const moreEvidence = indices([40, 40, 20], 100);
+  assert.equal(winner(moreEvidence), 0);
+  const reward = assignments.reduce((sum, probability, index) => sum + probability * picture.means[index], 0);
+  assert(Math.abs(reward - .586) < 1e-12);
+  let body = text(20, 27, 'Three eligible arms; three different selection rules', { width: 320, weight: 700 })
+    + text(20, 115, 'Toy generic bounded rewards, not Bernoulli fractions. Estimated leader A has more evidence than B.', { width: 320 });
+  for (const [index, mean] of picture.means.entries()) {
+    const vertical = 270 + index * 140;
+    body += text(20, vertical, `Arm ${String.fromCharCode(65 + index)}: mean ${mean}; ${picture.counts[index]} pulls`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 30}" width="${mean * 320}" height="25" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 745, 'Epsilon-greedy: random branch chance 0.3', { width: 320, weight: 700 })
+    + text(20, 835, 'The random branch samples all three arms, including A. Combine it with the leader branch.', { width: 320 });
+  let left = 20;
+  for (const [index, probability] of assignments.entries()) {
+    body += `<rect x="${left}" y="960" width="${probability * 320}" height="45" style="fill:${fill(['input', 'focus', 'output'][index])};stroke:${color(['input', 'focus', 'output'][index])};stroke-width:1.5"></rect>`;
+    left += probability * 320;
+  }
+  body += text(20, 1065, 'Assignment chances: A eighty percent, B ten, C ten', { width: 320, weight: 700 })
+    + text(20, 1185, 'UCB at round 64, coefficient 0.2: mean plus count-dependent bonus', { width: 320, weight: 700 })
+    + text(20, 1290, 'Blue mean; orange bonus. Same zero-to-one scale.', { width: 320 });
+  for (const [index, score] of scores.entries()) {
+    const vertical = 1420 + index * 160;
+    const mean = picture.means[index];
+    body += text(20, vertical - 30, `Arm ${String.fromCharCode(65 + index)}: index ${score.toFixed(6)}`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="${mean * 320}" height="30" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + `<rect x="${20 + mean * 320}" y="${vertical}" width="${(score - mean) * 320}" height="30" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1880, 'B wins now. Give B forty pulls, keep means fixed, use round one hundred: A 0.688, B 0.618, C 0.446. A wins.', { width: 320, weight: 700 })
+    + text(20, 2040, 'Thompson: one declared posterior draw per arm', { width: 320, weight: 700 });
+  for (const [index, draw] of picture.draws.entries()) {
+    const vertical = 2195 + index * 125;
+    body += text(20, vertical - 30, `Arm ${String.fromCharCode(65 + index)}: draw ${draw}`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="${draw * 320}" height="25" style="fill:${fill(index === 1 ? 'output' : 'input')};stroke:${color(index === 1 ? 'output' : 'input')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 2560, 'B wins this draw. Observe its reward, update its posterior, then draw again; the next choice can differ.', { width: 320 })
+    + text(20, 2700, 'If displayed estimates were true stationary means, fixed epsilon gives expected reward 0.586 instead of 0.62: continuing opportunity cost.', { width: 320 })
+    + text(20, 2850, 'Eligibility and untried-arm initialization come first. The illustrated coefficient is not a regret theorem. Drift, pending rewards and causal inference need different accounting.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 3040 };
 }
 
 function pathScoreMovement(picture, model, tools) {
@@ -3745,6 +6178,41 @@ function opposedDirections(picture, model, tools) {
   return { body, height: 476 };
 }
 
+function varianceAndDependence(picture, model, tools) {
+  const { text, circle, color, fill } = tools;
+  const totals = picture.signs.map(sign => picture.terms * sign);
+  const scaled = totals.map(value => value / picture.divisor);
+  const mean = scaled.reduce((sum, value) => sum + value, 0) / scaled.length;
+  const variance = scaled.reduce((sum, value) => sum + (value - mean) ** 2, 0) / scaled.length;
+  assert.deepEqual(totals, [64, -64]);
+  assert.deepEqual(scaled, [8, -8]);
+  assert.equal(variance, 64);
+  assert.equal(picture.terms / picture.divisor ** 2, 1);
+  const independent = varianceSquare(picture, model, tools);
+  let body = independent.body + text(20, 655, 'Changed condition: every term shares one fluctuation', { width: 320, weight: 700 })
+    + text(20, 735, 'The two signs have equal chance. Each cell is one term.', { width: 320 });
+  for (const [sample, sign] of picture.signs.entries()) {
+    const horizontal = sample ? 212 : 20;
+    const tone = sample ? 'warning' : 'input';
+    body += text(horizontal, 795, sign > 0 ? 'All positive ones' : 'All negative ones', { width: 140, weight: 700, tone });
+    for (let term = 0; term < picture.terms; term++) body += `<rect x="${horizontal + term % 8 * 16}" y="${835 + Math.floor(term / 8) * 16}" width="16" height="16" data-picture-shared-noise-sample="${sample}" data-picture-shared-noise-term="${term}" data-picture-shared-noise-sign="${sign}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1"></rect>`;
+    body += text(horizontal, 1030, `Total ${totals[sample]}`, { width: 140, weight: 700, tone })
+      + arrowBetween([horizontal + 65, 1070], [horizontal + 65, 1160], tone, tools, 2)
+      + circle(horizontal + 65, 1195, 24, tone) + text(horizontal + 65, 1201, scaled[sample], { width: 42, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1280, 'Divide both totals by eight: the scaled variance is 64.', { width: 320, weight: 700 })
+    + text(20, 1380, 'Same unit scale after division', { width: 320, weight: 700 });
+  for (const [caseIndex, deviation] of [1, Math.sqrt(variance)].entries()) {
+    const horizontal = caseIndex ? 184 : 28;
+    const tone = caseIndex ? 'warning' : 'output';
+    body += text(horizontal, 1455, caseIndex ? 'Fully shared' : 'Independent', { width: 145, weight: 700, tone });
+    for (let row = 0; row < deviation; row++) for (let column = 0; column < deviation; column++) body += `<rect x="${horizontal + column * 18}" y="${1640 - (row + 1) * 18}" width="18" height="18" data-picture-dependent-variance-case="${caseIndex}" data-picture-dependent-variance-tile="${row},${column}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1"></rect>`;
+    body += text(horizontal, 1700, `Variance ${deviation ** 2}`, { width: 145, weight: 700, tone });
+  }
+  body += text(20, 1790, 'Scaling cannot repair a false independence assumption.', { width: 320, weight: 700 });
+  return { body, height: 1880 };
+}
+
 function varianceSquare(picture, model, tools) {
   const { text, color, fill, line } = tools;
   let body = text(20, 27, 'Variance is the square of the signal scale', { width: 320, weight: 700 });
@@ -3759,6 +6227,47 @@ function varianceSquare(picture, model, tools) {
   body += text(20, 452, 'Divide SD by eight; divide area by sixty-four.', { width: 320, weight: 700 })
     + text(20, 519, 'This calculation requires independent unit-variance products.', { width: 320, tone: 'soft' });
   return { body, height: 578 };
+}
+
+function categoricalTargetAndTemperature(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const hard = picture.probabilities.map((unused, target) => target ? 0 : 1);
+  const soft = hard.map(value => value * (1 - picture.smoothing) + picture.smoothing / hard.length);
+  const warmWeights = picture.probabilities.map(probability => Math.exp(Math.log(probability) / picture.temperature));
+  const warm = warmWeights.map(value => value / warmWeights.reduce((sum, weight) => sum + weight, 0));
+  const cases = [
+    { name: 'Hard target; original temperature', predictions: picture.probabilities, targets: hard, temperature: 1 },
+    { name: 'Smoothed target; same predictions', predictions: picture.probabilities, targets: soft, temperature: 1 },
+    { name: 'Warmer predictions; hard target', predictions: warm, targets: hard, temperature: picture.temperature },
+  ];
+  const gradients = cases.map(item => item.predictions.map((probability, target) => (probability - item.targets[target]) / item.temperature));
+  assert.deepEqual(gradients[0], [-.99, .49, .5]);
+  assert(Math.abs(gradients[1][0] + .9233333333333333) < 1e-12);
+  assert(gradients.every(values => Math.abs(values.reduce((sum, value) => sum + value, 0)) < 1e-12));
+  assert(gradients[2][0] > -.5 && gradients[2][0] < 0);
+  let body = text(20, 27, 'Predictions and targets each keep total mass one', { width: 320, weight: 700 });
+  const tones = ['input', 'output', 'state'];
+  for (const [caseIndex, item] of cases.entries()) {
+    const offset = caseIndex * 400;
+    body += text(20, 100 + offset, item.name, { width: 320, weight: 700 });
+    for (const [distribution, values] of [item.predictions, item.targets].entries()) {
+      assert(Math.abs(values.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
+      const vertical = 160 + offset + distribution * 130;
+      body += text(20, vertical - 22, distribution ? 'Target shares' : 'Prediction shares', { width: 320 });
+      let cumulative = 0;
+      for (const [target, probability] of values.entries()) {
+        if (probability) body += `<rect x="${20 + cumulative * 320}" y="${vertical}" width="${probability * 320}" height="32" data-picture-cross-entropy-setting="${caseIndex}" data-picture-cross-entropy-distribution="${distribution}" data-picture-cross-entropy-target="${target}" data-picture-cross-entropy-share="${probability}" style="fill:${fill(tones[target])};stroke:${color(tones[target])};stroke-width:1"></rect>`;
+        body += text(70 + target * 110, vertical + 69, `C${target}: ${probability.toFixed(3)}`, { width: 100, anchor: 'middle', tone: tones[target] });
+        cumulative += probability;
+      }
+    }
+    body += text(20, 385 + offset, `Target-class logit gradient: ${gradients[caseIndex][0].toFixed(3)}`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1290, 'Temperature also divides the logit gradient, not only the logits.', { width: 320 })
+    + text(20, 1380, 'Separate binary example: a confident wrong prediction', { width: 320, weight: 700 });
+  const saturated = saturatedGradient(picture, model, tools);
+  body += `<g transform="translate(0 1460)">${saturated.body}</g>`;
+  return { body, height: 1460 + saturated.height };
 }
 
 function saturatedGradient(picture, model, tools) {
@@ -3778,38 +6287,142 @@ function saturatedGradient(picture, model, tools) {
   return { body, height: 508 };
 }
 
+function sharedFeatureInteractions(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const coefficient = (first, second) => picture.vectors[first].reduce((sum, value, coordinate) => sum + value * picture.vectors[second][coordinate], 0);
+  const pairs = [[0, 1], [0, 2], [1, 2]].map(([first, second]) => coefficient(first, second));
+  const fast = active => {
+    const sums = picture.vectors[0].map((unused, coordinate) => picture.vectors.reduce((sum, vector, feature) => sum + vector[coordinate] * active[feature], 0));
+    const squared = sums.reduce((sum, value) => sum + value * value, 0);
+    const self = picture.vectors.reduce((sum, vector, feature) => sum + vector.reduce((subtotal, value) => subtotal + value * value * active[feature] ** 2, 0), 0);
+    return { sums, squared, self, interaction: (squared - self) / 2 };
+  };
+  const all = fast([1, 1, 1]);
+  const withoutSecond = fast([1, 0, 1]);
+  assert.deepEqual(pairs.map(value => Number(value.toFixed(2))), [.8, .6, .56]);
+  assert(Math.abs(all.interaction - 1.96) < 1e-12);
+  assert(Math.abs(all.interaction - pairs.reduce((sum, value) => sum + value, 0)) < 1e-12);
+  assert(Math.abs(withoutSecond.interaction - .6) < 1e-12);
+  assert.equal(fast([1, 0, 0]).interaction, 0);
+  let body = text(20, 27, 'Shared vectors estimate the missing A-C interaction', { width: 320, weight: 700 })
+    + text(20, 110, 'Training has A-B and B-C, not A-C.', { width: 320, weight: 700 });
+  const nodes = [[65, 225], [180, 340], [295, 225]];
+  body += line(65, 225, 180, 340, 'output') + line(180, 340, 295, 225, 'output') + line(65, 225, 295, 225, 'warning', true);
+  for (const [index, node] of nodes.entries()) body += circle(...node, 25, 'input') + text(node[0], node[1] + 6, 'ABC'[index], { width: 43, anchor: 'middle', weight: 700 });
+  body += text(20, 445, 'Toy vectors, not fitted outputs', { width: 320, weight: 700 })
+    + text(110, 510, 'Coord 1', { width: 100, anchor: 'middle', weight: 700 }) + text(255, 510, 'Coord 2', { width: 100, anchor: 'middle', weight: 700 });
+  for (const [feature, vector] of picture.vectors.entries()) {
+    const vertical = 550 + feature * 95;
+    body += text(20, vertical + 34, 'ABC'[feature], { width: 35, weight: 700 });
+    for (const [coordinate, value] of vector.entries()) body += `<rect x="${65 + coordinate * 145}" y="${vertical}" width="100" height="53" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + text(115 + coordinate * 145, vertical + 34, value, { width: 86, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 900, 'All three inputs active; zero bias and linear effects', { width: 320, weight: 700 });
+  for (const [index, value] of pairs.entries()) {
+    const vertical = 1030 + index * 150;
+    const label = ['A with B', 'A with C: unobserved pair', 'B with C'][index];
+    const tone = index === 1 ? 'warning' : 'output';
+    body += text(20, vertical - 34, `${label}: ${value.toFixed(2)}`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="${value * 320}" height="32" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1500, 'All-pair interaction: 1.96', { width: 320, weight: 700 })
+    + text(20, 1600, 'Sparse shortcut: square summed coordinates, remove self-terms, then halve.', { width: 320, weight: 700 })
+    + text(20, 1710, `Squared sum ${all.squared.toFixed(2)}; self-terms ${all.self.toFixed(2)}; interaction ${all.interaction.toFixed(2)}`, { width: 320 })
+    + text(20, 1830, 'Turn B off: only A with C remains, contributing 0.60.', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1940, 'Only active pairs contribute. Add bias and linear effects for the full score; it is not automatically a probability.', { width: 320 })
+    + text(20, 2060, 'Work scales with active features and vector width; storage still scales with the whole vocabulary. Validate unseen-pair predictions independently.', { width: 320 });
+  return { body, height: 2200 };
+}
+
 function sharedFactorArea(picture, model, tools) {
   const { text, color, fill, circle } = tools;
-  let body = text(20, 27, 'One shared factor contributes to all asset pairs', { width: 320, weight: 700 });
-  for (let row = 0; row < 2; row++) for (let column = 0; column < 2; column++) {
-    const horizontal = 55 + column * 170;
-    const vertical = 143 + row * 154;
-    const product = picture.loadings[row] * picture.loadings[column];
-    assert.equal(product, model.values[row][column]);
-    for (let across = 0; across < picture.loadings[column]; across++) for (let down = 0; down < picture.loadings[row]; down++) body += `<rect x="${horizontal + across * 32}" y="${vertical + down * 32}" width="32" height="32" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
-    body += text(horizontal, vertical + 103, `Shared ${product}`, { width: 123, weight: 700, tone: 'input' });
-    if (row === column) body += circle(horizontal + 83, vertical + 22, 7, 'warning', true);
+  const shared = picture.loadings.map(first => picture.loadings.map(second => first * second));
+  const covariance = noise => shared.map((row, rowIndex) => row.map((value, column) => value + (rowIndex === column ? noise[rowIndex] : 0)));
+  const posterior = noise => {
+    const precision = picture.loadings.map((loading, index) => loading * loading / noise[index]);
+    const variance = 1 / (1 + precision.reduce((sum, value) => sum + value, 0));
+    const mean = variance * picture.loadings.reduce((sum, loading, index) => sum + loading * picture.observation[index] / noise[index], 0);
+    return { precision, variance, mean };
+  };
+  const fitted = posterior(picture.noise);
+  const tied = posterior([1, 1]);
+  assert.deepEqual(shared, [[4, 2], [2, 1]]);
+  assert.deepEqual(covariance(picture.noise), [[5, 2], [2, 5]]);
+  assert.deepEqual(covariance([1, 1]), [[5, 2], [2, 2]]);
+  assert.deepEqual(fitted.precision, [4, .25]);
+  assert(Math.abs(fitted.mean - 17 / 21) < 1e-12 && Math.abs(fitted.variance - 4 / 21) < 1e-12);
+  assert(Math.abs(tied.mean - 5 / 6) < 1e-12 && Math.abs(tied.variance - 1 / 6) < 1e-12);
+  assert(fitted.mean < 1 && fitted.mean !== tied.mean);
+  const matrix = (values, vertical, diagonalTone) => values.map((row, rowIndex) => row.map((value, column) => {
+    const horizontal = 105 + column * 78;
+    const top = vertical + rowIndex * 63;
+    const tone = rowIndex === column ? diagonalTone : 'input';
+    return `<rect x="${horizontal}" y="${top}" width="70" height="55" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + text(horizontal + 35, top + 35, value, { width: 62, anchor: 'middle', weight: 700 });
+  }).join('')).join('');
+  let body = text(20, 27, 'Infer one uncertain factor from two noisy measurements', { width: 320, weight: 700 })
+    + text(20, 105, 'One standard Gaussian factor; zero observation mean', { width: 320 })
+    + circle(180, 205, 31, 'focus') + text(180, 200, 'latent factor', { width: 53, anchor: 'middle', weight: 700 });
+  for (const [index, loading] of picture.loadings.entries()) {
+    const horizontal = index ? 280 : 80;
+    body += arrowBetween([index ? 202 : 158, 245], [horizontal, 310], 'input', tools)
+      + circle(horizontal, 350, 27, 'input') + text(horizontal, 356, picture.observation[index], { width: 46, anchor: 'middle', weight: 700 })
+      + text(horizontal, 420, `Loading ${loading}; noise variance ${picture.noise[index]}`, { width: 145, anchor: 'middle', weight: 700 });
   }
-  body += text(20, 501, 'Independent noise adds only to diagonal entries.', { width: 320, weight: 700, tone: 'warning' })
-    + text(20, 566, 'Blue areas: shared covariance. Red marks: private noise.', { width: 320, tone: 'soft' });
-  return { body, height: 621 };
+  body += text(20, 540, 'Shared covariance', { width: 320, weight: 700 }) + matrix(shared, 580, 'input')
+    + text(20, 780, 'Independent noise adds only to diagonal entries: one and four.', { width: 320, weight: 700 })
+    + text(20, 890, 'Total covariance', { width: 320, weight: 700 }) + matrix(covariance(picture.noise), 930, 'warning')
+    + text(20, 1140, 'Posterior precision: prior plus both measurements', { width: 320, weight: 700 });
+  for (const [index, [label, precision]] of [['Prior: 1', 1], ['First measurement: 4', fitted.precision[0]], ['Noisier second: 0.25', fitted.precision[1]]].entries()) {
+    const vertical = 1270 + index * 140;
+    const tone = index === 0 ? 'focus' : index === 1 ? 'input' : 'warning';
+    body += text(20, vertical - 30, label, { width: 320 })
+      + `<rect x="20" y="${vertical}" width="${precision / 4 * 320}" height="30" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1690, `Posterior mean ${fitted.mean.toFixed(3)}; variance ${fitted.variance.toFixed(3)}`, { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1790, 'The prior shrinks the unregularized coordinate one toward zero.', { width: 320 })
+    + text(20, 1895, 'PPCA ties residual noise. Set both variances to one, keeping loadings and observations fixed.', { width: 320, weight: 700 })
+    + text(20, 2020, `Recomputed mean ${tied.mean.toFixed(3)}; variance ${tied.variance.toFixed(3)}`, { width: 320, weight: 700, tone: 'output' })
+    + text(20, 2120, 'Do not reuse the old posterior. Classical PCA instead minimizes reconstruction error; a latent name is not causal evidence.', { width: 320 });
+  return { body, height: 2250 };
 }
 
 function parameterVersion(picture, model, tools) {
-  const { text, circle, line } = tools;
-  let body = text(20, 27, 'Accumulate first; advance the parameter version once', { width: 320, weight: 700 });
+  const { text, circle, line, color, fill } = tools;
+  const contributions = picture.gradients.map(gradient => gradient / picture.gradients.length);
+  const buffers = contributions.map((unused, index) => contributions.slice(0, index + 1).reduce((sum, value) => sum + value, 0));
+  const count = picture.unequal.reduce((sum, batch) => sum + batch.count, 0);
+  const weighted = picture.unequal.reduce((sum, batch) => sum + batch.count * batch.gradient, 0) / count;
+  assert.deepEqual(contributions, [.5, 1, 1.5, 2]);
+  assert.deepEqual(buffers, [.5, 1.5, 3, 5]);
+  assert.equal(picture.gradients.reduce((sum, value) => sum + value, 0), 20);
+  assert.equal(weighted, 3.5);
+  assert.notEqual(weighted, picture.unequal.reduce((sum, batch) => sum + batch.gradient, 0) / picture.unequal.length);
+  let body = text(20, 27, 'Four backward calls; one intended mean and update', { width: 320, weight: 700 })
+    + text(20, 105, 'Toy equal-sized microbatches; clear the buffer first', { width: 320 })
+    + text(20, 195, 'Mean gradient', { width: 100, weight: 700 })
+    + text(145, 195, 'Added', { width: 100, weight: 700 })
+    + text(270, 195, 'Buffer', { width: 70, weight: 700 });
   for (const [index, gradient] of picture.gradients.entries()) {
-    const horizontal = 55 + index * 83;
-    body += circle(horizontal, 142, 22, 'input') + text(horizontal, 148, gradient, { width: 36, anchor: 'middle', weight: 700 })
-      + text(horizontal, 214, 'v0', { width: 55, anchor: 'middle', weight: 700, tone: 'state' })
-      + arrowBetween([horizontal, 246], [180, 340], 'input', tools);
+    const vertical = 290 + index * 155;
+    body += circle(58, vertical, 24, 'input') + text(58, vertical + 6, gradient, { width: 40, anchor: 'middle', weight: 700 })
+      + text(58, vertical + 61, 'v0', { width: 50, anchor: 'middle', tone: 'state' })
+      + arrowBetween([92, vertical], [147, vertical], 'input', tools)
+      + text(182, vertical + 6, contributions[index], { width: 70, anchor: 'middle', weight: 700 })
+      + `<rect x="260" y="${vertical - 27}" width="72" height="54" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+      + text(296, vertical + 6, buffers[index], { width: 62, anchor: 'middle', weight: 700 });
   }
-  const total = picture.gradients.reduce((sum, value) => sum + value, 0);
-  body += text(180, 386, `Accumulated gradient ${total}`, { width: 320, anchor: 'middle', weight: 700 })
-    + line(35, 432, 325, 432, 'warning', true) + text(20, 476, 'One optimizer step crosses the boundary', { width: 320, weight: 700 })
-    + circle(180, 547, 24, 'output') + text(180, 553, 'v1', { width: 45, anchor: 'middle', weight: 700, tone: 'output' });
-  assert.equal(total, 10);
-  return { body, height: 594 };
+  body += line(20, 875, 340, 875, 'warning', true)
+    + text(20, 935, 'Consume mean five once; optimizer and scheduler follow the intended update clock.', { width: 320, weight: 700 })
+    + circle(180, 1060, 27, 'output') + text(180, 1066, 'v1', { width: 46, anchor: 'middle', weight: 700 })
+    + text(20, 1170, 'Unequal counts: three examples at gradient two; one at gradient eight', { width: 320, weight: 700 })
+    + `<rect x="20" y="1290" width="240" height="35" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + `<rect x="260" y="1290" width="80" height="35" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`
+    + text(20, 1390, 'Count-weighted mean 3.5; averaging the two batch means gives the wrong five.', { width: 320, weight: 700 })
+    + text(20, 1510, 'A partial window uses its actual example or valid-target count, not the configured window length.', { width: 320 })
+    + text(20, 1630, 'Finish synchronization and unscale once before clipping. Step once, then clear the accumulated buffer.', { width: 320, weight: 700 })
+    + text(20, 1750, 'One live activation graph can be released per backward call. Batch-coupled forward statistics need not match a larger batch.', { width: 320 });
+  return { body, height: 1880 };
 }
 
 function frozenFactor(picture, model, tools) {
@@ -3830,17 +6443,98 @@ function frozenFactor(picture, model, tools) {
 }
 
 function coordinateRelabel(picture, model, tools) {
-  const { text, circle, line } = tools;
+  const { text, circle, line, color } = tools;
   let body = text(20, 27, 'The same prediction has different coordinate labels', { width: 320, weight: 700 });
   for (let stage = 0; stage < 2; stage++) {
-    const vertical = 152 + stage * 229;
-    body += text(20, vertical - 56, stage ? 'Coordinate b: a = 2b' : 'Coordinate a: prediction equals a', { width: 320, weight: 700 }) + line(35, vertical, 325, vertical);
-    for (let tick = 0; tick < 5; tick++) body += circle(35 + tick * 72.5, vertical, tick === 2 ? 7 : 3, stage ? 'warning' : 'input', true)
-      + text(35 + tick * 72.5, vertical + 45, stage ? tick / picture.factor : tick, { width: 58, anchor: tick === 0 ? 'start' : tick === 4 ? 'end' : 'middle', weight: 700 });
+    const scale = stage ? picture.factor : 1;
+    const bottom = 340 + stage * 350;
+    const tone = stage ? 'warning' : 'input';
+    const point = prediction => [45 + prediction / scale * 67.5, bottom - prediction ** 2 * 11.25];
+    const points = Array.from({ length: 101 }, (_, index) => point(index / 25));
+    assert.equal((2 / scale * scale) ** 2, 4);
+    body += `<g data-picture-sharpness-scale="${scale}" data-picture-coordinate-curvature="${2 * scale ** 2}" data-picture-sharpness-prediction="2" data-picture-sharpness-coordinate="${2 / scale}" data-picture-sharpness-loss="4">`
+      + text(20, bottom - 236, stage ? 'Coordinate b: a = 2b' : 'Coordinate a: prediction equals a', { width: 320, weight: 700 })
+      + text(20, bottom - 199, 'loss', { width: 100, tone: 'soft' });
+    for (const loss of [0, 4, 8, 12, 16]) {
+      const vertical = bottom - loss * 11.25;
+      body += line(45, vertical, 315, vertical, 'neutral')
+        + text(37, vertical + 5, loss, { width: 28, anchor: 'end', tone: 'soft' });
+    }
+    body += line(45, bottom - 180, 45, bottom, 'neutral')
+      + `<path d="${points.map((value, index) => `${index ? 'L' : 'M'}${value.join(' ')}`).join('')}" style="fill:none;stroke:${color(tone)};stroke-width:2.5"></path>`
+      + circle(...point(2), 7, tone, true);
+    for (let tick = 0; tick < 5; tick++) body += text(45 + tick * 67.5, bottom + 30, tick, { width: 45, anchor: 'middle', tone: 'soft' });
+    body += text(20, bottom + 59, stage ? 'coordinate b' : 'coordinate a', { width: 320, tone: 'soft' })
+      + text(20, bottom + 91, 'Selected prediction 2; loss 4', { width: 320, weight: 700, tone })
+      + '</g>';
   }
-  body += text(20, 520, 'Same prediction a=2, b=1; same loss four.', { width: 320, weight: 700 })
-    + text(20, 584, 'Coordinate curvatures differ: two versus eight.', { width: 320, tone: 'soft' });
-  return { body, height: 639 };
+  body += text(20, 845, 'Same prediction a=2, b=1; same loss four.', { width: 320, weight: 700 })
+    + text(20, 906, 'Coordinate curvatures differ: two versus eight.', { width: 320, tone: 'soft' });
+  return { body, height: 960 };
+}
+
+function threeDiscreteGradientPaths(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  const probability = .75;
+  const outcomes = [0, 1];
+  const shares = [1 - probability, probability];
+  const scores = [-probability, 1 - probability];
+  const estimate = baseline => outcomes.map((reward, index) => (reward - baseline) * scores[index]);
+  const mean = values => values.reduce((sum, value, index) => sum + shares[index] * value, 0);
+  assert.equal(mean(estimate(0)), .1875);
+  assert.equal(mean(estimate(1 - probability)), .1875);
+  assert.equal(new Set(estimate(1 - probability)).size, 1);
+  const temperatures = [1, .25];
+  const relaxed = temperatures.map(temperature => {
+    const second = 1 / (1 + Math.exp(-2 / temperature));
+    return [1 - second, second];
+  });
+  assert(relaxed.every(values => Math.abs(values[0] + values[1] - 1) < 1e-12));
+  assert(relaxed[1][1] > relaxed[0][1] && relaxed[1][1] < 1);
+  const lane = (labels, vertical) => {
+    let body = '';
+    for (const [index, label] of labels.entries()) {
+      const horizontal = 65 + index * 110;
+      const tone = index === 2 ? 'output' : 'input';
+      body += circle(horizontal, vertical, 29, tone)
+        + text(horizontal, vertical + 6, label, { width: 52, anchor: 'middle', weight: 700 });
+      if (index) body += arrowBetween([horizontal - 76, vertical], [horizontal - 34, vertical], 'input', tools, 2);
+    }
+    return body;
+  };
+  let body = text(20, 27, 'Score function: return reward around the hard sample', { width: 320, weight: 700 })
+    + text(20, 100, 'Choose one category; observe its reward', { width: 320, weight: 700 })
+    + lane(['probs', 'hard', 'value'], 190)
+    + line(285, 227, 285, 338, 'warning', true)
+    + arrowBetween([285, 338], [65, 338], 'warning', tools, 3)
+    + line(65, 338, 65, 227, 'warning', true)
+    + text(20, 414, 'Reward changes its selection probability. The return route bypasses the hard choice and reward derivative.', { width: 320, weight: 700 })
+    + text(20, 510, 'An outcome-independent baseline can reduce variation without changing the expected gradient.', { width: 320, tone: 'soft' })
+    + text(20, 617, 'Relaxation: make the sampled path continuous', { width: 320, weight: 700 })
+    + text(20, 691, 'Hold noise fixed; use logits zero and two', { width: 320, weight: 700 })
+    + lane(['logits', 'soft', 'value'], 780)
+    + line(285, 813, 285, 873, 'warning', true)
+    + arrowBetween([285, 873], [175, 873], 'warning', tools, 2)
+    + line(175, 813, 175, 873, 'warning', true)
+    + arrowBetween([175, 873], [65, 873], 'warning', tools, 2)
+    + line(65, 813, 65, 873, 'warning', true)
+    + text(20, 909, 'Backward: through soft choice to logits', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 956, 'Use a smooth objective. A hard black-box reward has no pathwise gradient.', { width: 320, weight: 700 });
+  for (const [index, values] of relaxed.entries()) {
+    const vertical = 1056 + index * 127;
+    body += text(20, vertical - 36, `Temperature ${temperatures[index]}; B share ${number(values[1])}`, { width: 320, weight: 700 });
+    let horizontal = 40;
+    for (const [category, share] of values.entries()) {
+      body += `<rect x="${horizontal}" y="${vertical}" width="${share * 280}" height="30" data-picture-relaxed-share="${index},${category}" style="fill:${fill(category ? 'output' : 'input')};stroke:${color(category ? 'output' : 'input')};stroke-width:1.5"></rect>`;
+      horizontal += share * 280;
+    }
+  }
+  body += text(20, 1260, 'A is the first segment; B is the second. Lower temperature sharpens the sample, but finite temperature still relaxes the discrete objective.', { width: 320, tone: 'soft' })
+    + text(20, 1377, 'Straight-through: hard forward, chosen reverse rule', { width: 320, weight: 700 });
+  const hard = hardForwardSurrogate(picture, model, tools);
+  body += `<g transform="translate(0 1440)">${hard.body}</g>`
+    + text(20, 2104, 'Relaxation changes the forward sample. Straight-through changes the reverse rule. Neither makes the hard derivative smooth.', { width: 320, weight: 700 });
+  return { body, height: 2220 };
 }
 
 function hardForwardSurrogate(picture, model, tools) {
@@ -4078,33 +6772,168 @@ function averagingPopulation(picture, model, tools) {
   return { body, height: 847 };
 }
 
+function estimationAndDecision(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const mean = picture.outcomes.reduce((sum, value) => sum + value, 0) / picture.outcomes.length;
+  const median = [...picture.outcomes].sort((first, second) => first - second)[1];
+  const risk = (constant, power) => picture.outcomes.reduce((sum, value) => sum + Math.abs(constant - value) ** power, 0) / picture.outcomes.length;
+  assert.equal(mean, 3);
+  assert.equal(median, 0);
+  assert.deepEqual([risk(median, 2), risk(median, 1), risk(mean, 2), risk(mean, 1)], [27, 3, 18, 4]);
+  const huberGradient = constant => picture.outcomes.reduce((sum, value) => sum + Math.max(-1, Math.min(1, constant - value)), 0) / picture.outcomes.length;
+  assert.equal(huberGradient(.5), 0);
+  assert.equal(Math.max(-1, Math.min(1, -9)), -1);
+  const costs = [picture.falsePositive, 1].map(falsePositive => ({ positive: (1 - picture.probability) * falsePositive, negative: picture.probability * picture.falseNegative, threshold: falsePositive / (falsePositive + picture.falseNegative) }));
+  assert(Math.abs(costs[0].positive - 1.8) < 1e-12);
+  assert.equal(costs[0].negative, .8);
+  assert.equal(costs[0].threshold, .9);
+  assert(costs[0].positive > costs[0].negative);
+  assert(costs[1].positive < costs[1].negative);
+  assert.equal(costs[1].threshold, .5);
+  let body = text(20, 27, 'Same population, different estimation targets', { width: 320, weight: 700 })
+    + text(20, 110, 'Zero, zero, nine; equal weights. Fit one constant. Square areas show squared error; short bars show absolute error.', { width: 320 });
+  for (const [index, constant] of [median, mean].entries()) {
+    const top = 300 + index * 380;
+    body += text(20, top, index ? 'Constant three: mean target' : 'Constant zero: median target', { width: 320, weight: 700 });
+    for (const [sample, target] of picture.outcomes.entries()) {
+      const horizontal = 65 + sample * 115;
+      const error = Math.abs(constant - target);
+      const side = error * 7;
+      body += text(horizontal, top + 65, `Target ${target}`, { width: 100, anchor: 'middle' });
+      if (side) body += `<rect x="${horizontal - side / 2}" y="${top + 95}" width="${side}" height="${side}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
+      else body += circle(horizontal, top + 95, 3, 'input', true);
+      body += text(horizontal, top + 190, error ** 2, { width: 95, anchor: 'middle', weight: 700, tone: 'input' })
+        + line(horizontal - 35, top + 235, horizontal + 35, top + 235, 'neutral');
+      if (error) body += `<rect x="${horizontal - 35}" y="${top + 228}" width="${error / 9 * 70}" height="14" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`;
+      body += text(horizontal, top + 275, error, { width: 95, anchor: 'middle', tone: 'focus' });
+    }
+    body += text(20, top + 320, `Mean squared error: ${risk(constant, 2)}. Mean absolute error: ${risk(constant, 1)}.`, { width: 320, weight: 700, tone: index ? 'input' : 'focus' });
+  }
+  body += text(20, 1110, 'Huber at scale one: the nine observation has bounded gradient minus one at zero. Robust location is 0.5 here.', { width: 320 })
+    + text(20, 1235, 'Treating nine as contamination changes the goal if nine is actually a genuine tail outcome.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1360, 'A separate decision: suitable calibrated probability stays 0.8', { width: 320, weight: 700 });
+  for (const [index, scenario] of costs.entries()) {
+    const top = 1500 + index * 390;
+    body += text(20, top, `False positive cost ${index ? 1 : picture.falsePositive}; false negative cost one`, { width: 320, weight: 700 });
+    for (const [action, chance, cost, horizontal, tone] of [['Positive', 1 - picture.probability, index ? 1 : picture.falsePositive, 25, 'warning'], ['Negative', picture.probability, picture.falseNegative, 190, 'output']]) {
+      const height = cost * 9;
+      body += text(horizontal, top + 80, `${action}: error chance ${chance.toFixed(1)}`, { width: 140 })
+        + `<rect x="${horizontal}" y="${top + 205 - height}" width="${chance * 150}" height="${height}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(horizontal, top + 250, `Expected cost ${scenario[action.toLowerCase()].toFixed(1)}`, { width: 140, weight: 700, tone });
+    }
+    body += text(20, top + 325, `${index ? 'Positive' : 'Negative'} action wins; probability threshold ${scenario.threshold.toFixed(1)}`, { width: 320, weight: 700 });
+  }
+  body += text(20, 2310, 'Rectangle width is error chance; height is error cost, on the same scales. Correct decisions cost zero.', { width: 320 })
+    + text(20, 2435, 'Changing action costs can change a threshold without retraining. Validate recall, precision and accepted volume; capacity may add constraints.', { width: 320, weight: 700 })
+    + text(20, 2580, 'Weighted or focal scores need probability-meaning and calibration checks before using this rule.', { width: 320, tone: 'warning' });
+  return { body, height: 2700 };
+}
+
 function neighborhoodMessages(picture, model, tools) {
-  const { text, circle, line } = tools;
-  let body = text(20, 27, 'Only the declared neighborhood reaches B', { width: 320, weight: 700 });
-  const positions = [[65, 153], [180, 318], [295, 153], [65, 459]];
-  for (const [index, point] of positions.entries()) body += circle(...point, 25, index === 3 ? 'neutral' : 'input') + text(point[0], point[1] + 6, `${String.fromCharCode(65 + index)}:${picture.features[index]}`, { width: 53, anchor: 'middle', size: index === 3 ? 14 : 16, weight: 700 });
-  body += arrowBetween([80, 177], [164, 290], 'input', tools) + arrowBetween([280, 177], [197, 290], 'input', tools)
-    + line(85, 440, 111, 411, 'warning', true) + line(132, 385, 161, 342, 'warning', true)
-    + line(111, 385, 131, 405, 'warning') + line(131, 385, 111, 405, 'warning')
-    + text(20, 551, 'Mean of A, B, C = (1+2+3)/3 = 2', { width: 320, weight: 700 })
-    + text(20, 615, 'D=100 has no edge and contributes nothing.', { width: 320, tone: 'soft' });
-  assert.deepEqual(model.values[1], [1, 1, 1]);
-  return { body, height: 670 };
+  const { text, circle, line, color, fill } = tools;
+  const adjacency = [[1, 1, 0, 0], [1, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 1]];
+  const row = matrix => {
+    const degrees = matrix.map(values => values.reduce((sum, value) => sum + value, 0));
+    return matrix[1].map((edge, index) => edge / Math.sqrt(degrees[1] * degrees[index]));
+  };
+  const coefficients = row(adjacency);
+  const aggregate = values => coefficients.reduce((sum, coefficient, index) => sum + coefficient * values[index], 0);
+  const contributions = coefficients.map((coefficient, index) => coefficient * picture.features[index]);
+  const total = aggregate(picture.features);
+  const transformed = total * picture.projection;
+  assert(Math.abs(total - (4 / Math.sqrt(6) + 2 / 3)) < 1e-12);
+  assert.notEqual(total, 2);
+  assert.equal(coefficients[3], 0);
+  assert.equal(aggregate([1, 2, 3, 1000]), total);
+  assert.equal(Math.max(0, transformed), transformed);
+  const connected = adjacency.map(values => [...values]);
+  connected[1][3] = 1;
+  connected[3][1] = 1;
+  const connectedRow = row(connected);
+  const connectedTotal = connectedRow.reduce((sum, coefficient, index) => sum + coefficient * picture.features[index], 0);
+  assert(connectedRow.slice(0, 3).every((coefficient, index) => coefficient !== coefficients[index]));
+  assert(Math.abs(connectedTotal - (104 / Math.sqrt(8) + .5)) < 1e-12);
+  let body = text(20, 27, 'Canonical GCN: symmetric degree weights, not a plain mean', { width: 320, weight: 700 })
+    + text(20, 115, 'Toy undirected path A-B-C; isolated D. Every node has a self-loop. Degrees: two, three, two, one.', { width: 320 });
+  const positions = [[65, 330], [180, 475], [295, 330], [65, 555]];
+  body += arrowBetween([82, 353], [161, 449], 'input', tools) + arrowBetween([278, 353], [199, 449], 'input', tools);
+  for (const [index, point] of positions.entries()) {
+    body += circle(...point, 27, index === 3 ? 'neutral' : 'input')
+      + text(point[0], point[1] + 6, `${String.fromCharCode(65 + index)} ${picture.features[index]}`, { width: 54, anchor: 'middle', size: index === 3 ? 14 : 16, weight: 700 })
+      + `<path d="M${point[0] - 18} ${point[1] - 22}C${point[0] - 65} ${point[1] - 90},${point[0] + 65} ${point[1] - 90},${point[0] + 18} ${point[1] - 22}" style="fill:none;stroke:${color(index === 3 ? 'neutral' : 'input')};stroke-width:1.5"></path>`;
+  }
+  body += text(20, 665, 'B row: coefficients from both endpoint degrees', { width: 320, weight: 700 });
+  for (const [index, coefficient] of coefficients.entries()) {
+    const horizontal = 55 + index * 83;
+    body += text(horizontal, 770, String.fromCharCode(65 + index), { width: 70, anchor: 'middle', weight: 700 })
+      + text(horizontal, 825, coefficient.toFixed(3), { width: 75, anchor: 'middle' });
+  }
+  body += text(20, 915, 'Multiply each feature by its coefficient, then sum', { width: 320, weight: 700 });
+  for (const [index, contribution] of contributions.entries()) {
+    const vertical = 1020 + index * 115;
+    body += text(20, vertical, `${String.fromCharCode(65 + index)} contributes ${contribution.toFixed(3)}`, { width: 320 });
+    if (contribution) body += `<rect x="20" y="${vertical + 20}" width="${contribution / 2.5 * 320}" height="22" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
+    else body += circle(20, vertical + 31, 3, 'neutral', true);
+  }
+  body += text(20, 1515, `Row total about ${total.toFixed(3)}; a plain mean would be two. Coefficients need not sum to one.`, { width: 320, weight: 700 });
+  for (const [index, label] of [`Weighted sum ${total.toFixed(3)}`, `Shared learned scalar doubles: ${transformed.toFixed(3)}`, `ReLU retains ${Math.max(0, transformed).toFixed(3)}`].entries()) {
+    const vertical = 1700 + index * 150;
+    body += text(20, vertical, label, { width: 320, weight: 700, tone: index === 2 ? 'output' : 'input' });
+    if (index < 2) body += arrowBetween([180, vertical + 45], [180, vertical + 95], 'neutral', tools);
+  }
+  body += text(20, 2155, 'Change isolated D from one hundred to one thousand: B stays unchanged.', { width: 320, weight: 700 })
+    + text(20, 2290, `With original D one hundred, add B-D and recompute degrees. B aggregate becomes about ${connectedTotal.toFixed(3)}; existing message weights change too.`, { width: 320 })
+    + text(20, 2450, 'Extra layers extend message paths, but oversmoothing and narrow bottlenecks can limit useful depth. Other GNN aggregators differ.', { width: 320 });
+  return { body, height: 2600 };
 }
 
 function bandwidthCeiling(picture, model, tools) {
-  const { text, circle, color, fill } = tools;
-  let body = text(20, 27, 'Same byte bandwidth; more work per byte', { width: 320, weight: 700 });
-  for (const [stage, intensity] of picture.intensities.entries()) {
-    const vertical = 150 + stage * 225;
-    body += text(20, vertical - 49, `Arithmetic intensity ${intensity} FLOP per byte`, { width: 320, weight: 700 })
-      + circle(60, vertical, 25, 'input') + text(60, vertical + 6, 'byte', { width: 46, anchor: 'middle', size: 14, weight: 700 })
-      + arrowBetween([90, vertical], [212, vertical], 'input', tools, 3);
-    for (let work = 0; work < intensity; work++) body += `<rect x="${246 + work * 36}" y="${vertical - 18}" width="33" height="36" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></rect>`;
-    body += text(20, vertical + 91, `At 1 TB/s: memory ceiling ${intensity} TFLOP/s`, { width: 320, weight: 700, tone: 'output' });
+  const { text, circle, color, fill, line } = tools;
+  const scenarios = [[picture.compute, picture.bytes], [picture.compute * 2, picture.bytes], [picture.compute, picture.bytes / 2]].map(([compute, bytes]) => ({ compute: picture.work / compute, traffic: bytes / picture.bandwidth }));
+  const bounds = scenarios.map(scenario => Math.max(scenario.compute, scenario.traffic));
+  assert.deepEqual(scenarios.map(scenario => scenario.compute), [.006, .003, .006]);
+  assert.deepEqual(bounds, [.12, .12, .06]);
+  const intensity = picture.work / picture.bytes;
+  const ridge = picture.compute / picture.bandwidth;
+  assert.equal(intensity, 10);
+  assert.equal(ridge, 200);
+  assert.equal(Math.min(picture.compute, picture.bandwidth * intensity), 1000);
+  const inputBytes = 2 * 128 ** 2 * 2;
+  const accumulatorBytes = 128 ** 2 * 4;
+  assert.equal(inputBytes, 65536);
+  assert(inputBytes + accumulatorBytes > 96 * 1024);
+  const point = (workPerByte, throughput) => [60 + Math.log10(workPerByte) / 3 * 260, 620 - (Math.log10(throughput) + 1) * 100];
+  const peak = picture.compute / 1000;
+  let body = text(20, 27, 'The same operation must satisfy compute and traffic bounds', { width: 320, weight: 700 })
+    + text(20, 105, 'Toy: 120 GFLOPs, 12 GB; 20 TFLOP/s and 100 GB/s at the stated precision and boundary.', { width: 320 })
+    + text(20, 220, 'Roofline: log axes; FLOPs per byte across, TFLOP/s up', { width: 320, weight: 700 });
+  body += line(60, 320, 60, 620, 'neutral') + line(60, 620, 320, 620, 'neutral');
+  for (const value of [.1, 1, 10, 100]) body += text(45, point(1, value)[1] + 5, value, { width: 38, anchor: 'end' });
+  for (const value of [1, 10, 100, 1000]) body += text(point(value, .1)[0], 665, value, { width: 58, anchor: 'middle' });
+  const roof = [point(1, .1), point(ridge, peak), point(1000, peak)];
+  body += line(60, point(ridge, peak)[1], 320, point(ridge, peak)[1], 'warning', true)
+    + `<polyline points="${roof.map(coordinate => coordinate.join(',')).join(' ')}" style="fill:none;stroke:${color('input')};stroke-width:3"></polyline>`
+    + text(75, 285, 'Compute roof: twenty; ridge: two hundred', { width: 250, weight: 700 });
+  for (const [index, value] of [intensity, intensity * 2].entries()) body += circle(...point(value, picture.bandwidth * value / 1000), 5, index ? 'output' : 'focus', true);
+  body += text(20, 735, 'Original intensity ten: roof one. Half traffic, intensity twenty: roof two.', { width: 320, weight: 700 });
+  for (const [index, scenario] of scenarios.entries()) {
+    const vertical = 930 + index * 310;
+    body += text(20, vertical - 75, ['Original operation', 'Double compute only', 'Half memory traffic only'][index], { width: 320, weight: 700 });
+    for (const [row, [label, value, tone]] of [['Compute', scenario.compute, 'input'], ['Traffic', scenario.traffic, 'focus']].entries()) {
+      const top = vertical + row * 95;
+      body += text(20, top - 22, `${label} lower bound: ${value} seconds`, { width: 320 })
+        + `<rect x="20" y="${top}" width="${value / .12 * 320}" height="25" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    }
+    body += text(20, vertical + 200, `Combined lower bound: ${bounds[index]} seconds`, { width: 320, weight: 700, tone: 'output' });
   }
-  body += text(20, 570, 'A ceiling is not a measured achieved speed.', { width: 320, tone: 'soft' });
-  return { body, height: 626 };
+  body += text(20, 1875, 'Time bars share zero-to-0.12-second scale. Lower bounds are not measured runtimes.', { width: 320 })
+    + text(20, 1980, 'Reuse one BF16 weight across 64 tokens: about 64 FLOPs per weight byte only. Count KV, activation, output, memory, and waiting costs too.', { width: 320 })
+    + text(20, 2120, 'Input tiles 64 KiB plus accumulator 64 KiB exceed a hypothetical 96 KiB local budget.', { width: 320, weight: 700 })
+    + `<rect x="20" y="2230" width="160" height="30" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + `<rect x="180" y="2230" width="160" height="30" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+    + line(260, 2215, 260, 2275, 'warning', true)
+    + text(20, 2340, 'Red line: 96 KiB. Separate register/shared-memory constraints still apply.', { width: 320 });
+  return { body, height: 2440 };
 }
 
 function normalizerShift(picture, model, tools) {
@@ -4131,18 +6960,49 @@ function normalizerShift(picture, model, tools) {
 
 function retainedFrontier(picture, model, tools) {
   const { text, circle, color, fill } = tools;
-  let body = text(20, 27, 'The retained frontier excludes weaker identities', { width: 320, weight: 700 });
-  for (const [stage, retained] of picture.retained.entries()) {
-    const vertical = 151 + stage * 241;
-    body += text(20, vertical - 63, stage ? 'New eight replaces seven; retain nine and eight' : 'From the first two batches: retain nine and seven', { width: 320, weight: 700 });
-    for (const [index, value] of picture.values.entries()) {
-      const horizontal = 40 + index * 70;
-      const kept = retained.includes(value);
-      body += circle(horizontal, vertical, kept ? 22 : 14, kept ? 'output' : 'neutral') + text(horizontal, vertical + 6, value, { width: 38, anchor: 'middle', size: 20, weight: 700, tone: kept ? 'output' : 'soft' });
+  const normalize = values => {
+    assert(values.every(Number.isFinite));
+    const norm = Math.hypot(...values);
+    assert(norm === 0 || norm >= 1e-12);
+    return values.map(value => norm ? value / norm : 0);
+  };
+  const queries = picture.queries.map(normalize);
+  const items = picture.items.map(normalize);
+  const dot = (first, second) => first.reduce((sum, value, index) => sum + value * second[index], 0);
+  const select = candidates => [...candidates].sort((first, second) => second.score - first.score || first.index - second.index).slice(0, picture.keep);
+  assert(picture.keep > 0 && picture.keep <= items.length && picture.block > 0);
+  assert.deepEqual(normalize([0, 0]), [0, 0]);
+  let retained = queries.map(() => []);
+  let body = text(20, 27, 'Per-query score blocks feed a bounded running frontier', { width: 320, weight: 700 })
+    + text(20, 115, 'Toy queries: x-axis, y-axis, zero. Items zero/one/two: x-axis, y-axis, negative x-axis. Keep two; block size two.', { width: 320, weight: 700 });
+  for (let start = 0, stage = 0; start < items.length; start += picture.block, stage++) {
+    const block = items.slice(start, start + picture.block);
+    const top = 350 + stage * 650;
+    const localScores = queries.map(query => block.map((item, index) => ({ index: start + index, score: dot(query, item) })));
+    retained = retained.map((previous, query) => select([...previous, ...select(localScores[query])]));
+    body += text(20, top - 80, stage ? 'Final partial block: item two only' : 'First score block: items zero and one', { width: 320, weight: 700 });
+    for (const [query, candidates] of retained.entries()) {
+      const vertical = top + query * 165;
+      body += text(20, vertical, `Query ${query}: block scores ${localScores[query].map(candidate => candidate.score).join(', ')}`, { width: 320, weight: 700 });
+      for (const [position, candidate] of candidates.entries()) {
+        const horizontal = 100 + position * 160;
+        body += circle(horizontal, vertical + 60, 23, 'output')
+          + text(horizontal, vertical + 66, candidate.index, { width: 39, anchor: 'middle', weight: 700 })
+          + text(horizontal, vertical + 112, `Score ${candidate.score}`, { width: 125, anchor: 'middle', tone: 'output' });
+      }
     }
-    body += text(20, vertical + 102, `Retained minimum ${Math.min(...retained)}; discarded three stays below it`, { width: 320, weight: 700 });
   }
-  return { body, height: 565 };
+  const full = queries.map(query => select(items.map((item, index) => ({ index, score: dot(query, item) }))));
+  assert.deepEqual(retained, full);
+  assert.deepEqual(retained[0], [{ index: 0, score: 1 }, { index: 1, score: 0 }]);
+  assert(retained[2].every(candidate => candidate.score === 0));
+  body += text(20, 1530, 'Circles retain global item IDs, not block-local offsets. Scores remain sorted per query.', { width: 320 })
+    + text(20, 1665, 'Invariant: retain the best two among every item seen. A discarded fixed-score item has two candidates ahead under the declared tie order. Later items cannot move it ahead of them.', { width: 320, weight: 700 })
+    + text(20, 1850, 'Query zero finishes with items zero and one, scores one and zero. Item two scores minus one and cannot enter.', { width: 320 })
+    + text(20, 1995, 'Zero query scores all items zero. This display breaks ties by item ID; the reference permits any tied membership unless a stricter policy is added.', { width: 320, tone: 'warning' })
+    + text(20, 2170, 'Toy score blocks hold six then three scalars, never the full nine-score matrix. Retained state holds six ID/score pairs. Normalized inputs use additional storage.', { width: 320 })
+    + text(20, 2350, 'Score-block storage scales with query count and block size; running results scale with query count and k. Every item is still scored: blocking does not remove exhaustive scoring work.', { width: 320, weight: 700 });
+  return { body, height: 2570 };
 }
 
 function shapeContract(picture, model, tools) {
@@ -4166,21 +7026,66 @@ function shapeContract(picture, model, tools) {
 }
 
 function featureSummary(picture, model, tools) {
-  const { text, circle, number } = tools;
+  const { text, circle, line, number, color, fill } = tools;
   const sums = picture.query.map((value, feature) => picture.features.reduce((sum, row, index) => sum + row[feature] * picture.values[index], 0));
   const normalizers = picture.query.map((value, feature) => picture.features.reduce((sum, row) => sum + row[feature], 0));
   assert.deepEqual(sums, [8, 10]);
   assert.deepEqual(normalizers, [2, 2]);
   const numerator = sums.reduce((sum, value, feature) => sum + value * picture.query[feature], 0);
   const denominator = normalizers.reduce((sum, value, feature) => sum + value * picture.query[feature], 0);
-  let body = text(20, 27, 'Store feature sums; let each query read them', { width: 320, weight: 700 });
-  for (const [index, value] of picture.values.entries()) body += circle(57 + index * 123, 142, 22, 'input') + text(57 + index * 123, 148, value, { width: 38, anchor: 'middle', weight: 700 });
-  body += text(20, 222, 'Key features: (1,0), (0,1), (1,1)', { width: 320, weight: 700 })
-    + arrowBetween([75, 250], [75, 335], 'input', tools) + arrowBetween([285, 250], [285, 335], 'input', tools)
-    + text(20, 383, 'S=(8,10)', { width: 143, weight: 700, tone: 'output' }) + text(340, 383, 'z=(2,2)', { width: 143, anchor: 'end', weight: 700, tone: 'output' })
-    + text(20, 462, 'Query features (1,2) weight both sums.', { width: 320, weight: 700 })
-    + text(20, 539, `${numerator} / ${denominator} = ${number(numerator / denominator)}`, { width: 320, size: 23, weight: 700, tone: 'output' });
-  return { body, height: 595 };
+  const means = sums.map((sum, feature) => sum / normalizers[feature]);
+  const reads = picture.query.flatMap((count, feature) => {
+    assert(Number.isInteger(count) && count > 0);
+    return Array.from({ length: count }, () => ({ feature, mean: means[feature] }));
+  });
+  const combinedMean = numerator / denominator;
+  assert(Math.abs(reads.reduce((sum, read) => sum + read.mean, 0) / reads.length - combinedMean) < 1e-12);
+  let body = text(20, 27, 'Kernel route: gather by feature', { width: 320, weight: 700 })
+    + text(190, 90, 'Feature 1', { width: 95, anchor: 'middle', weight: 700 })
+    + text(295, 90, 'Feature 2', { width: 95, anchor: 'middle', weight: 700 });
+  for (const [position, value] of picture.values.entries()) {
+    const vertical = 150 + position * 90;
+    body += circle(57, vertical, 21, 'input') + text(57, vertical + 6, value, { width: 38, anchor: 'middle', weight: 700 });
+    for (const [feature, active] of picture.features[position].entries()) {
+      const horizontal = 190 + feature * 105;
+      if (active) {
+        if (feature) body += line(85, vertical + 8, 112, vertical + 30, 'input') + line(112, vertical + 30, 265, vertical + 30, 'input') + arrowBetween([265, vertical + 30], [284, vertical + 17], 'input', tools);
+        else body += arrowBetween([85, vertical], [166, vertical], 'input', tools);
+      }
+      body += `<g data-picture-feature-source="${position},${feature}" data-picture-contribution="${active * value}">${circle(horizontal, vertical, 20, active ? 'input' : 'neutral')}${text(horizontal, vertical + 6, active * value, { width: 36, anchor: 'middle', weight: 700 })}</g>`;
+    }
+  }
+  for (const [feature, sum] of sums.entries()) {
+    const horizontal = 190 + feature * 105;
+    body += arrowBetween([horizontal, 357], [horizontal, 427], 'output', tools)
+      + `<g data-picture-feature-total="${sum}" data-picture-feature-count="${normalizers[feature]}">${circle(horizontal, 455, 24, 'output')}${text(horizontal, 461, sum, { width: 42, anchor: 'middle', weight: 700 })}</g>`
+      + text(horizontal, 512, `count ${normalizers[feature]}`, { width: 96, anchor: 'middle', weight: 700, tone: 'output' })
+      + text(horizontal, 543, `mean ${number(means[feature])}`, { width: 96, anchor: 'middle', tone: 'output' });
+  }
+  body += text(20, 575, 'Query reads the first bank once and the second twice', { width: 320, weight: 700 });
+  for (const [index, read] of reads.entries()) {
+    const horizontal = 45 + index * 100;
+    const height = read.mean * 22;
+    const tone = read.feature ? 'output' : 'input';
+    body += `<rect data-picture-bank-read="${read.feature}" data-picture-bank-mean="${read.mean}" x="${horizontal}" y="${728 - height}" width="70" height="${height}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+      + text(horizontal + 35, 754, read.mean, { width: 60, anchor: 'middle', weight: 700, tone });
+  }
+  body += line(35, 728, 325, 728, 'neutral')
+    + `<line data-picture-kernel-result="${combinedMean}" x1="35" y1="${728 - combinedMean * 22}" x2="325" y2="${728 - combinedMean * 22}" style="stroke:${color('warning')};stroke-width:2;stroke-dasharray:5 4"></line>`
+    + text(20, 788, 'Dashed line: the combined mean', { width: 320, tone: 'warning' })
+    + text(20, 831, `Weighted mean: ${number(combinedMean)}`, { width: 320, size: 20, weight: 700, tone: 'output' })
+    + text(20, 913, 'Compression route: merge positions into fewer slots', { width: 320, weight: 700 });
+  assert.deepEqual(picture.positionGroups.flat().sort(), [0, 1, 2]);
+  for (const [position, value] of picture.values.entries()) body += circle(55 + position * 125, 998, 21, 'input') + text(55 + position * 125, 1004, value, { width: 38, anchor: 'middle', weight: 700 });
+  for (const [slot, positions] of picture.positionGroups.entries()) {
+    const horizontal = 100 + slot * 160;
+    const average = positions.reduce((sum, position) => sum + picture.values[position], 0) / positions.length;
+    for (const position of positions) body += arrowBetween([55 + position * 125, 1025], [horizontal, 1080], 'state', tools);
+    body += `<g data-picture-compressed-members="${positions.join(',')}" data-picture-compressed-value="${average}" style="stroke:${color('state')}">${circle(horizontal, 1108, 24, 'state')}${text(horizontal, 1114, average, { width: 42, anchor: 'middle', weight: 700 })}</g>`
+      + text(horizontal, 1168, `slot ${slot + 1}`, { width: 100, anchor: 'middle', weight: 700, tone: 'state' });
+  }
+  body += text(20, 1222, 'Two slots replace three positions; some detail is lost.', { width: 320, tone: 'soft' });
+  return { body, height: 1277 };
 }
 
 function positionEntryPoint(picture, model, tools) {
@@ -4218,6 +7123,46 @@ function alignmentAxes(picture, model, tools) {
   body += text(20, 455, 'Horizontal: emit token, keep audio time', { width: 320, weight: 700, tone: 'input' })
     + text(20, 521, 'Vertical: emit blank, advance audio time', { width: 320, weight: 700, tone: 'output' });
   return { body, height: 579 };
+}
+
+function asrDecoderContrast(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const clocks = alignmentAxes(picture, model, tools);
+  const merged = picture.ctc.filter((token, index) => !index || token !== picture.ctc[index - 1]);
+  const decoded = merged.filter(token => token !== null);
+  assert.deepEqual(decoded, ['A', 'A', 'B']);
+  assert.equal(picture.transcript.filter((word, index) => word !== picture.reference[index]).length, 1);
+  assert(picture.delays[0] < picture.delays[1]);
+  let body = clocks.body + text(20, 419, 'Audio time down; output count right', { width: 320, size: 14 })
+    + text(20, 628, 'CTC: every position belongs to an audio frame', { width: 320, weight: 700 });
+  for (const [frame, token] of picture.ctc.entries()) {
+    const horizontal = 48 + frame * 66;
+    body += `<g data-picture-asr-frame="${frame}" data-picture-asr-frame-label="${token ?? 'blank'}">${circle(horizontal, 735, 24, token === null ? 'neutral' : 'input')}${text(horizontal, 741, token ?? '-', { width: 43, anchor: 'middle', weight: 700 })}${text(horizontal, 789, `frame ${frame}`, { width: 60, anchor: 'middle', size: 14 })}</g>`;
+  }
+  body += text(20, 849, 'Merge adjacent repeats; then remove blanks', { width: 320, weight: 700 });
+  for (const [index, token] of decoded.entries()) {
+    const horizontal = 70 + index * 110;
+    body += circle(horizontal, 944, 24, 'output') + text(horizontal, 950, token, { width: 43, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1028, 'The blank separates two surviving As.', { width: 320, tone: 'soft' });
+  for (const [lane, available] of [3, 5].entries()) {
+    const vertical = 1146 + lane * 165;
+    body += text(20, vertical, lane ? 'Full-audio attention: later frames are visible' : 'Streaming: later frames are not yet available', { width: 320, weight: 700 });
+    for (let frame = 0; frame < 5; frame++) {
+      const horizontal = 32 + frame * 64;
+      body += `<rect x="${horizontal}" y="${vertical + 69}" width="40" height="29" data-picture-asr-context="${lane},${frame}" data-picture-asr-available="${frame < available}" style="fill:${fill(frame < available ? 'input' : 'neutral')};stroke:${color(frame < available ? 'input' : 'neutral')};stroke-width:1.5;${frame < available ? '' : 'stroke-dasharray:4 3;opacity:.5'}"></rect>`;
+    }
+  }
+  body += text(20, 1503, 'Text quality and delay answer different questions', { width: 320, weight: 700 })
+    + text(20, 1580, `Heard: ${picture.reference.join(' ')}`, { width: 320 })
+    + text(20, 1634, `Decoded: ${picture.transcript.join(' ')}; one wrong word`, { width: 320, tone: 'warning' });
+  for (const [lane, delay] of picture.delays.entries()) {
+    const vertical = 1747 + lane * 125;
+    body += text(20, vertical - 43, `Same decoded words, arriving after ${delay} ms`, { width: 320, size: 14 })
+      + line(30, vertical, 330, vertical, 'neutral')
+      + `<rect x="30" y="${vertical - 10}" width="${delay * .3}" height="20" data-picture-asr-delay="${delay}" style="fill:${fill(lane ? 'warning' : 'output')};stroke:${color(lane ? 'warning' : 'output')};stroke-width:1.5"></rect>`;
+  }
+  return { body, height: 1950 };
 }
 
 function denominatorMembers(picture, model, tools) {
@@ -4526,7 +7471,7 @@ function serialGates(picture, model, tools) {
         if (alive) body += arrowBetween([horizontal - spacing + 27, vertical], [horizontal - 27, vertical], 'output', tools, 3);
         else body += line(horizontal - spacing + 27, vertical, horizontal - 27, vertical, 'neutral', true);
       }
-      body += circle(horizontal, vertical, 22, tone) + text(horizontal, vertical + 6, accepted ? '+' : 'x', { width: 37, anchor: 'middle', size: 23, weight: 700, tone })
+      body += circle(horizontal, vertical, 22, tone) + text(horizontal, vertical + 6, accepted ? '\u2713' : 'x', { width: 37, anchor: 'middle', size: 23, weight: 700, tone })
         + text(horizontal, vertical + 66, path.labels[gate], { width: Math.min(104, spacing - 8), anchor: 'middle', size: 15, weight: 700 });
       alive &&= accepted;
     }
@@ -4536,18 +7481,102 @@ function serialGates(picture, model, tools) {
   return { body, height: 164 + picture.lanes.length * 270 };
 }
 
+function coherentRecoveryScope(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const fields = [['model', 'model'], ['optimizer', 'optimizer'], ['step', 'step'], ['data', 'data map'], ['rng', 'RNG map'], ['layout', 'layout']];
+  const canResume = (restored, complete) => complete && fields.every(([field]) => restored[field] === picture.committed[field]);
+  assert(!canResume(picture.restored, true));
+  assert(canResume({ ...picture.restored, optimizer: 4 }, true));
+  assert(!canResume(picture.committed, false));
+  assert(!canResume({ ...picture.committed, data: undefined }, true));
+  let body = text(20, 27, 'Compare committed bundle identities, not process liveness', { width: 320, weight: 700 })
+    + text(20, 110, 'Per-rank shards and random streams need not have identical values; their saved mappings must be compatible.', { width: 320, tone: 'soft' })
+    + text(225, 228, 'saved', { width: 69, anchor: 'middle', weight: 700 })
+    + text(310, 228, 'worker', { width: 69, anchor: 'middle', weight: 700 });
+  for (const [row, [field, label]] of fields.entries()) {
+    const vertical = 291 + row * 87;
+    const compatible = picture.restored[field] === picture.committed[field];
+    body += text(20, vertical + 6, label, { width: 162, weight: 700 })
+      + circle(225, vertical, 24, 'input') + text(225, vertical + 6, picture.committed[field], { width: 42, anchor: 'middle', weight: 700 })
+      + line(253, vertical, 282, vertical, compatible ? 'output' : 'warning', !compatible)
+      + circle(310, vertical, 24, compatible ? 'output' : 'warning') + text(310, vertical + 6, picture.restored[field], { width: 42, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 812, 'Stop: matching model v4 does not repair optimizer v3. A partial checkpoint cannot pass either.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 955, 'Choose recovery from evidence', { width: 320, weight: 700 });
+  const cases = [
+    ['Transport retry', 'Only proven idempotent work with no committed update may be retried.', 'retry', 'output'],
+    ['Alive but slow', 'Measure compute, storage latency and collective wait; diagnose the straggler rather than calling it dead.', 'trace', 'state'],
+    ['Missing or divergent rank', 'Abort the affected group and restore a complete compatible bundle unless elastic semantics are proven.', 'load', 'input'],
+    ['Suspected corruption', 'Preserve mismatches and checksums. Isolate or roll back before admitting further updates.', 'hold', 'warning'],
+  ];
+  for (const [index, [heading, detail, action, tone]] of cases.entries()) {
+    const vertical = 1081 + index * 257;
+    body += text(20, vertical, heading, { width: 205, weight: 700 })
+      + text(20, vertical + 64, detail, { width: 205 })
+      + arrowBetween([239, vertical + 60], [275, vertical + 60], tone, tools, 3)
+      + circle(310, vertical + 60, 25, tone) + text(310, vertical + 66, action, { width: 44, anchor: 'middle', size: 13, weight: 700 });
+  }
+  body += text(20, 2073, 'Changed membership must also preserve batch, optimizer and parallel-layout semantics; record the experiment lineage.', { width: 320, tone: 'soft' });
+  return { body, height: 2180 };
+}
+
 function evidenceChain(picture, model, tools) {
   const { text, circle, line } = tools;
   let body = text(20, 27, 'Known evidence stops where observation stops', { width: 320, weight: 700 });
   for (const [stage, state] of picture.states.entries()) {
     const vertical = 135 + stage * 133;
     const verified = state === 'verified';
-    body += circle(58, vertical, 21, verified ? 'output' : 'neutral') + text(58, vertical + 6, verified ? '+' : '?', { width: 38, anchor: 'middle', size: 22, weight: 700 })
+    body += circle(58, vertical, 21, verified ? 'output' : 'neutral') + text(58, vertical + 6, verified ? '\u2713' : '?', { width: 38, anchor: 'middle', size: 22, weight: 700 })
       + text(113, vertical + 6, picture.labels[stage], { width: 226, weight: 700, tone: verified ? 'output' : 'soft' });
     if (stage) body += line(58, vertical - 109, 58, vertical - 27, verified ? 'output' : 'warning', !verified);
   }
   body += text(20, 135 + picture.states.length * 133, 'Unknown is not a pass, a zero, or a completed proof.', { width: 320, tone: 'soft' });
   return { body, height: 212 + picture.states.length * 133 };
+}
+
+function policyExposureAndMaturity(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  assert(picture.earlyPositive < picture.maturePositive && picture.maturePositive < picture.count);
+  const cohorts = [
+    Array.from({ length: picture.count }, (_, identity) => identity < picture.earlyPositive ? 'positive' : 'pending'),
+    Array.from({ length: picture.count }, (_, identity) => identity < picture.maturePositive ? 'positive' : 'negative'),
+  ];
+  assert.deepEqual(cohorts.map(rows => rows.filter(value => value === 'positive').length), [2, 10]);
+  assert.equal(cohorts[0].filter(value => value === 'pending').length, 98);
+  assert.equal(cohorts[1].filter(value => value === 'negative').length, 90);
+  assert.equal(cohorts[0].filter((value, identity) => value === 'pending' && cohorts[1][identity] === 'positive').length, 8);
+  let body = text(20, 27, 'The revealing action controls which outcomes can arrive', { width: 320, weight: 700 });
+  body += `<rect x="75" y="115" width="210" height="57" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + text(180, 149, 'Model and policy P1', { width: 191, anchor: 'middle', weight: 700 })
+    + arrowBetween([155, 185], [82, 250], 'output', tools, 2) + arrowBetween([205, 185], [278, 250], 'warning', tools, 2)
+    + circle(65, 283, 25, 'output') + text(65, 289, 'go', { width: 43, anchor: 'middle', weight: 700 })
+    + circle(295, 283, 25, 'warning') + text(295, 289, 'stop', { width: 43, anchor: 'middle', weight: 700 })
+    + text(20, 351, '100 approved; complete follow-up', { width: 146, weight: 700 })
+    + text(210, 351, 'Blocked: approval outcome unknown', { width: 130, weight: 700, tone: 'warning' });
+  for (const [stage, cohort] of cohorts.entries()) {
+    const vertical = 510 + stage * 310;
+    body += text(20, vertical - 65, stage ? `Day ${picture.window}: the same approved identities` : 'Day one: known events plus pending cases', { width: 320, weight: 700 });
+    for (const [identity, state] of cohort.entries()) {
+      const tone = state === 'positive' ? 'output' : state === 'negative' ? 'input' : 'neutral';
+      body += `<g data-picture-policy-cohort="${stage}" data-picture-policy-identity="${identity}" data-picture-policy-state="${state}">${circle(30 + identity % 20 * 15.5, vertical + Math.floor(identity / 20) * 15.5, 4, tone, true)}</g>`;
+    }
+    body += text(20, vertical + 120, stage ? 'Ten positives; ninety mature negatives.' : 'Two known positives; ninety-eight pending.', { width: 320, weight: 700 });
+  }
+  body += text(20, 1042, 'Eight eventual positives were pending, not negative, on day one.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1145, 'Separate state gate for other records', { width: 320, weight: 700 });
+  const states = observedLabels(picture, model, tools);
+  body += `<g transform="translate(0 1220)">${states.body}</g>`;
+  body += text(20, 2075, 'Selected mature labels train the successor', { width: 320, weight: 700 });
+  for (const [index, label] of ['data', 'M2', 'P2'].entries()) {
+    const horizontal = 55 + index * 125;
+    body += circle(horizontal, 2200, 24, index ? 'input' : 'output') + text(horizontal, 2206, label, { width: 43, anchor: 'middle', weight: 700 });
+    if (index) body += arrowBetween([horizontal - 92, 2200], [horizontal - 33, 2200], 'input', tools, 2);
+  }
+  body += arrowBetween([305, 2233], [305, 2302], 'input', tools, 2)
+    + `<rect x="75" y="2330" width="265" height="62" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + text(208, 2355, 'Future revealing actions', { width: 244, anchor: 'middle', weight: 700 })
+    + text(20, 2485, 'Next exposure changes next labels. Selected-cohort loss cannot establish risk for blocked cases.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 2585 };
 }
 
 function observedLabels(picture, model, tools) {
@@ -4618,16 +7647,43 @@ function compareSwapOwner(picture, model, tools) {
 
 function idempotentReceipt(picture, model, tools) {
   const { text, circle, line } = tools;
-  let body = text(20, 27, 'Same key, one account effect, one retained receipt', { width: 320, weight: 700 });
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const vertical = 163 + attempt * 248;
-    body += text(20, vertical - 65, attempt ? 'Reconcile after losing the reply' : 'Authorized dispatch commits once', { width: 320, weight: 700 })
-      + circle(68, vertical, 28, 'input') + text(68, vertical + 6, 'key K', { width: 50, anchor: 'middle', size: 14, weight: 700 })
-      + arrowBetween([102, vertical], [248, vertical], attempt ? 'output' : 'input', tools, 3)
-      + circle(284, vertical, 28, 'output') + text(284, vertical + 6, 'R1', { width: 50, anchor: 'middle', weight: 700 })
-      + text(20, vertical + 96, attempt ? 'Return original receipt R1; no new payment.' : 'Account effect one; receipt R1 persists.', { width: 320, weight: 700, tone: 'output' });
+  const committed = { call: picture.call, key: picture.key, credit: picture.credit, receipt: 'R1' };
+  const lookup = (key, credit) => key === committed.key && credit === committed.credit ? committed : undefined;
+  assert.equal(picture.credit, 50);
+  assert.equal(lookup(picture.key, picture.credit), committed);
+  assert.equal(lookup(picture.key, picture.credit * 2), undefined);
+  assert.equal(lookup('different-key', picture.credit), undefined);
+  assert.equal(new Set([lookup(picture.key, picture.credit), lookup(picture.key, picture.credit)]).size, 1);
+  let body = text(20, 27, 'Control: a proposal does not widen the grant', { width: 320, weight: 700 })
+    + text(20, 104, 'Allowed: credit fifty, exact account and region.', { width: 320, tone: 'input' })
+    + circle(60, 190, 27, 'input') + text(60, 196, 'ask', { width: 46, anchor: 'middle', weight: 700 })
+    + arrowBetween([91, 190], [147, 190], 'input', tools, 3)
+    + circle(180, 190, 27, 'output') + text(180, 196, 'grant', { width: 48, anchor: 'middle', size: 14, weight: 700 })
+    + arrowBetween([213, 190], [267, 190], 'output', tools, 3)
+    + circle(300, 190, 27, 'output') + text(300, 196, 'save', { width: 48, anchor: 'middle', size: 14, weight: 700 })
+    + text(20, 265, 'Persist exact authorization before sending.', { width: 320, weight: 700, tone: 'output' })
+    + circle(60, 367, 27, 'input') + text(60, 373, 'ask', { width: 48, anchor: 'middle', size: 14, weight: 700 })
+    + arrowBetween([91, 367], [147, 367], 'input', tools, 3)
+    + circle(180, 367, 27, 'warning') + text(180, 373, 'stop', { width: 48, anchor: 'middle', size: 14, weight: 700 })
+    + line(213, 367, 267, 367, 'warning', true)
+    + circle(300, 367, 27, 'neutral') + text(300, 373, 'tool', { width: 48, anchor: 'middle', size: 14 })
+    + text(20, 444, 'Uploaded text cannot authorize a broader export. Nothing is dispatched on this route.', { width: 320, tone: 'warning' })
+    + text(20, 568, 'Execution: one durable logical credit', { width: 320, weight: 700 });
+  const events = [
+    ['Saved authorization', 'Logical call C, key K, exact credit fifty. Not sent yet.', 'input'],
+    ['Dispatched; response lost', 'Durable state: outcome unknown. The account may already contain the credit.', 'warning'],
+    ['Replacement worker resumes', 'With current lookup authority, reconcile original key K. Do not create another credit.', 'state'],
+    ['Evidence: authoritative receipt R1', 'One fifty-unit credit exists. Finish the original logical call; retain its receipt.', 'output'],
+  ];
+  for (const [event, [heading, detail, tone]] of events.entries()) {
+    const vertical = 699 + event * 236;
+    if (event) body += arrowBetween([60, vertical - 202], [60, vertical - 35], 'state', tools, 3);
+    body += circle(60, vertical, 27, tone) + text(60, vertical + 6, event + 1, { width: 46, anchor: 'middle', weight: 700 })
+      + text(110, vertical - 9, heading, { width: 230, weight: 700, tone })
+      + text(110, vertical + 71, detail, { width: 230 });
   }
-  return { body, height: 570 };
+  body += text(20, 1614, 'No downstream deduplication and lookup? Keep the effect unknown; no automatic retry.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1710 };
 }
 
 function retainedEvidence(picture, model, tools) {
@@ -4670,19 +7726,78 @@ function persistentRefreshing(picture, model, tools) {
 
 function nodeReassignment(picture, model, tools) {
   const { text, circle, line } = tools;
-  let body = text(20, 27, 'Reassign the same eight instantaneous nodes', { width: 320, weight: 700 });
-  for (const [stage, owners] of [picture.before, picture.after].entries()) {
-    const vertical = 143 + stage * 261;
-    body += text(20, vertical - 51, stage ? 'Serving pressure: checkpoint, pause, reclaim' : 'Six serving nodes and two offline nodes', { width: 320, weight: 700 });
+  const after = picture.before.map((owner, index) => index === 15 ? 'X' : owner);
+  const allocation = owners => ['S', 'T', 'P', 'E', 'R'].map(owner => owners.filter(value => value === owner).length * picture.acceleratorsPerNode);
+  assert.deepEqual(allocation(picture.before), [64, 24, 8, 16, 16]);
+  assert.deepEqual(allocation(after), [64, 24, 8, 16, 8]);
+  assert.equal(allocation(after).reduce((sum, count) => sum + count, 0), 120);
+  assert.equal(allocation(after).slice(0, -1).reduce((sum, count) => sum + count, 0), 112);
+  const mayReclaim = state => state.checkpointed && state.paused;
+  assert(!mayReclaim({ checkpointed: true, paused: false }));
+  assert(mayReclaim({ checkpointed: true, paused: true }));
+  let body = text(20, 27, 'One physical ledger; reserve is not free offline capacity', { width: 320, weight: 700 })
+    + text(20, 103, 'Each numbered node holds eight accelerators.', { width: 320 });
+  for (const [stage, owners] of [picture.before, after].entries()) {
+    const vertical = 204 + stage * 480;
+    body += text(20, vertical - 58, stage ? 'Same identities; reserve node 16 is lost' : 'Sixteen nodes; 128 accelerators', { width: 320, weight: 700 });
     for (const [node, owner] of owners.entries()) {
-      const horizontal = 56 + node % 4 * 82;
-      const row = vertical + Math.floor(node / 4) * 83;
-      body += `<g data-picture-node-member="${node}" data-picture-stage="${stage}">${circle(horizontal, row, 26, owner === 'S' ? 'input' : 'warning')}${text(horizontal, row + 6, owner, { width: 44, anchor: 'middle', weight: 700 })}</g>`;
+      const horizontal = 53 + node % 4 * 84;
+      const row = vertical + Math.floor(node / 4) * 64;
+      const tone = owner === 'X' ? 'warning' : owner === 'R' ? 'output' : owner === 'S' ? 'input' : 'focus';
+      body += `<g data-picture-node-member="${node}" data-picture-stage="${stage}">${circle(horizontal, row, 25, tone)}${text(horizontal, row + 5, `${node + 1}${owner}`, { width: 45, anchor: 'middle', size: 14, weight: 700 })}</g>`;
     }
+    body += text(20, vertical + 251, 'S serving 64; T training 24; P post-training 8; E evaluation/verifiers 16', { width: 320 })
+      + text(20, vertical + 328, stage ? 'R reserve 8; physical total 120' : 'R reserve 16; physical total 128', { width: 320, weight: 700, tone: 'output' });
   }
-  assert.equal(picture.before.length, picture.after.length);
-  body += text(20, 600, 'No ninth node was created; two owners changed.', { width: 320, tone: 'soft' });
-  return { body, height: 662 };
+  body += text(20, 1085, 'Serving disrupted or placement incompatible?', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1158, 'Checkpoint and pause offline work', { width: 320, weight: 700 })
+    + arrowBetween([180, 1196], [180, 1236], 'warning', tools)
+    + text(20, 1270, 'Reclaim safely; restore the online floor', { width: 320, weight: 700 })
+    + text(20, 1370, 'Four candidates add generation, verifier, and queue work. Measure benefit and node-loss headroom before admission.', { width: 320 })
+    + text(20, 1480, 'A ledger is not throughput, latency, or universal-verifier proof.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1570 };
+}
+
+function diagnosticOrderAndDelivery(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  assert.equal(picture.delivered + picture.fallback, picture.assigned);
+  const combined = picture.deliveredSuccess + picture.fallbackSuccess;
+  const conditional = picture.deliveredSuccess / picture.delivered;
+  assert.equal(conditional, .82);
+  assert.equal(combined, 778);
+  assert.equal(combined / picture.assigned, .778);
+  assert(conditional > picture.controlSuccess / picture.assigned && combined < picture.controlSuccess);
+  const bar = (count, success, vertical, tone) => `<rect data-picture-diagnostic-count="${count}" x="20" y="${vertical}" width="${count / picture.assigned * 320}" height="47" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1.5"></rect>`
+    + `<rect data-picture-diagnostic-success="${success}" x="20" y="${vertical}" width="${success / picture.assigned * 320}" height="47" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+  let body = text(20, 27, 'Contain harm and retain evidence; check in this order', { width: 320, weight: 700 });
+  const checks = [
+    ['1. Valid observation?', 'Assignment, denominators, instrumentation, label maturity'],
+    ['2. Actual delivery?', 'Replay model, feature and candidate versions; inspect latency and fallback'],
+    ['3. Product effect?', 'After checks pass, test one model or feedback hypothesis'],
+  ];
+  for (const [index, [label, detail]] of checks.entries()) {
+    const vertical = 151 + index * 220;
+    body += circle(47, vertical, 22, 'neutral') + text(47, vertical + 6, '?', { width: 37, anchor: 'middle', weight: 700 })
+      + text(101, vertical - 30, label, { width: 239, weight: 700 })
+      + text(101, vertical + 25, detail, { width: 239 });
+    if (index < checks.length - 1) body += arrowBetween([47, vertical + 32], [47, vertical + 180], 'neutral', tools, 2);
+  }
+  body += text(20, 775, 'Exact delivery toy: one common thousand-user scale', { width: 320, weight: 700 })
+    + text(20, 872, 'A: 800 successes among 1,000 assigned', { width: 320, weight: 700 })
+    + bar(picture.assigned, picture.controlSuccess, 943, 'input')
+    + text(20, 1055, 'B\'s routing branches still contain every assigned user', { width: 320, weight: 700 })
+    + text(20, 1155, '900 delivered: 738 successes; 82% conditional rate', { width: 320, weight: 700 })
+    + bar(picture.delivered, picture.deliveredSuccess, 1232, 'output')
+    + text(20, 1345, '100 fallback: 40 successes; 40% conditional rate', { width: 320, weight: 700 })
+    + bar(picture.fallback, picture.fallbackSuccess, 1422, 'focus')
+    + text(20, 1537, 'Merge successes, but keep the original 1,000-user denominator', { width: 320, weight: 700 });
+  body += `<rect x="20" y="1655" width="320" height="47" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1.5"></rect>`
+    + `<rect x="20" y="1655" width="${picture.deliveredSuccess / picture.assigned * 320}" height="47" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+    + `<rect x="${20 + picture.deliveredSuccess / picture.assigned * 320}" y="1655" width="${picture.fallbackSuccess / picture.assigned * 320}" height="47" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`
+    + text(20, 1780, 'B: 778 of 1,000; 77.8% versus A\'s 80.0%', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1878, 'The delivered-only comparison discards routing-selected users. It cannot prove a causal model improvement.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 2014, 'Join fallback reasons to latency and version records. A repair still needs controlled product measurement.', { width: 320, weight: 700 });
+  return { body, height: 2120 };
 }
 
 function assignmentMembership(picture, model, tools) {
@@ -4800,6 +7915,46 @@ function clockAfterBoundary(picture, model, tools) {
   return { body, height: 216 + picture.events.length * 120 };
 }
 
+function annRoutingAndCompression(picture, model, tools) {
+  const { text, circle, color, fill, number } = tools;
+  const distances = picture.graph.map(point => Math.hypot(...point));
+  assert(distances[0] > distances[1] && distances[1] > distances[2]);
+  const position = point => [45 + point[0] * 85, 190 + point[1] * 80];
+  let body = text(20, 27, 'HNSW: visit linked candidates nearer the query', { width: 320, weight: 700 })
+    + text(20, 97, 'A short graph-search example, not a recall guarantee', { width: 320, size: 14 })
+    + circle(45, 190, 12, 'focus') + text(45, 196, 'Q', { width: 20, anchor: 'middle', size: 14, weight: 700 });
+  for (const [index, point] of picture.graph.entries()) {
+    const center = position(point);
+    if (index) body += arrowBetween(position(picture.graph[index - 1]), center, 'input', tools, 2);
+    body += circle(...center, 9, index === 2 ? 'output' : 'input', true)
+      + text(center[0], center[1] + 46, ['C', 'B', 'A'][2 - index], { width: 42, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 342, `Query distances: ${distances.map(number).join(', ')}`, { width: 320, size: 14 })
+    + `<g transform="translate(0 423)">${unscannedPartition(picture, model, tools).body}</g>`
+    + text(20, 1054, 'PQ: split the vector into two coordinate slices', { width: 320, weight: 700 });
+  const codes = [];
+  const reconstructed = [];
+  for (let chunk = 0; chunk < 2; chunk++) {
+    const values = picture.vector.slice(chunk * 2, chunk * 2 + 2);
+    const errors = picture.codebook.map(choice => choice.reduce((sum, value, coordinate) => sum + (value - values[coordinate]) ** 2, 0));
+    const code = errors.indexOf(Math.min(...errors));
+    codes.push(code);
+    reconstructed.push(...picture.codebook[code]);
+    const horizontal = 30 + chunk * 175;
+    for (const [coordinate, value] of values.entries()) body += `<rect x="${horizontal + coordinate * 70}" y="1150" width="65" height="50" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + text(horizontal + coordinate * 70 + 32, 1183, value, { width: 55, anchor: 'middle', weight: 700 });
+    body += arrowBetween([horizontal + 65, 1210], [horizontal + 65, 1320], 'output', tools)
+      + `<g data-picture-pq-chunk="${chunk}" data-picture-pq-code="${code}" data-picture-pq-error="${errors[code]}">${circle(horizontal + 65, 1356, 27, 'output')}${text(horizontal + 65, 1362, `code ${code}`, { width: 51, anchor: 'middle', size: 14, weight: 700 })}</g>`;
+  }
+  assert.deepEqual(codes, [0, 1]);
+  assert.deepEqual(reconstructed, [0, 1, 2, 1]);
+  assert(Math.abs(reconstructed.reduce((sum, value, coordinate) => sum + (value - picture.vector[coordinate]) ** 2, 0) - .16) < 1e-12);
+  body += text(20, 1440, 'Shared codebook: code 0 holds (0,1); code 1 holds (2,1)', { width: 320, size: 14 })
+    + text(20, 1540, `Reconstructed coordinates: ${reconstructed.join(', ')}`, { width: 320, weight: 700 })
+    + text(20, 1615, 'Two stored choices replace four coordinates; the shared codebook also consumes memory.', { width: 320, tone: 'soft' });
+  return { body, height: 1710 };
+}
+
 function unscannedPartition(picture, model, tools) {
   const { text, circle, line, color, fill } = tools;
   let body = text(20, 27, 'A scan route reaches members, not excluded partitions', { width: 320, weight: 700 });
@@ -4875,6 +8030,37 @@ function memoryRoundtrip(picture, model, tools) {
   return { body, height: 656 };
 }
 
+function scalingExpertsAndFusion(picture, model, tools) {
+  const { text, color, fill, circle } = tools;
+  assert(picture.budgets.every(([width, tokens]) => width * tokens === picture.work));
+  assert.equal(picture.experts, 4);
+  assert.deepEqual(picture.active, [1]);
+  let body = text(20, 27, 'Fixed dense work trades model width for tokens', { width: 320, weight: 700 })
+    + text(20, 89, 'Width: model units. Height: token units.', { width: 320 });
+  for (const [budget, [width, tokens]] of picture.budgets.entries()) {
+    const vertical = 170 + budget * 260;
+    body += text(20, vertical - 27, `Model units ${width}; token units ${tokens}`, { width: 320, weight: 700 });
+    for (let token = 0; token < tokens; token++) for (let coordinate = 0; coordinate < width; coordinate++) {
+      body += `<rect x="${20 + coordinate * 20}" y="${vertical + token * 20}" width="20" height="20" data-picture-scaling-budget="${budget}" data-picture-scaling-work-member="${token * width + coordinate}" style="fill:${fill(['input', 'focus', 'output'][budget])};stroke:${color(['input', 'focus', 'output'][budget])};stroke-width:1"></rect>`;
+    }
+  }
+  body += text(20, 759, 'Each rectangle contains the same 16 work tiles', { width: 320, tone: 'soft' })
+    + text(20, 860, 'MoE: store four experts; select one for this token', { width: 320, weight: 700 })
+    + circle(180, 950, 30, 'input') + text(180, 956, 'token', { width: 56, anchor: 'middle', weight: 700 });
+  for (let expert = 0; expert < picture.experts; expert++) {
+    const horizontal = 18 + expert * 86;
+    const selected = picture.active.includes(expert);
+    body += `<rect x="${horizontal}" y="1020" width="62" height="68" data-picture-moe-stored-expert="${expert}" data-picture-moe-active-expert="${selected}" style="fill:${fill(selected ? 'output' : 'neutral')};stroke:${color(selected ? 'output' : 'neutral')};stroke-width:${selected ? 2.5 : 1.5}"></rect>`
+      + text(horizontal + 31, 1062, `E${expert + 1}`, { width: 54, anchor: 'middle', weight: 700 });
+    if (selected) body += arrowBetween([180, 983], [horizontal + 31, 1012], 'output', tools, 2);
+  }
+  const fusion = memoryRoundtrip(picture, model, tools);
+  body += text(20, 1135, 'Only E2 executes for this token', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1200, 'All four experts still occupy storage', { width: 320, tone: 'soft' })
+    + `<g transform="translate(0 1270)">${fusion.body}</g>`;
+  return { body, height: fusion.height + 1270 };
+}
+
 function complementBeforeStore(picture, model, tools) {
   const { text, circle, line } = tools;
   let body = text(20, 27, 'Query the earlier complement before storing this index', { width: 320, weight: 700 })
@@ -4886,6 +8072,43 @@ function complementBeforeStore(picture, model, tools) {
     + text(20, 420, 'Return distinct original indices (1,2).', { width: 320, weight: 700, tone: 'output' })
     + text(20, 508, 'The current position cannot serve as its own earlier match.', { width: 320, tone: 'soft' });
   return { body, height: 572 };
+}
+
+function moderationReviewAndAppeal(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const region = picture.boundaries.filter(boundary => picture.score >= boundary).length;
+  assert.equal(picture.actions[region], 'review');
+  let body = text(20, 27, 'One content item; prediction and policy stay separate', { width: 320, weight: 700 });
+  body += circle(65, 150, 27, 'input') + text(65, 156, 'C1', { width: 46, anchor: 'middle', weight: 700 })
+    + arrowBetween([101, 150], [254, 150], 'input', tools, 2)
+    + circle(290, 150, 27, 'input') + text(290, 156, 'M7', { width: 46, anchor: 'middle', weight: 700 })
+    + text(20, 224, 'Content', { width: 135, weight: 700 }) + text(218, 224, 'Model scores', { width: 122, weight: 700 })
+    + text(20, 316, 'Declared P7 maps this score; it does not inherit model authority.', { width: 320, weight: 700 });
+  const band = policyRegion(picture, model, tools);
+  body += `<g transform="translate(0 420)">${band.body}</g>`;
+  const stages = [
+    { label: 'Review C1', detail: 'Human applies P7. If capacity is unavailable, defer under an explicit policy.', tone: 'state' },
+    { label: 'Authorized action on C1', detail: 'Apply the decision and reason; log model, policy and review versions.', tone: 'output' },
+    { label: 'Optional appeal for C1', detail: 'A requested appeal reaches senior reviewers; nonappealers are not represented here.', tone: 'focus' },
+    { label: 'Adjudicate under a version', detail: 'Uphold or correct the action; retain the decision and correction history.', tone: 'state' },
+    { label: 'Audited labels and outcomes', detail: 'Check label quality and representative samples, not just the selected appeal queue.', tone: 'input' },
+  ];
+  for (const [index, stage] of stages.entries()) {
+    const vertical = 1010 + index * 260;
+    body += `<rect x="45" y="${vertical}" width="270" height="54" style="fill:${fill(stage.tone)};stroke:${color(stage.tone)};stroke-width:1.5"></rect>`
+      + text(180, vertical + 33, stage.label, { width: 246, anchor: 'middle', weight: 700 })
+      + text(45, vertical + 121, stage.detail, { width: 270 });
+    if (index) body += arrowBetween([180, vertical - 80], [180, vertical - 22], stage.tone, tools, 2);
+  }
+  body += arrowBetween([180, 902], [180, 988], 'state', tools, 2)
+    + `<path d="M326 1297H341V2076H326" style="fill:none;stroke:${color('neutral')};stroke-width:1.5;stroke-dasharray:4 3"></path>`
+    + text(20, 2295, 'Without an appeal, the logged action still enters observation and representative audit.', { width: 320, weight: 700 });
+  body += text(20, 2423, 'Versioned review evidence can train the next model', { width: 320, weight: 700 })
+    + circle(65, 2555, 25, 'input') + text(65, 2561, 'data', { width: 43, anchor: 'middle', weight: 700 })
+    + arrowBetween([98, 2555], [262, 2555], 'input', tools, 2)
+    + circle(295, 2555, 25, 'output') + text(295, 2561, 'M8', { width: 43, anchor: 'middle', weight: 700 })
+    + text(20, 2662, 'New scores still meet explicit policy. Check slices, capacity and evasion on held-out evidence.', { width: 320, weight: 700 });
+  return { body, height: 2770 };
 }
 
 function policyRegion(picture, model, tools) {
@@ -4919,6 +8142,48 @@ function matchedComparison(picture, model, tools) {
   return { body, height: 713 };
 }
 
+function rotateStructuredFolds(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const folds = picture.groups.map((heldOut, fold) => ({ heldOut, training: picture.groups.flatMap((group, index) => index === fold ? [] : group) }));
+  assert.deepEqual(folds.flatMap(fold => fold.heldOut), picture.groups.flat());
+  assert(folds.every(fold => fold.heldOut.every(record => !fold.training.includes(record))));
+  const mean = picture.losses.reduce((sum, value) => sum + value, 0) / folds.length;
+  assert.equal(mean, 5);
+  let body = text(20, 27, 'Rotate complete groups, not their individual records', { width: 320, weight: 700 });
+  for (const [fold, data] of folds.entries()) {
+    const vertical = 140 + fold * 230;
+    body += text(20, vertical - 35, `Fold ${fold + 1}: one held-out group`, { width: 320, weight: 700 })
+      + text(282, vertical + 24, 'loss', { width: 55 });
+    for (const [group, records] of picture.groups.entries()) {
+      const tone = group === fold ? 'output' : 'input';
+      const horizontal = 20 + group * 85;
+      body += `<rect x="${horizontal}" y="${vertical}" width="64" height="120" data-picture-crossvalidation-fold="${fold}" data-picture-crossvalidation-group="${group}" data-picture-crossvalidation-held="${group === fold}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(horizontal + 32, vertical + 29, group === fold ? 'hold' : 'fit', { width: 55, anchor: 'middle', weight: 700, tone });
+      for (const [member, record] of records.entries()) body += text(horizontal + 32, vertical + 67 + member * 34, record, { width: 55, anchor: 'middle', weight: 700 });
+    }
+    body += text(282, vertical + 76, picture.losses[fold], { width: 55, weight: 700 });
+  }
+  body += text(20, 800, 'Mean held-out loss: 5', { width: 320, weight: 700 })
+    + text(20, 870, 'Toy loss units. Refit transforms and model within each fold.', { width: 320 })
+    + text(20, 970, 'A different claim: predict later periods from earlier ones', { width: 320, weight: 700 });
+  for (const [split, boundary] of picture.timeBoundaries.entries()) {
+    const vertical = 1080 + split * 180;
+    body += text(20, vertical - 43, split ? 'First four fit; fifth is held out' : 'First three fit; fourth is held out', { width: 320, weight: 700 });
+    const training = Array.from({ length: boundary }, (unused, index) => index);
+    assert(training.every(index => index < boundary));
+    for (let time = 0; time < picture.timePoints; time++) {
+      const tone = time < boundary ? 'input' : time === boundary ? 'output' : 'neutral';
+      body += `<rect x="${20 + time * 54}" y="${vertical}" width="44" height="44" data-picture-crossvalidation-time="${time}" data-picture-crossvalidation-time-split="${split}" data-picture-crossvalidation-time-role="${time < boundary ? 'train' : time === boundary ? 'held' : 'future'}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(42 + time * 54, vertical + 28, time + 1, { width: 37, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 1350, 'Blue fits; green evaluates; gray is future. No later point trains an earlier fold.', { width: 320 })
+    + text(20, 1450, 'Separate user-boundary illustration', { width: 320, weight: 700 });
+  const grouping = groupCut(picture, model, tools);
+  body += `<g transform="translate(0 1510)">${grouping.body}</g>`;
+  return { body, height: 1510 + grouping.height };
+}
+
 function groupCut(picture, model, tools) {
   const { text, circle, line } = tools;
   let body = text(20, 27, 'The held-out boundary must respect user identity', { width: 320, weight: 700 });
@@ -4928,6 +8193,43 @@ function groupCut(picture, model, tools) {
     for (let row = 0; row < 3; row++) body += circle(64 + row * 116, vertical, 25, !stage && row === 1 ? 'warning' : 'input') + text(64 + row * 116, vertical + 6, 'A', { width: 44, anchor: 'middle', weight: 700 }) + text(64 + row * 116, vertical + 82, !stage && row === 1 ? 'test' : 'train', { width: 94, anchor: 'middle', size: 17, weight: 700 });
   }
   return { body, height: 553 };
+}
+
+function measuredDensityNeighborhoods(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const neighbors = picture.points.map(point => picture.points.flatMap((other, index) => Math.hypot(point.xy[0] - other.xy[0], point.xy[1] - other.xy[1]) <= picture.radius + 1e-12 ? [index] : []));
+  const counts = neighbors.map(members => members.length);
+  const core = counts.map(count => count >= picture.minimum);
+  assert.deepEqual(counts, [5, 4, 4, 4, 2, 1]);
+  assert(core[0] && !core[4] && !core[5]);
+  assert(neighbors[0].includes(4) && !neighbors[4].includes(5));
+  const selected = [0, 4, 5];
+  const roles = ['Core', 'Border', 'Noise'];
+  let body = text(20, 27, 'Same points, same radius; different expansion roles', { width: 320, weight: 700 });
+  for (const [view, focus] of selected.entries()) {
+    const offset = view * 430;
+    const position = point => [100 + point.xy[0] * 65, 240 + offset - point.xy[1] * 65];
+    const center = position(picture.points[focus]);
+    const tone = ['input', 'focus', 'warning'][view];
+    body += text(20, 104 + offset, `Count around ${picture.points[focus].name}; minimum 4 includes self`, { width: 320, weight: 700 })
+      + `<circle cx="${center[0]}" cy="${center[1]}" r="${picture.radius * 65}" data-picture-dbscan-radius="${picture.radius}" data-picture-dbscan-focus="${focus}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5;stroke-dasharray:4 3"></circle>`;
+    for (const [pointIndex, point] of picture.points.entries()) {
+      const pointPosition = position(point);
+      const pointTone = core[pointIndex] ? 'input' : pointIndex === 4 ? 'focus' : 'warning';
+      const labelPosition = pointIndex === 0 ? [pointPosition[0], pointPosition[1] - 18] : pointIndex === 1 ? [pointPosition[0] - 19, pointPosition[1] + 6] : pointIndex === 2 ? [pointPosition[0], pointPosition[1] - 18] : pointIndex === 3 ? [pointPosition[0], pointPosition[1] + 25] : [pointPosition[0] + 21, pointPosition[1] + 6];
+      body += `<g data-picture-dbscan-point="${pointIndex}" data-picture-dbscan-view="${view}">${circle(...pointPosition, 5, pointTone, true)}${text(...labelPosition, point.name, { width: 20, anchor: 'middle', weight: 700, tone: pointTone })}</g>`;
+    }
+    body += text(20, 359 + offset, `${picture.points[focus].name}: ${counts[focus]} ${counts[focus] === 1 ? 'neighbor' : 'neighbors'}. ${roles[view]}.`, { width: 320, weight: 700, tone });
+  }
+  body += text(20, 1320, 'Core expansion reaches E, but E cannot continue to F', { width: 320, weight: 700 });
+  for (const [index, focus] of selected.entries()) body += circle(65 + index * 115, 1410, 24, ['input', 'focus', 'warning'][index])
+    + text(65 + index * 115, 1416, picture.points[focus].name, { width: 42, anchor: 'middle', weight: 700 });
+  body += arrowBetween([101, 1410], [144, 1410], 'input', tools, 2)
+    + line(215, 1410, 242, 1410, 'warning', true)
+    + line(246, 1398, 270, 1422, 'warning') + line(270, 1398, 246, 1422, 'warning')
+    + text(20, 1510, 'Among D, E, and F, only D expands. A, B, and C are also core.', { width: 320 })
+    + text(20, 1615, 'Reachability gives E membership, not expansion authority.', { width: 320, weight: 700 });
+  return { body, height: 1705 };
 }
 
 function coreBorderSource(picture, model, tools) {
@@ -4965,6 +8267,42 @@ function alternativeWhole(picture, model, tools) {
   return { body, height: 537 };
 }
 
+function labelMixtureAndLocalSplit(picture, model, tools) {
+  const { text, circle, line, color } = tools;
+  const mixture = points => {
+    if (!points.length) return 0;
+    const positive = points.filter(point => point.label === 1).length / points.length;
+    return 1 - positive ** 2 - (1 - positive) ** 2;
+  };
+  const tests = [point => point.xy[0] > 0, point => point.xy[1] > 1];
+  const scores = tests.map(test => [false, true].reduce((sum, outcome) => {
+    const child = picture.points.filter(point => test(point) === outcome);
+    return sum + child.length / picture.points.length * mixture(child);
+  }, 0));
+  assert.equal(mixture(picture.points), .375);
+  assert(Math.abs(scores[0] - .25) < 1e-12 && Math.abs(scores[1] - .3) < 1e-12);
+  assert(scores[0] < scores[1]);
+  const leaves = [picture.points.filter(point => point.xy[0] <= 0), picture.points.filter(point => point.xy[0] > 0 && point.xy[1] <= 1), picture.points.filter(point => point.xy[0] > 0 && point.xy[1] > 1)];
+  assert.deepEqual(leaves.map(mixture), [0, 0, 0]);
+  assert.equal(leaves.flat().length, picture.points.length);
+  let body = text(20, 27, 'Compare useful splits before naming leaf regions', { width: 320, weight: 700 })
+    + text(20, 100, 'Before any split: label mixture 0.375', { width: 320, weight: 700 })
+    + text(20, 165, 'Blue: label 0. Orange: label 1. Same eight points.', { width: 320 });
+  for (const [candidate, score] of scores.entries()) {
+    const offset = candidate * 470;
+    body += text(20, 235 + offset, candidate ? 'Candidate: low or high position' : 'Candidate: left or right position', { width: 320, weight: 700 })
+      + `<rect x="45" y="${275 + offset}" width="270" height="180" style="fill:none;stroke:${color('neutral')};stroke-width:1.5"></rect>`;
+    body += candidate ? line(45, 365 + offset, 315, 365 + offset, 'state') : line(180, 275 + offset, 180, 455 + offset, 'state');
+    for (const [pointIndex, point] of picture.points.entries()) body += `<g data-picture-tree-candidate="${candidate}" data-picture-tree-point="${pointIndex}" data-picture-tree-label="${point.label}">${circle(180 + point.xy[0] * 135, 365 + offset - (point.xy[1] - 1) * 90, 6, point.label ? 'focus' : 'input', true)}</g>`;
+    body += text(20, 510 + offset, `Weighted child mixture: ${score.toFixed(3)}`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1050, 'The left/right split leaves less mixture in this fixture.', { width: 320, weight: 700 })
+    + text(20, 1145, 'Split the right child again. All three final leaves are pure here.', { width: 320 });
+  const regions = conditionalSpatialCut(picture, model, tools);
+  body += `<g transform="translate(0 1220)">${regions.body}</g>`;
+  return { body, height: 1220 + regions.height };
+}
+
 function conditionalSpatialCut(picture, model, tools) {
   const { text, color, fill, line } = tools;
   let body = text(20, 27, 'The second split exists only inside the right root branch', { width: 320, weight: 700 });
@@ -4976,6 +8314,56 @@ function conditionalSpatialCut(picture, model, tools) {
   return { body, height: 604 };
 }
 
+function pinnedWorkAndDeveloperApply(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  assert.deepEqual(picture.allowed, [false, false, false, true]);
+  const matches = (state, target) => ['repository', 'revision', 'overlay'].every(key => state[key] === target[key]);
+  const oldArtifact = { state: picture.original, checksPassed: true, checksIntact: true, textApplies: true };
+  const newArtifact = { ...oldArtifact, state: picture.current };
+  const canApply = (artifact, accepted, authorized) => matches(artifact.state, picture.current) && artifact.checksPassed && artifact.checksIntact && accepted && authorized;
+  assert(!matches(oldArtifact.state, picture.current));
+  assert(!canApply(oldArtifact, true, true));
+  assert(!canApply(newArtifact, false, true) && !canApply(newArtifact, true, false));
+  assert(!canApply({ ...newArtifact, checksIntact: false }, true, true));
+  assert(canApply(newArtifact, true, true));
+  const modes = authorityRails(picture, model, tools);
+  let body = modes.body;
+  body += text(20, 855, 'One agent request: repository R, revision r1, overlay o7', { width: 320, weight: 700 });
+  body += `<rect x="45" y="955" width="270" height="59" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+    + text(180, 981, 'Isolated bounded work', { width: 245, anchor: 'middle', weight: 700 })
+    + text(20, 1087, 'Declared edit/test permissions and action budget; no authority from retrieved repository text.', { width: 320, weight: 700 })
+    + arrowBetween([180, 1150], [180, 1209], 'input', tools, 2)
+    + `<rect x="20" y="1250" width="145" height="72" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+    + text(93, 1277, 'Patch: r1, o7', { width: 126, anchor: 'middle', weight: 700 })
+    + text(93, 1304, 'Checks pass', { width: 126, anchor: 'middle', weight: 700 })
+    + `<rect x="205" y="1250" width="135" height="72" style="fill:${fill('warning')};stroke:${color('warning')};stroke-width:1.5"></rect>`
+    + text(273, 1277, 'Target', { width: 119, anchor: 'middle', weight: 700 })
+    + text(273, 1304, 'r2, o8', { width: 119, anchor: 'middle', weight: 700 });
+  body += line(174, 1286, 195, 1286, 'warning', true)
+    + text(20, 1408, 'Text may apply cleanly; old tests still describe the old state.', { width: 320, weight: 700, tone: 'warning' })
+    + line(180, 1481, 180, 1551, 'warning', true)
+    + line(166, 1502, 194, 1530, 'warning') + line(194, 1502, 166, 1530, 'warning')
+    + text(20, 1607, 'Do not apply as a validated current artifact.', { width: 320, weight: 700, tone: 'warning' });
+  const stages = [
+    ['Reconcile in authorized workspace', 'Rebase or regenerate against r2/o8; preserve the task and API contract.'],
+    ['Rerun independent checks', 'Keep assertions intact and attach results to the reconciled artifact.'],
+    ['Return current diff and evidence', 'Current repository, revision, overlay and residual risks remain visible.'],
+  ];
+  for (const [index, [label, detail]] of stages.entries()) {
+    const vertical = 1740 + index * 250;
+    body += `<rect x="45" y="${vertical}" width="270" height="64" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + text(180, vertical + 26, label, { width: 246, anchor: 'middle', weight: 700 })
+      + text(45, vertical + 127, detail, { width: 270 });
+    if (index) body += arrowBetween([180, vertical - 62], [180, vertical - 18], 'input', tools, 2);
+  }
+  body += text(20, 2500, 'Developer acceptance is a separate gate', { width: 320, weight: 700 })
+    + circle(70, 2614, 27, 'state') + text(70, 2620, 'user', { width: 47, anchor: 'middle', weight: 700 })
+    + arrowBetween([107, 2614], [253, 2614], 'state', tools, 2)
+    + circle(290, 2614, 27, 'output') + text(290, 2620, 'apply', { width: 47, anchor: 'middle', weight: 700 })
+    + text(20, 2730, 'Current checks plus acceptance permit the declared apply action, not an unapproved merge or publication.', { width: 320, weight: 700 });
+  return { body, height: 2840 };
+}
+
 function authorityRails(picture, model, tools) {
   const { text, circle, line } = tools;
   let body = text(20, 27, 'Context access and tool authority are independent routes', { width: 320, weight: 700 });
@@ -4984,66 +8372,785 @@ function authorityRails(picture, model, tools) {
     body += text(20, vertical + 7, label, { width: 99, weight: 700 }) + circle(161, vertical, 23, 'input') + text(161, vertical + 6, 'repo', { width: 40, anchor: 'middle', size: 14, weight: 700 });
     const allowed = picture.allowed[mode];
     body += allowed ? arrowBetween([190, vertical], [270, vertical], 'output', tools, 3) : line(190, vertical, 253, vertical, 'warning', true);
-    body += circle(300, vertical, 22, allowed ? 'output' : 'neutral') + text(300, vertical + 6, allowed ? '+' : 'x', { width: 37, anchor: 'middle', weight: 700 });
+    body += circle(300, vertical, 22, allowed ? 'output' : 'neutral') + text(300, vertical + 6, allowed ? '\u2713' : 'x', { width: 37, anchor: 'middle', weight: 700 });
   }
   return { body, height: 209 + picture.labels.length * 138 };
 }
 
-function availabilityBefore(picture, model, tools) {
-  const { text, circle, line } = tools;
-  const horizontal = hour => 40 + (hour - 11) / 1.25 * 280;
-  let body = text(20, 27, 'Only available versions cross into the noon lookup', { width: 320, weight: 700 });
-  const events = [[11 + 5 / 60, 'A available 11:05', true], [11 + 50 / 60, 'B event 11:50; not yet available', false], [12 + 10 / 60, 'B available 12:10; after the lookup', false]];
-  for (const [row, [time, label, available]] of events.entries()) {
-    const vertical = 145 + row * 149;
-    body += line(40, vertical, 320, vertical) + line(horizontal(12), vertical - 25, horizontal(12), vertical + 28, 'focus', true) + circle(horizontal(time), vertical, 7, available ? 'output' : 'warning', true) + text(20, vertical + 68, label, { width: 320, weight: 700 });
+function kvAdmissionAndMixedIteration(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const required = picture.promptPages + picture.generationPages;
+  const free = picture.pages.filter(owner => owner === '-').length;
+  assert.equal(picture.promptPages, Math.ceil(picture.promptTokens / picture.tokensPerPage));
+  assert.equal(required, 4);
+  assert.equal(free, 3);
+  assert(required > free);
+  const cancellationRequested = [...picture.pages];
+  assert.deepEqual(cancellationRequested, picture.pages);
+  const released = picture.pages.map(owner => owner === 'B' ? '-' : owner);
+  assert.equal(released.filter(owner => owner === '-').length, 7);
+  let admitted = 0;
+  const active = released.map(owner => owner === '-' && admitted < required ? (admitted++, 'C') : owner);
+  assert.equal(admitted, required);
+  assert.equal(active.filter(owner => owner === 'A').length, 5);
+  assert.equal(active.filter(owner => owner === 'C').length, 4);
+  assert.equal(active.filter(owner => owner === '-').length, 3);
+  const firstWork = ['D', ...Array(picture.promptTokens).fill('P')];
+  while (firstWork.length < picture.workBudget) firstWork.push('-');
+  const secondWork = ['D', 'D', ...Array(picture.workBudget - 2).fill('-')];
+  assert.equal(firstWork.length, picture.workBudget);
+  assert.equal(secondWork.length, picture.workBudget);
+  assert.equal(firstWork.filter(work => work === 'P').length, 6);
+  assert.equal(secondWork.filter(work => work === '-').length, 6);
+  assert.equal(active.filter(owner => owner !== '-').length, 9);
+  const inventory = (values, top, pageMode) => values.map((value, index) => {
+    const left = 26 + index % 4 * 80;
+    const vertical = top + Math.floor(index / 4) * 55;
+    const tone = value === '-' ? 'neutral' : value === 'B' ? 'warning' : value === 'C' || value === 'P' ? 'state' : 'input';
+    return `<rect x="${left}" y="${vertical}" width="66" height="40" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+      + text(left + 33, vertical + 26, value === '-' ? pageMode ? 'free' : 'idle' : value, { width: 58, anchor: 'middle', weight: 700 });
+  }).join('');
+  let body = text(20, 27, 'Admission needs cache, not just free work slots', { width: 320, weight: 700 })
+    + text(20, 117, 'Toy: twelve pages; two tokens per page', { width: 320, weight: 700 })
+    + inventory(picture.pages, 190, true)
+    + text(20, 411, 'C: three prompt pages and one bounded generation page. Four needed; three free. Queue C.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 555, 'Cancel B requested: keep its four pages until the executor confirms stop.', { width: 320, weight: 700 })
+    + text(20, 681, 'B stopped: seven free; reserve four for C', { width: 320, weight: 700 })
+    + inventory(active, 757, true)
+    + text(20, 979, 'Iteration one: A decodes; C prefills six prompt tokens', { width: 320, weight: 700 })
+    + inventory(firstWork, 1064, false)
+    + text(20, 1221, 'Iteration two: A and C decode; six work slots idle', { width: 320, weight: 700 })
+    + inventory(secondWork, 1306, false)
+    + text(20, 1463, 'D: one decode token. P: one prefill token. Eight slots reset each iteration.', { width: 320 })
+    + text(20, 1581, 'A and C still reserve nine pages. Idle compute does not release them; output uses the reserved growth allowance.', { width: 320, weight: 700 })
+    + text(20, 1720, 'Fair admission also checks tenant quotas, queue deadlines and the request latency class.', { width: 320 });
+  return { body, height: 1840 };
+}
+
+function episodeEvidenceAndPolicyGrade(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const trajectories = [
+    { account: 'A', resolved: true, quality: .9 },
+    { account: 'B', resolved: true, quality: 1 },
+  ];
+  const grade = trajectory => {
+    const policy = trajectory.account === 'A';
+    return { task: trajectory.resolved, policy, quality: policy ? trajectory.quality : null, eligible: policy && trajectory.resolved };
+  };
+  assert.deepEqual(grade(trajectories[0]), { task: true, policy: true, quality: .9, eligible: true });
+  assert.deepEqual(grade(trajectories[1]), { task: true, policy: false, quality: null, eligible: false });
+  assert.equal(grade({ ...trajectories[1], quality: 100 }).eligible, false);
+  const trainingFamilies = new Set(['reset', 'billing']);
+  const heldOutFamilies = ['ambiguous state', 'new tool contract'];
+  assert(heldOutFamilies.every(family => !trainingFamilies.has(family)));
+  let body = text(20, 27, 'Contained environment E3; ticket T7', { width: 320, weight: 700 })
+    + text(20, 107, 'User permits account A only. Keep tool schema, reset state and terminal rules reproducible.', { width: 320, weight: 700 });
+  for (const [index, trajectory] of trajectories.entries()) {
+    const vertical = 301 + index * 340;
+    const result = grade(trajectory);
+    const tone = result.policy ? 'output' : 'warning';
+    body += circle(71, vertical, 32, tone)
+      + text(71, vertical + 6, `read ${trajectory.account}`, { width: 57, anchor: 'middle', weight: 700 })
+      + arrowBetween([113, vertical], [239, vertical], tone, tools, 2)
+      + circle(280, vertical, 31, 'output')
+      + text(280, vertical + 6, 'done', { width: 54, anchor: 'middle', weight: 700 })
+      + text(20, vertical + 91, 'Task resolved; preserve action and final-state evidence', { width: 320, weight: 700 })
+      + text(20, vertical + 183, result.policy ? 'Policy passes. Quality and communication can now be scored.' : 'Policy fails. Higher quality cannot buy eligibility.', { width: 320, weight: 700, tone });
   }
-  body += text(20, 636, 'Noon returns A. Event time alone cannot admit B.', { width: 320, weight: 700, tone: 'output' });
-  return { body, height: 704 };
+  body += text(20, 976, 'Structured grade, not one opaque reward', { width: 320, weight: 700 });
+  const headers = ['task', 'policy', 'quality'];
+  for (const [column, label] of headers.entries()) {
+    const center = 64 + column * 115;
+    body += text(center, 1053, label, { width: 99, anchor: 'middle', weight: 700 });
+    for (let row = 0; row < 2; row++) {
+      const top = 1087 + row * 68;
+      const value = column === 0 ? 'pass' : column === 1 ? row ? 'fail' : 'pass' : row ? 'ineligible' : 'judge';
+      const tone = row && column ? 'warning' : 'output';
+      body += `<rect x="${center - 49}" y="${top}" width="98" height="42" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+        + text(center, top + 27, value, { width: 88, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 1275, 'Keep expert, verified, failed and contrastive trajectories with explicit evidence labels.', { width: 320, weight: 700 })
+    + text(20, 1400, 'Training families: reset and billing', { width: 320, weight: 700 })
+    + line(20, 1460, 340, 1460, 'warning', true)
+    + text(20, 1520, 'Held out: new states and tool contracts. Independent task, policy and exploitation checks.', { width: 320, weight: 700 })
+    + text(20, 1650, 'Calibrate semantic graders against blinded human and adversarial cases; do not train on held-out answers.', { width: 320 });
+  return { body, height: 1770 };
+}
+
+function publicationPromotionRecovery(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const run = { version: 0, artifact: null };
+  const publish = (artifact, expected) => {
+    if (run.version !== expected) return false;
+    run.artifact = artifact;
+    run.version++;
+    return true;
+  };
+  assert(publish('A', 0));
+  assert(!publish('B', 0));
+  assert.deepEqual(run, { version: 1, artifact: 'A' });
+  const operations = new Map();
+  const deploy = (key, argumentsValue, authorized = true, evidenceValid = true) => {
+    if (!authorized || !evidenceValid) return null;
+    const binding = JSON.stringify(argumentsValue);
+    if (operations.has(key)) return operations.get(key).binding === binding ? operations.get(key).identity : null;
+    operations.set(key, { binding, identity: 'D1' });
+    return 'D1';
+  };
+  const argumentsValue = { artifact: 'A', target: 'canary' };
+  assert.equal(deploy('K', argumentsValue), 'D1');
+  assert.equal(deploy('K', argumentsValue), 'D1');
+  assert.equal(deploy('K', { ...argumentsValue, artifact: 'B' }), null);
+  assert.equal(deploy('other', argumentsValue, false), null);
+  assert.equal(deploy('other', argumentsValue, true, false), null);
+  assert.equal(operations.size, 1);
+  const canMutate = (epoch, version, metadataAvailable) => metadataAvailable && epoch === 8 && version === 2;
+  assert(!canMutate(7, 2, true));
+  assert(!canMutate(8, 1, true));
+  assert(!canMutate(8, 2, false));
+  assert(canMutate(8, 2, true));
+  let body = text(20, 27, 'One logical run R; existing executors stay', { width: 320, weight: 700 });
+  for (const [index, identity] of ['A', 'B'].entries()) {
+    const left = 20 + index * 177;
+    body += `<rect x="${left}" y="124" width="143" height="104" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.75"></rect>`
+      + text(left + 71.5, 159, `Attempt ${identity}`, { width: 126, anchor: 'middle', weight: 700 })
+      + text(left + 71.5, 196, 'Private artifact', { width: 126, anchor: 'middle' });
+  }
+  body += text(20, 309, 'A publishes first with expected version zero', { width: 320, weight: 700 })
+    + circle(76, 407, 29, 'input') + text(76, 413, 'A', { width: 50, anchor: 'middle', weight: 700 })
+    + arrowBetween([115, 407], [237, 407], 'output', tools, 2)
+    + circle(277, 407, 30, 'output') + text(277, 413, 'v1', { width: 52, anchor: 'middle', weight: 700 })
+    + text(20, 489, 'Shared R now publishes artifact A at version one', { width: 320, weight: 700 })
+    + circle(76, 595, 29, 'warning') + text(76, 601, 'B', { width: 50, anchor: 'middle', weight: 700 })
+    + line(115, 595, 237, 595, 'warning', true)
+    + line(164, 580, 186, 610, 'warning') + line(186, 580, 164, 610, 'warning')
+    + circle(277, 595, 30, 'output') + text(277, 601, 'A', { width: 52, anchor: 'middle', weight: 700 })
+    + text(20, 681, 'B still expects zero: rejected. Keep its private artifact and cost evidence.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 810, 'Authorized deployment: key K, artifact A, canary', { width: 320, weight: 700 });
+  const requests = [['first K', 'D1', 'output'], ['same K', 'D1', 'output'], ['K for B', 'stop', 'warning']];
+  for (const [index, [request, result, tone]] of requests.entries()) {
+    const vertical = 920 + index * 105;
+    body += text(20, vertical + 6, request, { width: 150, weight: 700 })
+      + arrowBetween([165, vertical], [239, vertical], tone, tools, 2)
+      + circle(278, vertical, 28, tone)
+      + text(278, vertical + 6, result, { width: 49, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1237, 'Metadata loss: keep approved serving state; freeze unverifiable promotion.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1370, 'Recovered writer: epoch eight, desired version two', { width: 320, weight: 700 })
+    + text(20, 1480, 'Reject old epoch seven and stale desired version one at the mutation boundary.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1615, 'Incomplete lineage stays incomplete. An older rollback also needs current compatibility and approval.', { width: 320 });
+  return { body, height: 1735 };
+}
+
+function monitoringEvidenceAndCoverage(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  const missing = picture.eligible - picture.joined;
+  const wrong = picture.joined - picture.correct;
+  const lower = picture.correct / picture.eligible;
+  const upper = (picture.correct + missing) / picture.eligible;
+  assert(picture.age > picture.maximumAge);
+  assert.equal(picture.correct / picture.joined, .9);
+  assert.equal(picture.joined / picture.eligible, .9);
+  assert.equal(lower, .81);
+  assert.equal(upper, .91);
+  assert.equal(wrong, 90);
+  assert.equal(missing, 100);
+  const couldAllMissOneSlice = missing <= 100;
+  assert(couldAllMissOneSlice);
+  let body = text(20, 27, 'At noon: distinct facts need distinct responses', { width: 320, weight: 700 });
+  for (const [index, [label, result, tone]] of [
+    ['Endpoint', 'Meets service objectives', 'output'],
+    ['Features', 'Snapshot from 11:40', 'warning'],
+    ['Scores', 'Distribution changed', 'state'],
+  ].entries()) {
+    const vertical = 153 + index * 110;
+    body += circle(51, vertical, 24, tone)
+      + text(51, vertical + 6, index === 1 ? '!' : index === 2 ? '?' : 'ok', { width: 41, anchor: 'middle', weight: 700 })
+      + text(96, vertical - 12, label, { width: 240, weight: 700 })
+      + text(96, vertical + 20, result, { width: 240 });
+  }
+  body += text(20, 465, 'Age 20 minutes; allowed maximum 2', { width: 320, weight: 700 });
+  for (const [index, value] of [picture.maximumAge, picture.age].entries()) {
+    const vertical = 524 + index * 60;
+    body += `<rect x="40" y="${vertical}" width="${value / picture.age * 280}" height="23" style="fill:${fill(index ? 'warning' : 'output')};stroke:${color(index ? 'warning' : 'output')};stroke-width:1.75"></rect>`
+      + text(40, vertical + 48, index ? 'Observed age' : 'Contract limit', { width: 280 });
+  }
+  body += text(20, 710, 'Data owner repairs freshness. Use a validated fallback; save versions, actions and exposure.', { width: 320, weight: 700 })
+    + text(20, 837, 'Quality for this cohort waits seven days', { width: 320, weight: 700 })
+    + line(45, 933, 315, 933, 'state')
+    + circle(45, 933, 6, 'input', true) + circle(315, 933, 6, 'state', true)
+    + text(45, 972, 'Day 0', { width: 75 }) + text(315, 972, 'Day 7', { width: 75, anchor: 'end' })
+    + text(20, 1052, 'Then: 1000 eligible; 900 joined; 810 correct', { width: 320, weight: 700 });
+  for (let index = 0; index < picture.eligible / 10; index++) {
+    const tone = index < picture.correct / 10 ? 'output' : index < picture.joined / 10 ? 'warning' : 'neutral';
+    body += circle(89 + index % 10 * 20, 1140 + Math.floor(index / 10) * 18, 5, tone, tone !== 'neutral');
+  }
+  body += text(20, 1370, 'Each dot: ten records. Green correct; red wrong; hollow missing joins.', { width: 320 })
+    + text(20, 1484, 'Joined accuracy 90%; join coverage 90%', { width: 320, weight: 700 })
+    + text(20, 1581, `Full-cohort bounds: ${number(lower * 100)} to ${number(upper * 100)} percent. Check missingness by slice before claiming recovery.`, { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1700 };
+}
+
+function assignmentToLaunchEvidence(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  const assigned = Array.from({ length: picture.assigned }, (_, index) => ({ identity: index, exposed: index < picture.exposed }));
+  assert.equal(assigned.filter(user => user.exposed).length, 30);
+  assert.equal(new Set(assigned.map(user => user.identity)).size, 100);
+  const decision = (interval, valid, harm) => {
+    if (!valid) return 'invalid';
+    if (harm) return 'stop harm';
+    if (interval[1] < picture.worthwhile) return 'too small';
+    if (interval[0] <= picture.worthwhile) return 'inconclusive';
+    return 'gain rule cleared';
+  };
+  assert.equal(decision(picture.intervals[0], true, false), 'too small');
+  assert.equal(decision(picture.intervals[1], true, true), 'stop harm');
+  assert.equal(decision(picture.intervals[2], true, false), 'inconclusive');
+  assert.equal(decision(picture.intervals[1], false, false), 'invalid');
+  assert.equal(decision(picture.intervals[1], true, false), 'gain rule cleared');
+  const horizontal = value => 40 + value / 2 * 280;
+  let body = text(20, 27, 'Stable user assignment; separate actual exposure', { width: 320, weight: 700 })
+    + text(20, 111, 'Illustrative treatment: 100 assigned users', { width: 320, weight: 700 });
+  for (const [index, user] of assigned.entries()) {
+    body += circle(89 + index % 10 * 20, 164 + Math.floor(index / 10) * 18, 5, user.exposed ? 'input' : 'neutral', user.exposed);
+  }
+  body += text(20, 377, '30 colored users saw the model; all 100 remain assigned. Color is exposure, not success.', { width: 320, weight: 700 })
+    + text(20, 493, 'First check assignment ratio, logs, interference and the committed readout.', { width: 320 })
+    + text(20, 602, 'Toy rule: full interval above one point; harm limits must also pass', { width: 320, weight: 700 });
+  const details = ['A: positive, but too small', 'B: gain rule cleared; safety still separate', 'C: worthwhile effect remains uncertain'];
+  for (const [index, interval] of picture.intervals.entries()) {
+    const vertical = 785 + index * 235;
+    const tone = index === 1 ? 'output' : 'warning';
+    body += text(20, vertical - 77, details[index], { width: 320, weight: 700 })
+      + text(20, vertical - 33, `Illustrative interval: ${number(interval[0])} to ${number(interval[1])} points`, { width: 320 })
+      + line(horizontal(0), vertical + 22, horizontal(2), vertical + 22)
+      + line(horizontal(1), vertical - 8, horizontal(1), vertical + 48, 'focus', true)
+      + `<rect x="${horizontal(interval[0])}" y="${vertical + 15}" width="${horizontal(interval[1]) - horizontal(interval[0])}" height="14" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`;
+    for (const value of [0, 1, 2]) body += text(horizontal(value), vertical + 81, value, { width: 50, anchor: 'middle', tone: value === 1 ? 'focus' : 'text' });
+  }
+  body += text(20, 1398, 'B still stops if its declared safety or latency limit fails.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1509, 'Invalid evidence stops all three. Otherwise ship, iterate, stop or continue by the predeclared rule.', { width: 320, weight: 700 });
+  return { body, height: 1620 };
+}
+
+function ownedAdaptiveSecurityLoop(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const mayRelease = (paths, utility, residualApproval) => utility && residualApproval && paths.every(path => path.blocked === true);
+  assert(!mayRelease(picture.paths, true, true));
+  const allRetested = picture.paths.map(path => ({ ...path, blocked: true }));
+  assert(mayRelease(allRetested, true, true));
+  assert(!mayRelease(allRetested, false, true));
+  assert(!mayRelease(allRetested, true, false));
+  assert(!mayRelease([{ blocked: false }], true, true));
+  let body = text(20, 27, 'Evaluate the whole authorized action system', { width: 320, weight: 700 })
+    + text(20, 104, 'Synthetic accounts and data; declared test budget; containment and stop conditions', { width: 320, weight: 700 });
+  const stages = [
+    ['scope', 'Name assets, attacker powers, trust boundaries and unacceptable effects.'],
+    ['repro', 'Save the exact action and state evidence; record severity and attempt budget.'],
+    ['fix', 'Assign an owner; strengthen action authorization, not just response wording.'],
+    ['retest', 'Rerun the finding, adaptive variants and legitimate workflows under the fixed system.'],
+  ];
+  for (const [index, [label, detail]] of stages.entries()) {
+    const vertical = 301 + index * 190;
+    body += circle(54, vertical, 31, index === 2 ? 'output' : 'input')
+      + text(54, vertical + 6, label, { width: 54, anchor: 'middle', weight: 700 })
+      + text(105, vertical - 12, detail, { width: 232 });
+    if (index) body += arrowBetween([54, vertical - 152], [54, vertical - 42], 'input', tools, 2);
+  }
+  body += text(20, 1024, 'Post-fix evidence; not one aggregate success rate', { width: 320, weight: 700 });
+  for (const [index, path] of picture.paths.entries()) {
+    const vertical = 1130 + index * 105;
+    body += text(20, vertical + 5, path.name, { width: 220, weight: 700 })
+      + circle(291, vertical, 27, path.blocked === true ? 'output' : 'neutral')
+      + text(291, vertical + 6, path.blocked === true ? 'stop' : '?', { width: 47, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1441, 'Release held: two paths lack results. False refusals and task utility need their own checks.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1581, 'Production evidence updates scope; saved cases become static regressions.', { width: 320, weight: 700 })
+    + line(180, 1640, 350, 1640, 'state')
+    + line(350, 1640, 350, 223, 'state')
+    + line(350, 223, 54, 223, 'state')
+    + arrowBetween([54, 223], [54, 259], 'state', tools, 2);
+  return { body, height: 1690 };
+}
+
+function fraudLossAndLabels(picture, model, tools) {
+  const { text, circle, line, color, fill, number } = tools;
+  const cases = picture.risks.map(risk => ({ risk, allow: risk * picture.fraudLoss, decline: (1 - risk) * picture.legitimateDeclineLoss }));
+  assert(Math.abs(cases[0].allow - 2) < 1e-12 && Math.abs(cases[0].decline - 2.94) < 1e-12);
+  assert(Math.abs(cases[1].allow - 10) < 1e-12 && Math.abs(cases[1].decline - 2.7) < 1e-12);
+  assert(cases[0].allow < cases[0].decline && cases[1].allow > cases[1].decline);
+  const observedLabel = outcome => outcome.action === 'allow' && outcome.mature && outcome.reported !== null ? Number(outcome.reported) : null;
+  assert.equal(observedLabel({ action: 'allow', mature: true, reported: true }), 1);
+  assert.equal(observedLabel({ action: 'allow', mature: true, reported: false }), 0);
+  assert.equal(observedLabel({ action: 'allow', mature: false, reported: false }), null);
+  assert.equal(observedLabel({ action: 'decline', mature: true, reported: false }), null);
+  assert.equal(observedLabel({ action: 'challenge', mature: true, reported: false }), null);
+  let body = text(20, 27, 'Compare action losses before selecting exposure', { width: 320, weight: 700 })
+    + text(20, 100, 'Toy losses; suitable calibrated probabilities assumed', { width: 320 });
+  for (const [index, example] of cases.entries()) {
+    const vertical = 211 + index * 308;
+    body += text(20, vertical - 44, `Risk ${number(example.risk * 100)} percent`, { width: 320, weight: 700 });
+    for (const [actionIndex, [action, loss]] of [['allow', example.allow], ['decline', example.decline]].entries()) {
+      const top = vertical + actionIndex * 81;
+      const best = loss === Math.min(example.allow, example.decline);
+      body += text(20, top + 20, action, { width: 76, weight: 700 })
+        + line(105, top + 13, 332, top + 13)
+        + `<rect x="105" y="${top}" width="${loss / 10 * 227}" height="26" style="fill:${fill(best ? 'output' : 'warning')};stroke:${color(best ? 'output' : 'warning')};stroke-width:1.75"></rect>`
+        + text(105, top + 55, number(loss), { width: 75, weight: 700, tone: best ? 'output' : 'warning' });
+    }
+    body += text(20, vertical + 191, `Lower expected loss: ${example.allow < example.decline ? 'allow' : 'decline'}`, { width: 320, weight: 700, tone: 'output' });
+  }
+  body += text(20, 784, 'Same loss scale: zero to ten currency units', { width: 320 })
+    + text(20, 876, 'Save decision D7, policy P2 and feature snapshot F3 at the decision cutoff', { width: 320, weight: 700 })
+    + circle(61, 1080, 34, 'input')
+    + text(61, 1086, 'allow', { width: 60, anchor: 'middle', weight: 700 });
+  const outcomes = [
+    ['Mature report: observed positive', 1002, 'output'],
+    ['Mature no report: defined negative, not proven legitimate', 1104, 'output'],
+    ['Pending: unknown, not negative', 1224, 'warning'],
+  ];
+  for (const [label, vertical, tone] of outcomes) {
+    body += arrowBetween([103, 1080], [137, vertical - 5], tone, tools, 2)
+      + text(153, vertical, label, { width: 185, weight: 700, tone });
+  }
+  body += circle(61, 1361, 34, 'warning')
+    + text(61, 1367, 'decline', { width: 62, anchor: 'middle', weight: 700 })
+    + arrowBetween([103, 1361], [137, 1361], 'warning', tools, 2)
+    + text(153, 1345, 'No observed allowed-payment outcome', { width: 185, weight: 700, tone: 'warning' })
+    + text(20, 1473, 'Challenge: save pass, failure or abandonment and its final action. Failure alone does not prove fraud.', { width: 320, weight: 700 })
+    + text(20, 1612, 'More declines change label coverage. Audits need explicit sampling and support assumptions.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1720 };
+}
+
+function permissionedLineageRelease(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const descendants = new Set(['S17']);
+  const pending = ['S17'];
+  for (const artifact of pending) {
+    for (const [source, target] of picture.edges) {
+      if (source !== artifact || descendants.has(target)) continue;
+      descendants.add(target);
+      pending.push(target);
+    }
+  }
+  assert.deepEqual([...descendants], ['S17', 'R7', 'P4', 'T8', 'M12', 'C4', 'R1']);
+  const original = JSON.stringify(picture.manifests.M12);
+  const mayRelease = sources => sources.every(source => picture.approvedSources.includes(source));
+  assert(!mayRelease(picture.manifests.M12));
+  assert(mayRelease(picture.manifests.M13));
+  const renamedShard = { name: 'new filename', sources: ['S17'], content: 'same T8 bytes' };
+  assert(!mayRelease(renamedShard.sources));
+  assert.equal(JSON.stringify(picture.manifests.M12), original);
+  let body = text(20, 27, 'Follow dependencies, then check current permission', { width: 320, weight: 700 })
+    + circle(180, 129, 30, 'input')
+    + text(180, 135, 'S17', { width: 52, anchor: 'middle', weight: 700 })
+    + text(20, 205, 'Source to raw, parsed, and token artifacts', { width: 320, weight: 700 });
+  const columns = [60, 180, 300];
+  for (const [index, identity] of ['R7', 'P4', 'T8'].entries()) {
+    const center = columns[index];
+    body += `<rect x="${center - 39}" y="270" width="78" height="50" style="fill:${fill('state')};stroke:${color('state')};stroke-width:1.75"></rect>`
+      + text(center, 301, identity, { width: 64, anchor: 'middle', weight: 700 });
+    if (index) body += arrowBetween([columns[index - 1] + 45, 295], [center - 45, 295], 'state', tools, 2);
+  }
+  body += line(180, 166, 180, 178, 'input')
+    + line(10, 180, 10, 295, 'input')
+    + arrowBetween([10, 295], [15, 295], 'input', tools, 2)
+    + line(180, 180, 10, 180, 'input')
+    + arrowBetween([300, 330], [180, 399], 'state', tools, 2)
+    + circle(180, 440, 32, 'state')
+    + text(180, 446, 'M12', { width: 55, anchor: 'middle', weight: 700 })
+    + text(232, 414, 'Immutable; includes S17', { width: 107, weight: 700 })
+    + arrowBetween([161, 480], [80, 591], 'state', tools, 2)
+    + circle(80, 631, 29, 'state') + text(80, 637, 'C4', { width: 50, anchor: 'middle', weight: 700 })
+    + arrowBetween([119, 631], [240, 631], 'state', tools, 2)
+    + circle(280, 631, 29, 'state') + text(280, 637, 'R1', { width: 50, anchor: 'middle', weight: 700 })
+    + text(80, 704, 'Checkpoint', { width: 135, anchor: 'middle' })
+    + text(280, 704, 'Released model', { width: 135, anchor: 'middle' })
+    + text(20, 795, 'Now: S17 training permission withdrawn', { width: 320, weight: 700, tone: 'warning' })
+    + circle(80, 900, 29, 'state') + text(80, 906, 'M12', { width: 50, anchor: 'middle', weight: 700 })
+    + line(118, 900, 242, 900, 'warning', true)
+    + line(169, 884, 191, 916, 'warning') + line(191, 884, 169, 916, 'warning')
+    + circle(280, 900, 29, 'warning') + text(280, 906, 'stop', { width: 50, anchor: 'middle', weight: 700 })
+    + text(20, 980, 'New affected release blocked; M12 stays historical', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1085, 'New M13 excludes S17; verify all current gates', { width: 320, weight: 700 })
+    + circle(80, 1185, 29, 'output') + text(80, 1191, 'M13', { width: 50, anchor: 'middle', weight: 700 })
+    + arrowBetween([119, 1185], [240, 1185], 'output', tools, 2)
+    + circle(280, 1185, 29, 'output') + text(280, 1191, 'new', { width: 50, anchor: 'middle', weight: 700 })
+    + text(20, 1275, 'Existing C4 and R1 need a separate owned response. Exclusion is not certified forgetting.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1395 };
+}
+
+function availabilityBefore(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const lookup = (versions, minute, definition = picture.definition) => versions
+    .filter(version => version.entity === picture.entity && version.definition === definition && version.event <= minute && version.available <= minute)
+    .sort((left, right) => right.event - left.event)[0];
+  const noon = lookup(picture.versions, 720);
+  const current = lookup(picture.versions, 735);
+  const backfilled = [...picture.versions, picture.backfill];
+  assert.equal(noon.identity, 'A');
+  assert.equal(noon.value, 3);
+  assert.equal(current.identity, 'B');
+  assert.equal(current.value, 8);
+  assert.equal(lookup(backfilled, 720).identity, noon.identity);
+  assert.equal(lookup(backfilled, 735).identity, current.identity);
+  assert.equal(lookup(backfilled, 745).identity, 'C');
+  assert.equal(lookup(picture.versions, 735, 'D4'), undefined);
+  assert.equal(lookup(picture.versions.map(version => ({ ...version, entity: 'other' })), 735), undefined);
+  const clock = minute => `${Math.floor(minute / 60)}:${String(minute % 60).padStart(2, '0')}`;
+  const horizontal = minute => 40 + (minute - 660) / 75 * 280;
+  let body = text(20, 27, 'One definition; two read contracts', { width: 320, weight: 700 })
+    + text(20, 91, `Entity ${picture.entity}; feature definition ${picture.definition}`, { width: 320, weight: 700 })
+    + `<rect x="40" y="139" width="280" height="58" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.75"></rect>`
+    + text(180, 174, 'Shared feature computation', { width: 260, anchor: 'middle', weight: 700 })
+    + arrowBetween([160, 207], [92, 276], 'input', tools, 2)
+    + arrowBetween([200, 207], [268, 276], 'input', tools, 2);
+  for (const [index, title] of ['Online', 'History'].entries()) {
+    const left = 20 + index * 177;
+    body += `<rect x="${left}" y="293" width="143" height="101" style="fill:${fill(index ? 'state' : 'output')};stroke:${color(index ? 'state' : 'output')};stroke-width:1.75"></rect>`
+      + text(left + 71.5, 321, title, { width: 127, anchor: 'middle', weight: 700 })
+      + text(left + 71.5, 355, index ? 'A and B kept' : 'Latest ready', { width: 127, anchor: 'middle' });
+  }
+  body += text(20, 446, 'Both clocks decide eligibility', { width: 320, weight: 700 });
+  for (const [index, version] of picture.versions.entries()) {
+    const vertical = 570 + index * 210;
+    const tone = version.available <= 720 ? 'output' : 'warning';
+    body += text(20, vertical - 58, `${version.identity}: value ${version.value}; definition ${version.definition}`, { width: 320, weight: 700 })
+      + line(40, vertical, 320, vertical)
+      + line(horizontal(720), vertical - 22, horizontal(720), vertical + 24, 'focus', true)
+      + text(horizontal(720), vertical - 33, 'noon', { width: 64, anchor: 'middle', tone: 'focus' })
+      + circle(horizontal(version.event), vertical, 6, 'input')
+      + circle(horizontal(version.available), vertical, 6, tone, true)
+      + text(20, vertical + 57, `Event ${clock(version.event)}; ready ${clock(version.available)}`, { width: 320 });
+  }
+  for (const [index, [online, replay]] of [[noon, noon], [current, noon]].entries()) {
+    const vertical = 958 + index * 218;
+    body += text(20, vertical - 65, index ? 'At 12:15; replay still asks about noon' : 'At noon; both reads use A', { width: 320, weight: 700 });
+    for (const [column, version] of [online, replay].entries()) {
+      const center = 94 + column * 172;
+      body += text(center, vertical - 9, column ? 'Noon replay' : 'Online now', { width: 148, anchor: 'middle', weight: 700 })
+        + circle(center, vertical + 48, 29, version.identity === 'A' ? 'output' : 'state')
+        + text(center, vertical + 54, `${version.identity}: ${version.value}`, { width: 51, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 1316, 'C arrives at 12:20; event was 11:55', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1393, 'A noon replay still uses A. Current reads may advance; the past cutoff does not.', { width: 320, weight: 700 });
+  return { body, height: 1480 };
 }
 
 function sharedSupplyReturn(picture, model, tools) {
-  const { text, circle } = tools;
-  let body = text(20, 27, 'One shared supply response returns to both cells', { width: 320, weight: 700 });
-  for (let cell = 0; cell < 2; cell++) body += circle(90 + cell * 180, 147, 27, cell ? 'state' : 'input') + text(90 + cell * 180, 153, cell ? 'C' : 'T', { width: 46, anchor: 'middle', weight: 700 }) + arrowBetween([90 + cell * 180, 180], [180, 280], cell ? 'state' : 'input', tools, 3);
-  body += circle(180, 323, 43, 'focus') + text(180, 329, 'creators', { width: 76, anchor: 'middle', size: 14, weight: 700 });
-  for (let cell = 0; cell < 2; cell++) body += arrowBetween([180, 372], [90 + cell * 180, 473], cell ? 'warning' : 'input', tools, 3) + circle(90 + cell * 180, 509, 29, cell ? 'warning' : 'input') + text(90 + cell * 180, 515, cell ? 'C' : 'T', { width: 49, anchor: 'middle', weight: 700 });
-  body += text(20, 603, 'Changed creator supply also reaches future control C.', { width: 320, weight: 700, tone: 'warning' });
-  return { body, height: 667 };
+  const { text, circle, color, fill } = tools;
+  const bounds = picture.cohorts.map(cohort => [cohort.returned / cohort.eligible, (cohort.returned + cohort.eligible - cohort.tested) / cohort.eligible]);
+  assert.deepEqual(bounds, [[.2, .8], [.12, .92]]);
+  assert.deepEqual(picture.cohorts.map(cohort => cohort.returned / cohort.tested), [.5, .6]);
+  assert.deepEqual(picture.cohorts.map(cohort => cohort.tested / cohort.eligible), [.4, .2]);
+  assert(bounds[1][0] < bounds[0][1] && bounds[1][1] > bounds[0][0]);
+  let body = text(20, 27, 'Higher tested-only return can hide shrinking opportunity', { width: 320, weight: 700 })
+    + text(20, 110, 'Toy: each mark is ten eligible creators. Return means an eligible upload on days 15-30 after the first eligible upload.', { width: 320 });
+  for (const [index, cohort] of picture.cohorts.entries()) {
+    const vertical = 270 + index * 650;
+    const unknown = cohort.eligible - cohort.tested;
+    const failed = cohort.tested - cohort.returned;
+    assert.equal(cohort.returned + failed + unknown, cohort.eligible);
+    body += text(20, vertical - 65, `Policy ${cohort.identity}: all ${cohort.eligible} eligible creators`, { width: 320, weight: 700 });
+    for (let mark = 0; mark < cohort.eligible / 10; mark++) {
+      const tone = mark < cohort.returned / 10 ? 'output' : mark < cohort.tested / 10 ? 'warning' : 'neutral';
+      body += `<g data-picture-creator-cohort="${cohort.identity}" data-picture-creator-outcome="${tone}">${circle(35 + mark % 10 * 32, vertical + Math.floor(mark / 10) * 22, 6, tone)}</g>`;
+    }
+    body += text(20, vertical + 268, `${cohort.returned} tested returns; ${failed} tested nonreturns; ${unknown} unknown`, { width: 320 })
+      + text(20, vertical + 343, `Tested return ${cohort.returned / cohort.tested * 100}%; test receipt ${cohort.tested / cohort.eligible * 100}%`, { width: 320, weight: 700 })
+      + text(20, vertical + 405, `All-eligible return: ${Math.round(bounds[index][0] * 100)} to ${Math.round(bounds[index][1] * 100)}%`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 435}" width="320" height="25" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1"></rect>`
+      + `<rect x="20" y="${vertical + 435}" width="${bounds[index][0] * 320}" height="25" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+      + `<rect x="${20 + bounds[index][0] * 320}" y="${vertical + 435}" width="${(bounds[index][1] - bounds[index][0]) * 320}" height="25" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5;stroke-dasharray:4 3"></rect>`
+      + text(20, vertical + 505, 'Green known returns; dashed range remains unresolved.', { width: 320 });
+  }
+  body += text(20, 1510, 'Either policy can win. Recover mature outcomes for the whole cohort; the cohort contrast is not randomized.', { width: 320, weight: 700 })
+    + text(20, 1650, 'Even viewer-randomized cells can share supply', { width: 320, weight: 700 });
+  for (let cell = 0; cell < 2; cell++) body += circle(80 + cell * 200, 1760, 27, cell ? 'state' : 'input')
+    + text(80 + cell * 200, 1766, cell ? 'C' : 'T', { width: 46, anchor: 'middle', weight: 700 })
+    + arrowBetween([80 + cell * 200, 1795], [cell ? 210 : 150, 1850], cell ? 'state' : 'input', tools);
+  body += circle(180, 1900, 40, 'focus') + text(180, 1897, 'creator pool', { width: 68, anchor: 'middle', weight: 700 });
+  for (let cell = 0; cell < 2; cell++) body += arrowBetween([cell ? 210 : 150, 1940], [80 + cell * 200, 2015], cell ? 'warning' : 'input', tools)
+    + circle(80 + cell * 200, 2055, 27, cell ? 'warning' : 'input')
+    + text(80 + cell * 200, 2061, cell ? 'C' : 'T', { width: 46, anchor: 'middle', weight: 700 });
+  body += text(20, 2150, 'Changed supply can reach future control C.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 2240, 'Hard policy gates first. Track viewer, creator, advertiser, and platform outcomes with reversible exposure and delayed readouts.', { width: 320 });
+  return { body, height: 2370 };
 }
 
 function duplicatePenalty(picture, model, tools) {
-  const { text, circle, color, fill, line } = tools;
-  let body = text(20, 27, 'Repeated song identity reduces whole-page utility', { width: 320, weight: 700 });
-  for (let choice = 0; choice < 2; choice++) {
-    const vertical = 155 + choice * 249;
-    body += text(20, vertical - 56, choice ? 'A six + C four; no duplicate penalty' : 'A six + B five; same song repeats', { width: 320, weight: 700 });
-    for (let shelf = 0; shelf < 2; shelf++) body += circle(89 + shelf * 180, vertical, 26, choice || !shelf ? 'input' : 'warning') + text(89 + shelf * 180, vertical + 6, choice && shelf ? 'new' : 'song X', { width: 48, anchor: 'middle', size: 13, weight: 700 });
-    body += text(20, vertical + 109, choice ? '6 + 4 = 10' : '6 + 5 - 4 = 7', { width: 320, weight: 700, tone: choice ? 'output' : 'warning' });
+  const { text, color, fill, line } = tools;
+  const score = identities => {
+    const shelves = identities.map(identity => picture.shelves.find(shelf => shelf.identity === identity));
+    const penalty = shelves[0].songs.some(song => shelves[1].songs.includes(song)) ? 4 : 0;
+    const raw = shelves.reduce((sum, shelf) => sum + shelf.score, 0);
+    return { identities, raw, penalty, utility: raw - penalty };
+  };
+  const pairs = [['A', 'B'], ['A', 'C'], ['B', 'C']].map(score);
+  assert.deepEqual(pairs.map(pair => pair.utility), [7, 10, 9]);
+  assert.equal(score(['A', 'C']).utility, score(['C', 'A']).utility);
+  assert.deepEqual([...pairs].sort((first, second) => second.utility - first.utility)[0].identities, ['A', 'C']);
+  let body = text(20, 27, 'Keep each shelf intact; compare whole-page choices', { width: 320, weight: 700 })
+    + text(20, 102, 'Toy common utility units; every pair eligible', { width: 320 });
+  for (const [index, shelf] of picture.shelves.entries()) {
+    const vertical = 158 + index * 138;
+    body += text(20, vertical, `${shelf.identity}: ${shelf.intent}; local score ${shelf.score}`, { width: 320, weight: 700 });
+    for (const [songIndex, song] of shelf.songs.entries()) {
+      const horizontal = 35 + songIndex * 155;
+      const tone = song === 1 ? 'warning' : 'input';
+      body += `<rect x="${horizontal}" y="${vertical + 27}" width="135" height="42" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(horizontal + 67, vertical + 54, `song ${song}`, { width: 122, anchor: 'middle', weight: 700 });
+    }
   }
-  return { body, height: 581 };
+  for (const [index, pair] of pairs.entries()) {
+    const vertical = 640 + index * 154;
+    const tone = index === 1 ? 'output' : index === 0 ? 'warning' : 'input';
+    body += text(20, vertical - 39, `${pair.identities.join(' with ')}: raw ${pair.raw}; penalty ${pair.penalty}`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="${pair.utility * 25}" height="35" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    if (pair.penalty) body += `<rect x="${20 + pair.utility * 25}" y="${vertical}" width="${pair.penalty * 25}" height="35" style="fill:${fill('warning')};stroke:${color('warning')};stroke-width:1.5;stroke-dasharray:4 3"></rect>`;
+    body += text(20, vertical + 75, `Page utility ${pair.utility}`, { width: 320, weight: 700, tone });
+  }
+  body += text(20, 1112, 'Winning membership: A and C', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1190, 'A then C, or C then A?', { width: 320, weight: 700 })
+    + text(20, 1242, 'Both score ten here. This symmetric rule does not decide order.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1350, 'Order needs position-sensitive evidence. Real selection also enforces editorial, rights, freshness, and privacy constraints.', { width: 320 });
+  return { body, height: 1470 };
+}
+
+function videoObjectiveAndExposure(picture, model, tools) {
+  const { text, circle, color, fill } = tools;
+  const expected = picture.videos.map(video => video.watch * video.seconds);
+  assert.deepEqual(expected, [18, 30]);
+  assert(picture.videos[0].watch > picture.videos[1].watch && expected[0] < expected[1]);
+  assert.equal(picture.sources.reduce((sum, count) => sum + count, 0) - picture.unique, 200);
+  assert.equal(picture.eligible - picture.shown, 890);
+  let body = text(20, 27, 'Same estimates; changing the objective reverses the order', { width: 320, weight: 700 });
+  for (const [index, video] of picture.videos.entries()) {
+    const vertical = 145 + index * 340;
+    body += text(20, vertical - 40, `${video.identity}: estimated watch chance ${video.watch * 100}%`, { width: 320, weight: 700 });
+    for (let mark = 0; mark < 10; mark++) body += circle(40 + mark * 30, vertical, 7, mark < video.watch * 10 ? 'input' : 'neutral');
+    for (const [row, value] of [video.seconds, expected[index]].entries()) {
+      const top = vertical + 70 + row * 95;
+      const tone = row ? 'output' : 'input';
+      body += text(20, top - 22, row ? `Per impression: ${value} expected seconds` : `Given a watch: ${value} seconds`, { width: 320 })
+        + `<rect x="30" y="${top}" width="280" height="27" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1"></rect>`
+        + `<rect x="30" y="${top}" width="${value / 60 * 280}" height="27" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    }
+  }
+  body += text(20, 765, 'Both bar types use a zero-to-sixty-second scale.', { width: 320 })
+    + text(20, 845, 'Sources: 800 collaborative, 300 content, 100 fresh', { width: 320, weight: 700 });
+  for (const [index, [count, label]] of [[picture.unique, 'Deduplicate: 1,000 unique'], [picture.eligible, 'Eligibility: 900'], [picture.shown, 'Constrained displayed slate: ten']].entries()) {
+    const vertical = 960 + index * 115;
+    body += text(20, vertical - 30, label, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical}" width="320" height="22" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1"></rect>`
+      + `<rect x="20" y="${vertical}" width="${count / picture.unique * 320}" height="22" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1295, 'Each mark: ten eligible videos; one mark shown', { width: 320, weight: 700 });
+  for (let mark = 0; mark < picture.eligible / 10; mark++) body += circle(29 + mark % 20 * 16, 1365 + Math.floor(mark / 20) * 23, 4, mark < picture.shown / 10 ? 'output' : 'neutral');
+  body += text(20, 1510, '890 unshown: no observed negative response', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1600, 'Log item, position, policy, and model before joining outcomes. Audit missing candidates and evaluate product effects independently.', { width: 320 });
+  return { body, height: 1730 };
+}
+
+function hybridRecallBeforeReranking(picture, model, tools) {
+  const { text, circle } = tools;
+  const union = [...new Set([...picture.dense, ...picture.lexical])].sort();
+  const caps = [['A', 'C', 'D'], ['A', 'B', 'C']];
+  const rerank = candidates => candidates.filter(candidate => picture.required.includes(candidate));
+  assert.deepEqual(union, ['A', 'B', 'C', 'D']);
+  assert(caps.every(cap => cap.every(candidate => union.includes(candidate))));
+  assert.deepEqual(caps.map(rerank), [['A'], ['A', 'B']]);
+  assert(!picture.dense.includes('B') && picture.lexical.includes('B'));
+  const row = (values, horizontal, vertical, tone) => values.map((value, index) => circle(horizontal + index * 44, vertical, 18, tone) + text(horizontal + index * 44, vertical + 5, value, { width: 30, anchor: 'middle', weight: 700 })).join('');
+  let body = text(20, 27, 'Required evidence A and B; preserve it before reranking', { width: 320, weight: 700 })
+    + text(20, 107, 'Toy chunks; boundaries must retain the facts.', { width: 320 })
+    + text(20, 190, 'Dense', { width: 140, weight: 700 }) + text(210, 190, 'Lexical', { width: 130, weight: 700 })
+    + row(picture.dense, 37, 250, 'input') + row(picture.lexical, 230, 250, 'focus')
+    + arrowBetween([80, 282], [150, 360], 'input', tools) + arrowBetween([265, 282], [210, 360], 'focus', tools)
+    + text(20, 405, 'Merge and deduplicate', { width: 320, weight: 700 });
+  for (const [index, candidate] of union.entries()) body += circle(54 + index * 84, 470, 23, 'input') + text(54 + index * 84, 476, candidate, { width: 40, anchor: 'middle', weight: 700 });
+  for (const [index, cap] of caps.entries()) {
+    const center = index ? 270 : 80;
+    const tone = index ? 'output' : 'warning';
+    body += arrowBetween([180, 510], [center, 578], tone, tools)
+      + text(center, 625, index ? 'Keep A and B' : 'Cap loses B', { width: 145, anchor: 'middle', weight: 700, tone })
+      + row(cap, center - 44, 695, tone)
+      + arrowBetween([center, 727], [center, 765], tone, tools)
+      + arrowBetween([center, 850], [center, 908], tone, tools)
+      + row(rerank(cap), center - (rerank(cap).length - 1) * 22, 940, tone)
+      + text(center, 1005, index ? 'Both retained' : 'B still missing', { width: 145, anchor: 'middle', weight: 700, tone });
+  }
+  body += text(20, 808, 'Query-aware reranker selects survivors', { width: 320, weight: 700 })
+    + text(20, 1100, 'Generate from compact context; verify citation support and faithfulness.', { width: 320, weight: 700 })
+    + text(20, 1205, 'Missing support: abstain or qualify, not invent evidence.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1315, 'Evaluate each stage; return production failures to the evaluation set.', { width: 320 });
+  return { body, height: 1410 };
 }
 
 function fixedSourceGrowingPrefix(picture, model, tools) {
   const { text, circle, color, fill, line } = tools;
-  let body = text(20, 27, 'Keep the source memory; grow the decoder prefix', { width: 320, weight: 700 });
-  for (let step = 0; step < 3; step++) {
-    const vertical = 144 + step * 175;
-    body += circle(64, vertical, 27, 'input') + text(64, vertical + 6, 'KV', { width: 48, anchor: 'middle', weight: 700 });
-    for (let token = 0; token <= step; token++) body += `<rect x="${130 + token * 62}" y="${vertical - 24}" width="56" height="48" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></rect>` + text(158 + token * 62, vertical + 6, token ? String.fromCharCode(64 + token) : 'BOS', { width: 48, anchor: 'middle', size: 13, weight: 700 });
-    if (step) body += line(64, vertical - 144, 64, vertical - 31, 'input');
+  const causal = picture.inputs.map((input, query) => picture.inputs.map((key, position) => position <= query));
+  assert.deepEqual(causal, [[true, false], [true, true]]);
+  assert.equal(picture.source.length * picture.inputs.length, 6);
+  assert.deepEqual(picture.inputs.map((input, index) => [input, picture.labels[index]]), [['BOS', 'y1'], ['y1', 'EOS']]);
+  assert(!picture.inputs.filter((input, position) => causal[0][position]).includes(picture.labels[0]));
+  assert(picture.labels.filter((input, position) => causal[0][position]).includes(picture.labels[0]));
+  const cacheIdentity = source => JSON.stringify({ source, parameters: 'fixed', layer: 1 });
+  assert.notEqual(cacheIdentity(picture.source), cacheIdentity([...picture.source, 's4']));
+  let body = text(20, 27, 'Fixed source memory; new target queries', { width: 320, weight: 700 })
+    + text(20, 105, 'One encoder pass; three source positions', { width: 320, weight: 700 });
+  for (const [index, source] of picture.source.entries()) body += circle(90 + index * 100, 190, 25, 'input') + text(90 + index * 100, 196, source, { width: 44, anchor: 'middle', weight: 700 });
+  body += text(20, 265, 'Layer-specific keys and values stay cached while source and parameters stay fixed.', { width: 320 });
+  for (const [step, input] of picture.inputs.entries()) {
+    const vertical = 450 + step * 245;
+    body += text(20, vertical - 80, `Step ${step + 1}: ${input} query predicts ${picture.labels[step]}`, { width: 320, weight: 700 });
+    for (let source = 0; source < picture.source.length; source++) {
+      const horizontal = 55 + source * 100;
+      body += `<rect data-picture-cross-score="${step}-${source}" x="${horizontal}" y="${vertical}" width="70" height="45" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`
+        + text(horizontal + 35, vertical + 28, `key ${source + 1}`, { width: 62, anchor: 'middle', weight: 700 });
+    }
+    body += text(20, vertical + 95, 'Three scores; normalize and mix source values.', { width: 320 });
   }
-  body += text(20, 633, 'Same source identity; prefixes BOS, BOS A, BOS A B.', { width: 320, weight: 700 });
-  return { body, height: 698 };
+  body += text(20, 880, 'Six score pairs per head and layer; one encoder pass, two incremental queries.', { width: 320, weight: 700 })
+    + text(20, 990, 'Teacher forcing: shifted inputs BOS, y1; labels y1, EOS. Positions may run in parallel.', { width: 320, weight: 700 })
+    + text(140, 1120, 'BOS', { width: 70, anchor: 'middle', weight: 700 }) + text(240, 1120, 'y1', { width: 70, anchor: 'middle', weight: 700 });
+  for (const [query, allowed] of causal.entries()) {
+    const vertical = 1150 + query * 95;
+    body += text(20, vertical + 31, `Predict ${picture.labels[query]}`, { width: 90, weight: 700 });
+    for (const [position, mayRead] of allowed.entries()) {
+      const tone = mayRead ? 'output' : 'warning';
+      body += `<rect x="${110 + position * 100}" y="${vertical}" width="60" height="53" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(140 + position * 100, vertical + 33, mayRead ? 'read' : 'no', { width: 52, anchor: 'middle', weight: 700, tone });
+    }
+  }
+  body += text(20, 1380, 'Unshifted labels leak their own answer, even with a causal mask.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1485, 'Cross-attention has separate source/padding masks; target causality does not mask future source positions.', { width: 320 })
+    + text(20, 1600, 'A fourth bidirectional source token changes the cache identity: recompute or invalidate affected source and target state.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 1725 };
+}
+
+function codingEvaluationLayers(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const tested = picture.passed === picture.tests;
+  assert(tested);
+  assert.equal(picture.privacySafe, false);
+  assert.equal(picture.completed, null);
+  const mayClaimProductivity = state => state.controlled === true && state.completed === true && state.includesReviewAndRepair === true;
+  assert(!mayClaimProductivity(picture));
+  assert(!mayClaimProductivity({ controlled: true, completed: true, includesReviewAndRepair: false }));
+  assert(mayClaimProductivity({ controlled: true, completed: true, includesReviewAndRepair: true }));
+  let body = text(20, 27, 'Same patch; three independent evaluation questions', { width: 320, weight: 700 })
+    + text(20, 110, 'Toy: repository-edit mode; held-out task T7, repo R4, environment E2, oracle T9.', { width: 320 })
+    + text(20, 225, '1. Tested functionality', { width: 320, weight: 700 })
+    + circle(65, 305, 29, 'output') + text(65, 311, 'PASS', { width: 50, anchor: 'middle', weight: 700 })
+    + text(120, 292, `${picture.passed} of ${picture.tests} tests pass`, { width: 210, weight: 700 })
+    + text(120, 337, 'Only the tested properties', { width: 210 })
+    + line(20, 405, 340, 405, 'neutral')
+    + text(20, 475, '2. Quality and security', { width: 320, weight: 700 })
+    + circle(65, 555, 29, 'warning') + text(65, 561, 'FAIL', { width: 50, anchor: 'middle', weight: 700 })
+    + text(120, 542, 'Review finds private-content logging', { width: 210, weight: 700, tone: 'warning' })
+    + text(20, 660, 'Static analysis plus a specific, human-calibrated rubric; neither covers every defect.', { width: 320 })
+    + line(20, 765, 340, 765, 'neutral')
+    + text(20, 835, '3. Real-task usefulness', { width: 320, weight: 700 })
+    + circle(65, 915, 29, 'input') + text(65, 921, picture.accepted ? 'YES' : 'NO', { width: 50, anchor: 'middle', weight: 700 })
+    + text(120, 902, 'Suggestion accepted', { width: 210, weight: 700 })
+    + text(120, 950, 'Completion and productivity still unknown', { width: 210 })
+    + text(20, 1085, 'Controlled comparison: include review, repair, completion time, latency, and cost.', { width: 320, weight: 700 })
+    + text(20, 1210, 'Separate completion, explanation, and repository-edit modes; inspect representative difficulty and security slices.', { width: 320 })
+    + text(20, 1330, 'The privacy failure blocks release despite passing tests and acceptance.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1440, 'Prevent leakage and preserve private-repository boundaries through staged rollout.', { width: 320 });
+  return { body, height: 1540 };
+}
+
+function trajectoryOutcomeAndBudget(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const success = trial => trial.task && trial.authorized && trial.state && trial.calls <= picture.callBudget;
+  const completed = picture.trials.filter(trial => trial.task).length;
+  const successes = picture.trials.filter(success).length;
+  const calls = picture.trials.reduce((sum, trial) => sum + trial.calls, 0);
+  assert.equal(completed, 2);
+  assert.equal(successes, 1);
+  assert.equal(calls, 19);
+  assert(picture.trials.every(trial => trial.calls <= picture.callBudget));
+  assert(!success({ task: true, authorized: true, state: true, calls: picture.callBudget + 1 }));
+  let body = text(20, 27, 'Inspect action evidence and joint outcomes at fixed budgets', { width: 320, weight: 700 })
+    + text(20, 110, 'Toy: contained E3, tools V2, reset each trial; ten-call budget. Account A only.', { width: 320 })
+    + text(20, 225, 'Trial 2: task closes, but the trajectory fails', { width: 320, weight: 700 });
+  for (const [index, [label, allowed]] of [['Read A: authorized', true], ['Write B: unauthorized', false], ['Receipt: synthetic external effect', false]].entries()) {
+    const vertical = 340 + index * 190;
+    body += circle(58, vertical, 26, allowed ? 'output' : 'warning')
+      + text(58, vertical + 6, allowed ? 'OK' : 'X', { width: 44, anchor: 'middle', weight: 700 })
+      + text(110, vertical - 8, label, { width: 225, weight: 700, tone: allowed ? 'output' : 'warning' });
+    if (index < 2) body += arrowBetween([58, vertical + 35], [58, vertical + 150], 'neutral', tools);
+  }
+  body += text(20, 820, 'Task verifier: closed. Authority verifier: fail. Inspect the first violating call, not the final answer alone.', { width: 320, weight: 700 })
+    + text(20, 955, 'Repeated reset trials: task / authority / state', { width: 320, weight: 700 });
+  for (const [index, trial] of picture.trials.entries()) {
+    const vertical = 1055 + index * 105;
+    body += text(20, vertical + 6, `${index + 1}`, { width: 25, weight: 700 });
+    for (const [gate, pass] of [trial.task, trial.authorized, trial.state].entries()) body += circle(80 + gate * 70, vertical, 20, pass ? 'output' : 'warning')
+      + text(80 + gate * 70, vertical + 5, pass ? 'OK' : 'X', { width: 34, anchor: 'middle', size: 14, weight: 700 });
+    body += text(270, vertical + 6, `${trial.calls} calls`, { width: 70, weight: 700 });
+  }
+  body += text(20, 1400, `${completed} of 3 tasks close; ${successes} of 3 jointly pass. All trials cost ${calls} calls.`, { width: 320, weight: 700 })
+    + text(20, 1510, 'Report uncertainty and success/cost tradeoffs. These three toy trials are not reliability certification.', { width: 320 })
+    + text(20, 1620, 'Diagnose, assign an owner, repair, and retest on held-out tasks. Check offline-to-production prediction during staged rollout.', { width: 320 });
+  return { body, height: 1750 };
+}
+
+function claimValidityAndConfirmation(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const independent = sample => sample.afterLock && !sample.trained && !sample.selected && !picture.usedFamilies.includes(sample.family);
+  assert.deepEqual(picture.candidates.map(independent), [false, true]);
+  assert(!independent({ ...picture.candidates[1], trained: true }));
+  assert(!independent({ ...picture.candidates[1], selected: true }));
+  assert(!independent({ ...picture.candidates[1], afterLock: false }));
+  const supportsClaim = (sample, validity) => independent(sample) && validity.every(condition => condition === true);
+  assert(!supportsClaim(picture.candidates[1], [true, null, true, true]));
+  assert(supportsClaim(picture.candidates[1], [true, true, true, true]));
+  let body = text(20, 27, 'Start with the claim, not the highest benchmark score', { width: 320, weight: 700 })
+    + text(20, 110, 'Example claim: repair unfamiliar repositories', { width: 320, weight: 700 });
+  const questions = ['Task: the actual permitted repair work?', 'Population: unfamiliar repositories?', 'Grader: detects unsafe or out-of-scope edits?', 'Prediction: later real-task behavior?'];
+  for (const [index, question] of questions.entries()) {
+    const vertical = 235 + index * 95;
+    body += text(20, vertical, question, { width: 250 }) + circle(310, vertical + 1, 21, 'neutral')
+      + text(310, vertical + 7, '?', { width: 36, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 650, 'F2 feedback guides prompt or checkpoint choice', { width: 320, weight: 700 })
+    + arrowBetween([180, 708], [180, 750], 'input', tools)
+    + text(180, 792, 'Lock the choice', { width: 260, anchor: 'middle', weight: 700 });
+  for (const [index, candidate] of picture.candidates.entries()) {
+    const horizontal = index ? 270 : 85;
+    const pass = independent(candidate);
+    const tone = pass ? 'output' : 'warning';
+    body += arrowBetween([180, 830], [horizontal, 885], tone, tools)
+      + text(horizontal, 938, candidate.label, { width: 145, anchor: 'middle', weight: 700 })
+      + circle(horizontal, 1030, 27, tone) + text(horizontal, 1036, pass ? 'OK' : 'X', { width: 46, anchor: 'middle', weight: 700, tone })
+      + text(horizontal, 1115, pass ? 'Eligible test only' : 'Still dependent', { width: 145, anchor: 'middle', weight: 700, tone });
+  }
+  body += text(20, 1230, 'Toy F9 assumes no overlap, training exposure, or selection feedback. Audit source families, not just exact text or timestamps.', { width: 320 })
+    + text(20, 1360, 'Independence is necessary, not sufficient: the four validity questions still require evidence.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1480, 'Known-repository test passes alone do not certify unfamiliar, safe, useful repairs.', { width: 320 });
+  return { body, height: 1590 };
 }
 
 function weightedTail(picture, model, tools) {
   const { text, color, fill, line, number } = tools;
-  let body = text(20, 27, 'Keep traffic weights and the independent tail floor', { width: 320, weight: 700 });
+  const equalMeans = picture.values.map(values => values.reduce((sum, value) => sum + value, 0) / values.length);
+  const trafficMeans = picture.values.map(values => values.reduce((sum, value, index) => sum + value * picture.weights[index], 0));
+  assert.deepEqual(equalMeans, [.8, .8]);
+  assert.deepEqual(trafficMeans.map(value => Number(value.toFixed(2))), [.8, .88]);
+  assert(picture.values[0][1] >= picture.floor && picture.values[1][1] < picture.floor);
+  let body = text(20, 27, 'Same judged-set sizes; different traffic weights', { width: 320, weight: 700 })
+    + text(20, 107, 'Equal-sized head and tail query sets', { width: 320 });
+  for (const [index, label] of ['Head', 'Tail'].entries()) body += `<rect x="${30 + index * 165}" y="155" width="135" height="42" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1.5"></rect>`
+    + text(97 + index * 165, 182, label, { width: 120, anchor: 'middle', weight: 700 });
+  body += text(20, 270, 'Target traffic: head 90%, tail 10%', { width: 320, weight: 700 });
   for (const [candidate, values] of picture.values.entries()) {
-    const vertical = 165 + candidate * 251;
-    const average = values.reduce((sum, value, index) => sum + value * picture.weights[index], 0);
-    body += text(20, vertical - 55, `Candidate ${candidate ? 'B' : 'A'}: weighted ${number(average)}`, { width: 320, weight: 700 });
+    const vertical = 365 + candidate * 285;
+    body += text(20, vertical - 55, `Candidate ${candidate ? 'B' : 'A'}: traffic mean ${trafficMeans[candidate].toFixed(2)}`, { width: 320, weight: 700 });
     let horizontal = 25;
     for (const [slice, value] of values.entries()) {
       const width = picture.weights[slice] * 310;
@@ -5051,32 +9158,187 @@ function weightedTail(picture, model, tools) {
       body += `<rect x="${horizontal}" y="${vertical + (1 - value) * 120}" width="${width}" height="${value * 120}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
       horizontal += width;
     }
-    body += line(25, vertical + (1 - picture.floor) * 120, 335, vertical + (1 - picture.floor) * 120, 'warning', true)
+    body += line(299, vertical + (1 - picture.floor) * 120, 340, vertical + (1 - picture.floor) * 120, 'warning', true)
       + text(20, vertical + 167, `Head ${values[0]}; tail ${values[1]}; tail floor ${picture.floor}`, { width: 320, weight: 700 });
   }
-  return { body, height: 649 };
+  body += text(20, 915, 'Equal-slice means: A 0.80, B 0.80', { width: 320, weight: 700 })
+    + text(20, 1000, 'B gains on traffic average, but fails the independent tail gate.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1120, 'New unjudged documents: unknown, not irrelevant.', { width: 320, weight: 700 })
+    + text(20, 1200, 'Pool multiple systems, obtain rubric-based judgments, and version coverage by slice.', { width: 320 })
+    + text(20, 1310, 'Offline gates do not establish user benefit. Randomize exposure for the defined product outcome.', { width: 320, weight: 700 })
+    + text(20, 1430, 'Clicks depend on position; no-click may also mean success.', { width: 320 })
+    + text(20, 1520, 'Freeze query, judgment, candidate, and exposure versions; record uncertainty, decision owner, and rollback rules.', { width: 320 });
+  return { body, height: 1640 };
 }
 
 function restoreCommon(picture, model, tools) {
   const { text, circle, line } = tools;
-  let body = text(20, 27, 'Restore both ranks from the same committed checkpoint', { width: 320, weight: 700 });
-  for (let rank = 0; rank < 2; rank++) body += circle(90 + rank * 180, 147, 27, 'warning') + text(90 + rank * 180, 153, rank ? 'fail' : 'v5', { width: 48, anchor: 'middle', size: 16, weight: 700 }) + arrowBetween([90 + rank * 180, 179], [180, 287], 'warning', tools, 3);
-  body += circle(180, 327, 34, 'input') + text(180, 333, 'v4', { width: 60, anchor: 'middle', weight: 700 });
-  for (let rank = 0; rank < 2; rank++) body += arrowBetween([180, 369], [90 + rank * 180, 472], 'output', tools, 3) + circle(90 + rank * 180, 510, 29, 'output') + text(90 + rank * 180, 516, 'v4', { width: 50, anchor: 'middle', weight: 700 });
-  body += text(20, 603, 'Both restored ranks retry from v4, not mixed local progress.', { width: 320, weight: 700 });
-  return { body, height: 669 };
+  const step = weight => Number((weight - picture.rate * picture.gradient).toFixed(3));
+  const committed = [picture.weight, picture.weight];
+  const partial = [step(committed[0]), committed[1]];
+  const wrong = partial.map(step);
+  const replayed = committed.map(step);
+  assert.deepEqual(partial, [.8, 1]);
+  assert.deepEqual(wrong, [.6, .8]);
+  assert.deepEqual(replayed, [.8, .8]);
+  const rows = [
+    ['Committed start', committed, 'input'],
+    ['Partial application, then failure', partial, 'warning'],
+    ['Wrong: blindly apply again', wrong, 'warning'],
+    ['Right alternative: restore both', committed, 'input'],
+    ['Replay one intended transition', replayed, 'output'],
+  ];
+  let body = text(20, 27, 'Same gradient; replay is not rollback', { width: 320, weight: 700 })
+    + text(20, 107, 'Two synthetic ranks. Start at weight one; plain SGD rate 0.1 and fixed gradient two subtract 0.2 per application.', { width: 320 });
+  for (const [index, [label, weights, tone]] of rows.entries()) {
+    const vertical = 255 + index * 235;
+    body += text(20, vertical, label, { width: 320, weight: 700, tone });
+    for (const [rank, weight] of weights.entries()) {
+      const horizontal = 90 + rank * 180;
+      body += text(horizontal, vertical + 59, `Rank ${rank}`, { width: 140, anchor: 'middle' })
+        + circle(horizontal, vertical + 115, 30, tone)
+        + text(horizontal, vertical + 121, weight.toFixed(1), { width: 52, anchor: 'middle', weight: 700 });
+      if (index === 0 || index === 1 || index === 3) body += arrowBetween([horizontal, vertical + 153], [horizontal, vertical + 199], index === 1 ? 'warning' : 'input', tools, 2);
+    }
+    if (index === 2) body += line(20, vertical + 183, 340, vertical + 183, 'warning', true);
+  }
+  body += text(20, 1478, 'Restore the committed consistency domain, not each rank\'s newest file. Abort the old group; verify the manifest before supported membership rebuild.', { width: 320, weight: 700 })
+    + text(20, 1612, 'Include parameters, optimizer moments, scheduler, scaler, random-generator state, input position and step identity. Equal weights alone can still yield different next updates.', { width: 320 });
+  const originalMean = [2, 4, 12].reduce((sum, value) => sum + value, 0) / 3;
+  const survivors = [2, 4];
+  const survivingMean = survivors.reduce((sum, value) => sum + value, 0) / survivors.length;
+  const wrongDenominator = survivors.reduce((sum, value) => sum + value, 0) / 3;
+  assert.deepEqual([originalMean, survivingMean, wrongDenominator], [6, 3, 2]);
+  assert.equal((2 + 100) / 2, 51);
+  body += text(20, 1770, 'Changed membership: equal local batches with gradients two, four, twelve average six. Losing twelve leaves mean three; the old divisor wrongly gives two.', { width: 320, weight: 700 })
+    + text(20, 1912, 'Availability is not the same experiment. Recheck effective batch, partition and normalization. A required missing model shard needs reconstruction.', { width: 320 })
+    + text(20, 2050, 'Timeout shows no timely completion, not its cause. Checksums check bytes, not correct gradients. Finite values two and one hundred still average fifty-one.', { width: 320, tone: 'warning' })
+    + text(20, 2192, 'Preserve lineage and evidence. This protocol illustrates a coherent intended update, not universal exactly-once execution or Byzantine tolerance.', { width: 320 });
+  return { body, height: 2312 };
+}
+
+function adaptationDiagnostic(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const day = 14;
+  const windows = { A: 7, B: 30 };
+  const candidates = [
+    { label: 'Baseline', input: 'Stale A; no working output contract', version: 'A', eligible: false, response: 'eligible = false', display: 'Bare text: eligible false' },
+    { label: 'Supply authorized B directly', input: 'Correct context only; retrieval bypassed', version: 'B', eligible: true, response: 'Eligible under policy B.' },
+    { label: 'Supply B and output contract', input: 'Correct context plus the required two-field schema', version: 'B', eligible: true, response: '{"eligible":true,"policy_version":"B"}' },
+    { label: 'Control: valid JSON, stale A', input: 'Repair formatting without changing the applied policy', version: 'A', eligible: false, response: '{"eligible":false,"policy_version":"A"}' },
+  ];
+  const schemaValid = response => {
+    try {
+      const parsed = JSON.parse(response);
+      return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
+        && Object.keys(parsed).sort().join(',') === 'eligible,policy_version'
+        && typeof parsed.eligible === 'boolean' && typeof parsed.policy_version === 'string';
+    } catch {
+      return false;
+    }
+  };
+  const checks = candidates.map(candidate => [candidate.version === 'B' && candidate.eligible === (day <= windows.B), schemaValid(candidate.response)]);
+  assert(day > windows.A && day <= windows.B);
+  assert.deepEqual(checks, [[false, false], [true, false], [true, true], [false, true]]);
+  assert(!schemaValid('{"eligible":true,"policy_version":"B","extra":1}'));
+  assert.equal(2000 / (.002 - .001), 2000000);
+  assert.equal((2000 + 500) / (.002 - .001), 2500000);
+  let body = text(20, 27, 'Change one suspected cause; keep both checks', { width: 320, weight: 700 })
+    + text(20, 109, 'Fictional refund case: day fourteen. Old A allows seven days; authorized B allows thirty. Expected: eligible under B.', { width: 320 })
+    + text(20, 223, 'Stipulated example responses, not measured model runs', { width: 320, weight: 700, tone: 'focus' });
+  for (const [index, candidate] of candidates.entries()) {
+    const offset = index * 380;
+    body += text(20, 305 + offset, candidate.label, { width: 320, weight: 700 })
+      + text(20, 362 + offset, candidate.input, { width: 320 })
+      + text(20, 428 + offset, candidate.display ?? candidate.response, { width: 320, tone: 'focus' });
+    for (const [check, passed] of checks[index].entries()) {
+      const horizontal = 90 + check * 175;
+      body += circle(horizontal, 513 + offset, 23, passed ? 'output' : 'warning')
+        + text(horizontal, 519 + offset, passed ? 'yes' : 'no', { width: 40, anchor: 'middle', weight: 700 })
+        + text(horizontal, 565 + offset, check ? 'Schema' : 'Policy B', { width: 140, anchor: 'middle', weight: 700 });
+    }
+    body += line(20, 615 + offset, 340, 615 + offset, 'neutral');
+  }
+  body += text(20, 1878, 'Direct B tests whether the model can use evidence. It does not show that an index retrieves B or that access filtering works.', { width: 320, weight: 700 })
+    + text(20, 2002, 'Persistent behavior gaps: evaluate representative training. Changing facts: maintain authorized sources and versions. These are composable changes, not a mandatory ladder.', { width: 320 })
+    + text(20, 2144, 'Equal-quality cost toy: prompt adds 0.002 per request; tuning costs 2,000 plus 0.001 per request. Break-even: two million requests. A 500 refresh moves it to 2.5 million.', { width: 320 })
+    + text(20, 2310, 'Include quality, freshness, latency, failures, maintenance and rollback. An exact whole-identifier grammar may need a parser, not generation.', { width: 320, tone: 'warning' });
+  return { body, height: 2452 };
 }
 
 function independentChoices(picture, model, tools) {
   const { text, color, fill, line } = tools;
-  let body = text(20, 27, 'Choose supervision and update scope independently', { width: 320, weight: 700 });
-  for (let signal = 0; signal < 2; signal++) for (let scope = 0; scope < 2; scope++) {
-    const horizontal = 26 + scope * 166;
-    const vertical = 139 + signal * 156;
-    body += `<rect x="${horizontal}" y="${vertical}" width="141" height="111" style="fill:${fill(scope ? 'output' : 'input')};stroke:${color(scope ? 'output' : 'input')};stroke-width:2"></rect>` + text(horizontal + 70, vertical + 44, signal ? 'pairs' : 'labels', { width: 120, anchor: 'middle', weight: 700 }) + text(horizontal + 70, vertical + 85, scope ? 'LoRA' : 'full', { width: 120, anchor: 'middle', weight: 700 });
+  const signals = [
+    ['Continued pretraining: domain next-token text', 'Corpus'],
+    ['SFT: prompt with ideal-response tokens', 'Answers'],
+    ['Preference objective: preferred and rejected answers', 'Preferences'],
+  ];
+  let body = text(20, 27, 'Three training signals; two independent scopes', { width: 320, weight: 700 })
+    + text(20, 109, 'Each row can train the full model or adapters. LoRA is a scope method, not a fourth objective.', { width: 320 });
+  for (const [signal, [label, shortLabel]] of signals.entries()) {
+    const vertical = 250 + signal * 250;
+    body += text(20, vertical - 50, label, { width: 320, weight: 700 });
+    for (let scope = 0; scope < 2; scope++) {
+      const horizontal = 26 + scope * 166;
+      body += `<rect x="${horizontal}" y="${vertical}" width="141" height="133" style="fill:${fill(scope ? 'output' : 'input')};stroke:${color(scope ? 'output' : 'input')};stroke-width:2"></rect>`
+        + text(horizontal + 70, vertical + 44, shortLabel, { width: 125, anchor: 'middle', weight: 700 })
+        + text(horizontal + 70, vertical + 99, scope ? 'LoRA' : 'Full', { width: 125, anchor: 'middle', weight: 700 });
+    }
   }
-  body += text(20, 492, 'Each supervision choice has both scope choices.', { width: 320, tone: 'soft' });
-  return { body, height: 554 };
+  body += text(20, 965, 'DPO example: compare preferred and rejected sequence odds relative to a fixed reference. That signal does not choose which weights may change.', { width: 320 })
+    + text(20, 1100, 'Computed LoRA toy: frozen four-by-four identity base; rank-one adapter; scale one. Input is the first coordinate direction.', { width: 320, weight: 700 });
+  const input = [1, 0, 0, 0];
+  const adapterInput = [1, 0, 0, 0];
+  const adapterOutput = [1, 2, 0, 0];
+  const base = input.map((unused, row) => input.map((unusedColumn, column) => Number(row === column)));
+  const before = structuredClone(base);
+  const activation = adapterInput.reduce((sum, value, index) => sum + value * input[index], 0);
+  const baseResult = base.map(row => row.reduce((sum, value, index) => sum + value * input[index], 0));
+  const correction = adapterOutput.map(value => value * activation);
+  const result = baseResult.map((value, index) => value + correction[index]);
+  assert.deepEqual(base, before);
+  assert.deepEqual(baseResult, [1, 0, 0, 0]);
+  assert.deepEqual(correction, [1, 2, 0, 0]);
+  assert.deepEqual(result, [2, 2, 0, 0]);
+  assert.equal(adapterInput.length + adapterOutput.length, 8);
+  for (const [row, [label, values, tone]] of [
+    ['Frozen base output', baseResult, 'input'],
+    ['Adapter contribution', correction, 'focus'],
+    ['Added output', result, 'output'],
+  ].entries()) {
+    const vertical = 1280 + row * 210;
+    body += text(20, vertical, label, { width: 320, weight: 700, tone });
+    for (const [index, value] of values.entries()) {
+      const horizontal = 25 + index * 84;
+      body += `<rect x="${horizontal}" y="${vertical + 32}" width="58" height="58" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(horizontal + 29, vertical + 69, value, { width: 48, anchor: 'middle', weight: 700 });
+    }
+    if (row < 2) body += line(20, vertical + 137, 340, vertical + 137, 'neutral');
+  }
+  body += text(20, 1900, 'Adapter factors: input row one, zero, zero, zero; output column one, two, zero, zero. Eight trainable values versus sixteen full-matrix entries; base storage stays.', { width: 320 })
+    + text(20, 2055, 'The low-rank addition changes outputs without updating the base. Rank limits flexibility; fewer trainable values do not guarantee quality or total-memory savings.', { width: 320, weight: 700 })
+    + text(20, 2204, 'Choose using representative held-out tasks, data rights, privacy, leakage and regression checks. Version base and adapters; test serving compatibility and rollback.', { width: 320, tone: 'warning' });
+  return { body, height: 2330 };
+}
+
+function permissionDispatchReceipt(picture, model, tools) {
+  const { text, circle } = tools;
+  assert.deepEqual(picture.frames, [['verified', 'verified', 'unknown'], ['verified', 'verified', 'verified']]);
+  const occurred = states => states[2] === 'verified';
+  assert(!occurred(picture.frames[0]) && occurred(picture.frames[1]));
+  let body = text(20, 27, 'Permission, dispatch and effect need separate evidence', { width: 320, weight: 700 });
+  for (const [index, states] of picture.frames.entries()) {
+    const offset = index * 530;
+    body += text(20, 119 + offset, index ? 'Later: authoritative receipt confirms the effect' : 'Authorized and dispatched; no outcome receipt yet', { width: 320, weight: 700 });
+    for (const [row, label] of picture.labels.entries()) {
+      const vertical = 220 + row * 105 + offset;
+      const verified = states[row] === 'verified';
+      body += text(20, vertical + 6, label, { width: 232, weight: 700 }) + circle(302, vertical, 22, verified ? 'output' : 'neutral')
+        + text(302, vertical + 6, verified ? '\u2713' : '?', { width: 38, anchor: 'middle', weight: 700 });
+    }
+    body += text(20, 509 + offset, index ? 'Occurrence is now evidenced, not inferred from permission.' : 'Effect unknown is not no effect. Keep the action unresolved.', { width: 320, weight: 700, tone: index ? 'output' : 'warning' });
+  }
+  return { body, height: 1140 };
 }
 
 function independentEvidence(picture, model, tools) {
@@ -5085,66 +9347,565 @@ function independentEvidence(picture, model, tools) {
   for (const [claim, label] of picture.labels.entries()) {
     const vertical = 129 + claim * 123;
     const verified = picture.states[claim] === 'verified';
-    body += text(20, vertical + 7, label, { width: 230, weight: 700 }) + circle(302, vertical, 22, verified ? 'output' : 'neutral') + text(302, vertical + 6, verified ? '+' : '?', { width: 38, anchor: 'middle', weight: 700, size: 23 });
+    body += text(20, vertical + 7, label, { width: 230, weight: 700 }) + circle(302, vertical, 22, verified ? 'output' : 'neutral') + text(302, vertical + 6, verified ? '\u2713' : '?', { width: 38, anchor: 'middle', weight: 700, size: 23 });
   }
   return { body, height: 193 + picture.labels.length * 123 };
 }
 
+function curationExposureLineage(picture, model, tools) {
+  const { text, circle, color, fill } = tools;
+  const sources = [
+    { name: 'A', eligible: 600, share: .6, draws: 600 },
+    { name: 'B', eligible: 200, share: .4, draws: 400 },
+  ];
+  const epochs = sources.map(source => source.draws / source.eligible);
+  assert.deepEqual(epochs, [1, 2]);
+  assert.equal(sources.reduce((sum, source) => sum + source.draws, 0), 1000);
+  assert.equal(sources[1].eligible / sources.reduce((sum, source) => sum + source.eligible, 0), .25);
+  assert.equal(200 / sources[1].eligible, 1);
+  let body = text(20, 27, 'Stored positions do not determine realized exposure', { width: 320, weight: 700 })
+    + text(20, 110, 'Post-gate eligible positions, not vocabulary IDs. Intended shares sixty/forty; actual consumption log totals one thousand draws.', { width: 320 });
+  for (const [index, source] of sources.entries()) {
+    const vertical = 255 + index * 400;
+    body += text(20, vertical, `Source ${source.name}: ${source.eligible} eligible positions`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 32}" width="${source.eligible / 2}" height="30" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+      + text(20, vertical + 135, `${source.draws} logged draws; ${epochs[index]} effective ${epochs[index] === 1 ? 'epoch' : 'epochs'}`, { width: 320, weight: 700, tone: 'output' })
+      + `<rect x="20" y="${vertical + 170}" width="${source.draws / 2}" height="30" style="fill:${fill('output')};stroke:${color('output')};stroke-width:1.5"></rect>`
+      + text(20, vertical + 271, `Intended source share: ${source.share * 100} percent`, { width: 320 });
+  }
+  body += text(20, 1095, 'B is one quarter of eligible positions, but receives two epochs. Reducing B logged draws to two hundred gives one epoch. Exposure arithmetic does not establish a capability gain.', { width: 320, weight: 700 })
+    + text(20, 1260, 'Restriction trace: record to consumed checkpoints', { width: 320, weight: 700 });
+  const lineage = [
+    ['R17', 'Source, parsing version, retention decision'],
+    ['S1', 'Accepted derived shard'],
+    ['M1', 'Versioned sources, transforms, gates, tokenizer, mixture and removal list'],
+    ['T1', 'Training run binds manifest M1'],
+    ['C200', 'Saved checkpoint binds actual consumption through its step'],
+  ];
+  for (const [index, [label, detail]] of lineage.entries()) {
+    const vertical = 1390 + index * 158;
+    body += circle(66, vertical, 34, 'input') + text(66, vertical + 6, label, { width: 61, anchor: 'middle', weight: 700 })
+      + text(121, vertical - 12, detail, { width: 215 });
+    if (index < lineage.length - 1) body += arrowBetween([66, vertical + 42], [66, vertical + 110], 'input', tools, 2);
+  }
+  body += text(20, 2170, 'R18 rejected: preserve a protected reason reference. No accepted membership or read is claimed; do not expose secret material in ordinary logs.', { width: 320, tone: 'warning' })
+    + text(20, 2313, 'Membership without a consumption receipt leaves actual use unresolved. A later R17 restriction follows S1, M1, T1 and affected consumption/checkpoints.', { width: 320, weight: 700 })
+    + text(20, 2460, 'Deleting raw data does not delete derivatives or learned effects. Audit accepted/rejected slices and filter variants independently at matched training budgets.', { width: 320 });
+  return { body, height: 2590 };
+}
+
+function scopedInterviewPermission(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const rules = {
+    implementation: { named: 'allowed', outside: 'not granted' },
+    oral: { named: 'forbidden', outside: 'forbidden' },
+  };
+  const permission = (round, tool) => rules[round]?.[tool] ?? 'unknown';
+  assert.equal(permission('implementation', 'named'), 'allowed');
+  assert.equal(permission('implementation', 'outside'), 'not granted');
+  assert.equal(permission('oral', 'named'), 'forbidden');
+  assert.equal(permission('silent', 'named'), 'unknown');
+  const cases = [
+    ['Implementation: named assistant', 'Existing codebase; forty-five minutes; one named embedded assistant explicitly allowed.', 'implementation', 'named', 'Practice navigation, small edits, tests and review with that assistant.'],
+    ['Oral math: same assistant', 'Spoken derivation; no AI in this round.', 'oral', 'named', 'Practice closed-book derivations and changed-assumption follow-ups.'],
+    ['Implementation: outside assistant', 'The allowance names the embedded tool, not every outside tool.', 'implementation', 'outside', 'Do not expand permission. Ask about any additional tool before using it.'],
+    ['New implementation round: silent', 'No tool rule was supplied for this round.', 'silent', 'named', 'Keep permission unknown. Ask the authorized contact before tool use.'],
+  ];
+  let body = text(20, 27, 'One fictional packet; permission belongs to a round/tool pair', { width: 320, weight: 700 });
+  for (const [index, [label, evidence, round, tool, action]] of cases.entries()) {
+    const vertical = 145 + index * 380;
+    const state = permission(round, tool);
+    const tone = state === 'allowed' ? 'output' : state === 'forbidden' ? 'warning' : 'neutral';
+    body += text(20, vertical, label, { width: 320, weight: 700 })
+      + text(20, vertical + 70, evidence, { width: 320 })
+      + circle(55, vertical + 197, 27, tone)
+      + text(55, vertical + 203, state === 'allowed' ? 'yes' : state === 'forbidden' ? 'no' : '?', { width: 46, anchor: 'middle', weight: 700 })
+      + text(104, vertical + 167, action, { width: 232, weight: 700, tone })
+      + text(20, vertical + 297, `Permission: ${state}`, { width: 320 })
+      + line(20, vertical + 337, 340, vertical + 337, 'neutral');
+  }
+  body += text(20, 1765, 'Employer name alone does not choose a format-specific drill. Confirm environment, tools, expected artifact, duration, domain and scoring.', { width: 320, weight: 700 })
+    + text(20, 1900, 'Record source, evidence class, checked date and scope. Official general policy is not every round\'s rule. Clarify conflicts; reports or pilots cannot grant permission.', { width: 320, tone: 'warning' });
+  return { body, height: 2040 };
+}
+
+function boundedContribution(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const claim = 'I designed a slice benchmark and recommended a launch gate. Another team owned the training platform. The report records the observed slice recovery. Concurrent data cleanup limits causal attribution.';
+  assert.equal(claim.trim().split(/\s+/).length, 29);
+  const fixture = {
+    personal: ['Benchmark design', 'Gate recommendation'],
+    team: ['Training platform', 'Rollout'],
+    observed: 'Slice recovery',
+    confounder: 'Concurrent data cleanup',
+  };
+  assert(!fixture.personal.includes('Training platform'));
+  assert(!fixture.personal.includes('Rollout'));
+  const witness = { outcome: true, decision: false };
+  assert(witness.outcome && !witness.decision);
+  let body = text(20, 27, 'Fictional ownership audit, not an achievement to reuse', { width: 320, weight: 700 })
+    + text(20, 118, 'Inflated draft: I built the training platform and improved launch quality.', { width: 320, tone: 'warning' })
+    + text(20, 230, 'Inspect the ownership boundary', { width: 320, weight: 700 });
+  for (const [index, [label, claims, tone]] of [['Personal contribution', fixture.personal, 'input'], ['Other team', fixture.team, 'neutral']].entries()) {
+    const vertical = 340 + index * 310;
+    body += text(20, vertical, label, { width: 320, weight: 700, tone });
+    for (const [row, item] of claims.entries()) body += circle(42, vertical + 61 + row * 84, 9, tone)
+      + text(67, vertical + 67 + row * 84, item, { width: 270 });
+    body += line(20, vertical + 235, 340, vertical + 235, 'neutral');
+  }
+  body += text(20, 1000, 'Bounded replacement: twenty-nine words by whitespace splitting', { width: 320, weight: 700 })
+    + text(20, 1100, claim, { width: 320 })
+    + text(20, 1365, 'Observed slice recovery is not exclusive causal credit: cleanup happened too. Use the actual destination limit and counting rule, not a universal hundred-word rule.', { width: 320, weight: 700 })
+    + text(20, 1520, 'Evidence table: claim, artifact, personal/team ownership, direct witness, caveat. Also mark observed/estimated/unavailable and approved/restricted disclosure.', { width: 320 })
+    + text(20, 1675, 'Changed witness: saw only the outcome, not the decision. Outcome knowledge does not establish benchmark authorship. Seek a direct observer if available; keep the limit explicit.', { width: 320, weight: 700 })
+    + text(20, 1835, 'Restricted report: use an approved sanitized or synthetic reconstruction and label it. An unrelated public repository does not prove the private contribution.', { width: 320, tone: 'warning' })
+    + text(20, 1990, 'References need compatible facts, not coordinated wording. Ask permission; preserve independent judgment and private contact details. Missing corroboration is not proof of falsehood.', { width: 320 });
+  return { body, height: 2130 };
+}
+
+function practiceFeedbackLoop(picture, model, tools) {
+  const { text, circle, color, fill } = tools;
+  const probability = .01;
+  const sigmoidDerivative = probability * (1 - probability);
+  const crossEntropyLogit = probability - 1;
+  const squaredLogit = (probability - 1) * sigmoidDerivative;
+  assert(Math.abs(crossEntropyLogit + .99) < 1e-12);
+  assert(Math.abs(squaredLogit + .009801) < 1e-12);
+  assert.equal(-1 / probability, -100);
+  let body = text(20, 27, 'Attempt, observed gap, drill, changed-condition check', { width: 320, weight: 700 })
+    + text(20, 113, 'Fictional attempt: squared loss always gives small gradients. Missing assumption: the output parameterization.', { width: 320, tone: 'warning' })
+    + text(20, 228, 'Same logit; sigmoid probability 0.01; target one. Squared loss uses half the squared error.', { width: 320, weight: 700 });
+  for (const [index, label] of ['Logit', 'Sigmoid', 'p 0.01'].entries()) {
+    const horizontal = 58 + index * 122;
+    body += circle(horizontal, 363, 34, 'input') + text(horizontal, 369, label, { width: 64, anchor: 'middle', weight: 700 });
+    if (index < 2) body += arrowBetween([horizontal + 38, 363], [horizontal + 84, 363], 'input', tools);
+  }
+  for (const [index, [label, gradient]] of [['Cross-entropy logit gradient', crossEntropyLogit], ['Squared-loss logit gradient', squaredLogit]].entries()) {
+    const vertical = 490 + index * 165;
+    body += text(20, vertical, label, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 32}" width="${Math.abs(gradient) * 300}" height="25" style="fill:${fill(index ? 'focus' : 'input')};stroke:${color(index ? 'focus' : 'input')};stroke-width:1"></rect>`
+      + text(20, vertical + 101, `Signed value: ${gradient.toFixed(6)}`, { width: 320 });
+  }
+  body += text(20, 845, 'Extra sigmoid factor: 0.0099. It shrinks this particular squared-loss gradient. Same bar scale; not a claim about every MSE problem.', { width: 320, weight: 700 })
+    + text(20, 985, 'Transfer: parameterize probability directly. Cross-entropy gradient is minus one hundred; squared-loss gradient is minus 0.99. Removing the sigmoid changes the comparison.', { width: 320 })
+    + text(20, 1138, 'Next drill: reconstruct the chain rule, then explain the changed parameterization. Memorizing two numbers does not close the gap.', { width: 320, weight: 700 });
+  for (const [index, label] of ['Scope', 'Evidence', 'Mechanism', 'Critique', 'Collaboration'].entries()) {
+    const vertical = 1320 + index * 106;
+    const gap = index === 2;
+    body += text(20, vertical, label, { width: 185, weight: 700 })
+      + text(210, vertical, gap ? 'Gap observed' : 'Unobserved', { width: 130, weight: 700, tone: gap ? 'warning' : 'neutral' });
+  }
+  body += text(20, 1895, 'Clarify partly wrong criticism and test its evidence. Other skills need separate observations. Use current role instructions, not a universal five-part hiring rubric.', { width: 320, tone: 'warning' });
+  return { body, height: 2020 };
+}
+
 function stableTileMerge(picture, model, tools) {
-  const { text, circle, number } = tools;
-  const tiles = picture.logits.map((logits, tile) => { const maximum = Math.max(...logits); return { maximum, denominator: logits.reduce((sum, value) => sum + Math.exp(value - maximum), 0), numerator: logits.reduce((sum, value, index) => sum + Math.exp(value - maximum) * picture.values[tile][index], 0) }; });
-  const maximum = Math.max(...tiles.map(tile => tile.maximum));
-  const denominator = tiles.reduce((sum, tile) => sum + tile.denominator * Math.exp(tile.maximum - maximum), 0);
-  const numerator = tiles.reduce((sum, tile) => sum + tile.numerator * Math.exp(tile.maximum - maximum), 0);
+  const { text, circle } = tools;
+  const merge = (state, scores, values, allowed = scores.map(() => true)) => {
+    const visible = scores.filter((unused, index) => allowed[index]);
+    if (!visible.length) return state;
+    const maximum = Math.max(state?.maximum ?? -Infinity, ...visible);
+    const scale = state ? Math.exp(state.maximum - maximum) : 0;
+    const masses = scores.map((score, index) => allowed[index] ? Math.exp(score - maximum) : 0);
+    return {
+      maximum, scale,
+      denominator: (state?.denominator ?? 0) * scale + masses.reduce((sum, value) => sum + value, 0),
+      numerator: (state?.numerator ?? 0) * scale + masses.reduce((sum, value, index) => sum + value * values[index], 0),
+    };
+  };
+  const first = merge(null, picture.logits[0], picture.values[0]);
+  const second = merge(first, picture.logits[1], picture.values[1]);
+  const output = state => { assert(state && state.denominator > 0); return state.numerator / state.denominator; };
   const completeDenominator = picture.logits.flat().reduce((sum, logit) => sum + Math.exp(logit), 0);
   const completeNumerator = picture.logits.flat().reduce((sum, logit, index) => sum + Math.exp(logit) * picture.values.flat()[index], 0);
-  assert(Math.abs(numerator / denominator - completeNumerator / completeDenominator) < 1e-12);
-  let body = text(20, 27, 'Merge retained statistics, then discard temporary scores', { width: 320, weight: 700 });
-  for (const [tile, state] of tiles.entries()) {
-    const vertical = 149 + tile * 164;
-    body += text(20, vertical - 42, `Tile ${tile + 1}: retain M, L, O`, { width: 320, weight: 700 });
-    for (const [component, value] of [state.maximum, state.denominator, state.numerator].entries()) body += circle(61 + component * 119, vertical, 28, 'input') + text(61 + component * 119, vertical + 6, number(value), { width: 50, anchor: 'middle', size: 13, weight: 700 });
+  assert(Math.abs(second.scale - 1 / 3) < 1e-12);
+  assert(Math.abs(output(second) - 5) < 1e-12);
+  assert(Math.abs(output(second) - completeNumerator / completeDenominator) < 1e-12);
+  assert.equal((2 + 6) / (1 + 1), 4);
+  assert.equal(output(merge(first, picture.logits[1], picture.values[1], [false])), 2);
+  assert.throws(() => output(merge(null, [0], [2], [false])));
+  assert.equal(output(merge(first, [1000], [6])), 6);
+  let body = text(20, 27, 'A higher maximum changes the scale of all old terms', { width: 320, weight: 700 })
+    + text(20, 115, 'First tile: score zero, value two. Retain the three summaries; output two.', { width: 320, weight: 700 });
+  for (const [index, [label, value]] of [['Maximum', first.maximum], ['Mass', first.denominator], ['Numerator', first.numerator]].entries()) {
+    const horizontal = 60 + index * 120;
+    body += text(horizontal, 230, label, { width: 108, anchor: 'middle', weight: 700 })
+      + circle(horizontal, 288, 30, 'input') + text(horizontal, 294, value, { width: 52, anchor: 'middle', weight: 700 });
   }
-  body += text(20, 454, `Merge at M=${maximum}: L=${number(denominator)}, O=${number(numerator)}`, { width: 320, weight: 700 }) + text(20, 554, `Output O/L = ${number(numerator / denominator)}`, { width: 320, weight: 700, tone: 'output' });
-  return { body, height: 619 };
+  body += text(20, 414, 'Next tile: score the natural log of three; value six. New maximum about 1.099. Old exponential weights shrink by one third.', { width: 320, weight: 700 });
+  for (const [index, [label, value]] of [['Old mass', first.denominator], ['Old numerator', first.numerator]].entries()) {
+    const horizontal = 90 + index * 180;
+    body += text(horizontal, 592, label, { width: 160, anchor: 'middle', weight: 700 })
+      + circle(horizontal, 654, 32, 'input') + text(horizontal, 660, value, { width: 58, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 696], [horizontal, 795], 'focus', tools, 3)
+      + circle(horizontal, 838, 34, 'focus') + text(horizontal, 844, (value * second.scale).toFixed(3), { width: 60, anchor: 'middle', weight: 700 });
+  }
+  body += text(180, 748, 'Scale both', { width: 130, anchor: 'middle', weight: 700, tone: 'focus' })
+    + text(20, 963, 'Add new tile mass one and numerator six', { width: 320, weight: 700 });
+  for (const [index, [label, value]] of [['Maximum', second.maximum], ['Mass', second.denominator], ['Numerator', second.numerator]].entries()) {
+    const horizontal = 60 + index * 120;
+    body += text(horizontal, 1055, label, { width: 108, anchor: 'middle', weight: 700 })
+      + circle(horizontal, 1114, 33, 'output') + text(horizontal, 1120, value.toFixed(3), { width: 58, anchor: 'middle', weight: 700 });
+  }
+  body += text(20, 1242, 'Divide numerator by mass: output five. Dense reference also gives five. The numerator is not an already-normalized output.', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1380, 'Without old-state rescaling, totals eight and two give four. That failing control exposes the missing operation.', { width: 320, tone: 'warning' })
+    + text(20, 1505, 'Mask the entire second tile: skip it. First state stays unchanged, so output remains two. A fully masked row needs a declared policy; this reference rejects it.', { width: 320, weight: 700 })
+    + text(20, 1660, 'Scores may be discarded after preserving maximum, mass and numerator. Large-logit control stays finite. Compare the toy to float64 dense softmax within one trillionth.', { width: 320 })
+    + text(20, 1812, 'Production tolerance depends on dtype, shape and kernel. The same mathematical operator need not produce identical floating-point bits.', { width: 320, tone: 'warning' });
+  return { body, height: 1940 };
+}
+
+function denseAttentionStorage(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const tokens = 8192;
+  const width = 128;
+  const bytes = 2;
+  const scoreMiB = tokens * tokens * bytes / 1024 ** 2;
+  const queryMiB = tokens * width * bytes / 1024 ** 2;
+  assert.equal(scoreMiB, 128);
+  assert.equal(queryMiB, 2);
+  assert.equal(scoreMiB / queryMiB, 64);
+  assert.equal(7 / 8, .875);
+  let body = text(20, 27, 'Remove global intermediate round trips, not the inputs', { width: 320, weight: 700 })
+    + text(20, 117, 'Unfused: inputs read into compute', { width: 320, weight: 700 });
+  for (const [index, [label, tone]] of [['Chip', 'input'], ['HBM', 'neutral']].entries()) body += circle(70 + index * 220, 199, 31, tone) + text(70 + index * 220, 205, label, { width: 56, anchor: 'middle', weight: 700 });
+  body += arrowBetween([250, 199], [112, 199], 'input', tools, 3)
+    + text(180, 254, 'Q, K, V read', { width: 300, anchor: 'middle' })
+    + line(180, 302, 180, 456, 'focus', true)
+    + arrowBetween([70, 333], [290, 333], 'warning', tools, 3)
+    + arrowBetween([290, 405], [70, 405], 'warning', tools, 3)
+    + text(20, 501, 'Score and probability intermediates: global write, then reread. Output also returns to global memory.', { width: 320, weight: 700 })
+    + text(20, 645, 'Tiled: read inputs; keep temporary scores on chip', { width: 320, weight: 700 });
+  for (const [index, label] of ['Chip', 'HBM'].entries()) body += circle(70 + index * 220, 752, 31, index ? 'neutral' : 'input') + text(70 + index * 220, 758, label, { width: 56, anchor: 'middle', weight: 700 });
+  body += arrowBetween([250, 752], [112, 752], 'input', tools, 3)
+    + line(235, 810, 235, 1050, 'focus', true);
+  for (let row = 0; row < 4; row++) for (let column = 0; column < 4; column++) body += `<rect x="${40 + column * 19}" y="${843 + row * 19}" width="17" height="17" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1"></rect>`;
+  body += circle(175, 880, 28, 'output') + text(175, 886, 'state', { width: 50, anchor: 'middle', weight: 700 })
+    + text(20, 958, 'Local tile and retained row summaries', { width: 205 })
+    + arrowBetween([70, 1040], [290, 1040], 'output', tools, 3)
+    + text(180, 1104, 'Output write remains', { width: 300, anchor: 'middle', weight: 700 })
+    + text(20, 1228, 'One-head size fixture: 8,192 tokens, width 128, two-byte elements. Temporary tiles must fit the actual on-chip budget.', { width: 320, weight: 700 });
+  for (const [index, [label, size]] of [['One global score matrix: 128 MiB', scoreMiB], ['One query tensor: 2 MiB', queryMiB]].entries()) {
+    const vertical = 1395 + index * 125;
+    body += text(20, vertical, label, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 32}" width="${300 * size / scoreMiB}" height="26" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1"></rect>`;
+  }
+  body += text(20, 1660, 'Size ratio sixty-four is not a traffic ratio or speedup. Keeping two full score/probability buffers would use 256 MiB in this fixture.', { width: 320, weight: 700 })
+    + text(20, 1800, 'Dense allowed pairs are still computed. Linear auxiliary storage at fixed width does not imply linear traffic or latency; tile capacity and scheduling matter.', { width: 320 })
+    + text(20, 1945, 'Invented short-sequence timings: baseline seven microseconds, tiled eight. Speedup factor 0.875: tiled is slower despite the same operator.', { width: 320, tone: 'warning' })
+    + text(20, 2095, 'Backward may recompute tiles instead of retaining full probabilities. Check forward/backward tolerance, dtype, device, head width, masks and saved-state requirements.', { width: 320 });
+  return { body, height: 2220 };
 }
 
 function transientGather(picture, model, tools) {
   const { text, color, fill, line } = tools;
-  let body = text(20, 27, 'One rank’s shard grows temporarily into one active unit', { width: 320, weight: 700 });
-  for (let stage = 0; stage < 3; stage++) {
-    const vertical = 137 + stage * 169;
-    body += text(20, vertical - 37, ['Rest: retain one quarter', 'Compute: gather this wrapped unit', 'Afterward: retain the same quarter'][stage], { width: 320, weight: 700 });
-    for (let shard = 0; shard < 4; shard++) body += `<rect x="${27 + shard * 77}" y="${vertical}" width="73" height="57" style="fill:${fill(!shard || stage === 1 ? 'input' : 'neutral')};stroke:${color(!shard || stage === 1 ? 'input' : 'neutral')};stroke-width:2"></rect>` + text(63 + shard * 77, vertical + 35, !shard || stage === 1 ? shard + 1 : '-', { width: 62, anchor: 'middle', weight: 700 });
+  const ranks = 4;
+  const persistent = [16, 4 + 12 / ranks, 2 + 14 / ranks, 16 / ranks];
+  assert.deepEqual(persistent, [16, 7, 5.5, 4]);
+  assert.deepEqual([4 + 12, 2 + 14, 16], [16, 16, 16]);
+  const unit = .5;
+  const live = [persistent[3], 2, .5, unit];
+  const total = live.reduce((sum, value) => sum + value, 0);
+  assert.equal(total, 7);
+  assert.equal(persistent[3] + 2 + .5 + 4 * unit, 8.5);
+  assert.equal(unit * (ranks - 1) / ranks, .375);
+  assert.deepEqual([4 + 6 + .5 + unit, 2 + 6 + .5 + unit, 2 + 2 + .5 + unit], [11, 9, 5]);
+  let body = text(20, 27, 'Persistent shards and live gathers are different ledgers', { width: 320, weight: 700 })
+    + text(20, 116, 'One billion parameters; four ranks. Per parameter: two BF16 weight bytes, two gradient bytes, eight Adam-moment bytes and four separate master-weight bytes.', { width: 320 })
+    + text(20, 269, 'Decimal GB; ideal persistent storage per rank', { width: 320, weight: 700 });
+  for (const [index, [label, size]] of [['Replicated', persistent[0]], ['ZeRO-1: optimizer sharded', persistent[1]], ['ZeRO-2: gradients too', persistent[2]], ['Full sharding: parameters too', persistent[3]]].entries()) {
+    const vertical = 355 + index * 113;
+    body += text(20, vertical, `${label}: ${size} GB`, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 28}" width="${size * 18}" height="25" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`;
   }
-  return { body, height: 558 };
+  body += text(20, 863, 'One wrapped unit: default free-and-regather policy', { width: 320, weight: 700 });
+  const stages = ['Rest: owned quarter', 'Gather full unit; forward', 'Free full unit; owned quarter', 'Gather full unit again; backward', 'Reduce-scatter gradients; local update'];
+  for (const [stage, label] of stages.entries()) {
+    const vertical = 1010 + stage * 177;
+    const gathered = stage === 1 || stage === 3;
+    body += text(20, vertical - 52, label, { width: 320, weight: 700 });
+    for (let shard = 0; shard < ranks; shard++) {
+      const present = !shard || gathered;
+      body += `<rect x="${27 + shard * 77}" y="${vertical}" width="73" height="57" style="fill:${fill(present ? 'input' : 'neutral')};stroke:${color(present ? 'input' : 'neutral')};stroke-width:2"></rect>`
+        + text(63 + shard * 77, vertical + 35, present ? shard + 1 : '-', { width: 62, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 1845, 'Box widths show ownership, not bytes. A 250-million-parameter BF16 unit gathers a full 0.5 GB buffer.', { width: 320 })
+    + text(20, 1960, 'Conservative separate-allocation live ledger: persistent four; activations two; other buffers 0.5; one full gather 0.5. Total seven GB.', { width: 320, weight: 700 });
+  let horizontal = 20;
+  for (const [index, size] of live.entries()) {
+    const width = size * 35;
+    const tone = ['input', 'focus', 'neutral', 'output'][index];
+    body += `<rect x="${horizontal}" y="2108" width="${width}" height="36" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    horizontal += width;
+  }
+  body += line(300, 2084, 300, 2170, 'warning', true)
+    + text(20, 2227, 'Eight-GB capacity is the dashed boundary. Retaining one unit skips its second gather but keeps 0.5 GB live. Four retained units raise this ledger to 8.5 GB: too large.', { width: 320, weight: 700 })
+    + text(20, 2384, 'Ideal four-rank ring gather sends and receives 0.375 GB per rank for that unit. Retention trades this communication against live memory.', { width: 320 })
+    + text(20, 2513, 'Grow activations to six GB: four ranks need eleven; eight ranks still need nine. Hypothetical checkpointing to two-GB activations gives five GB at eight ranks, with recomputation.', { width: 320, tone: 'warning' })
+    + text(20, 2680, 'Check actual precision, wrapping, prefetch overlap and storage aliasing. Smaller units can add launches. FSDP and ZeRO-3 are related, not identical peak policies.', { width: 320 });
+  return { body, height: 2810 };
 }
 
 function gradientOwnership(picture, model, tools) {
-  const { text, circle, line } = tools;
-  let body = text(20, 27, 'Freeze parameter updates without freezing every gradient path', { width: 320, weight: 700 });
+  const { text, circle, line, color, fill } = tools;
+  let body = text(20, 27, 'Two objectives; alternate which parameters update', { width: 320, weight: 700 })
+    + text(20, 112, 'G maps noise to fake samples. D learns to classify real and fake. G learns to fool D; a high-quality sample is not the same as coverage of every mode.', { width: 320 });
   for (let step = 0; step < 2; step++) {
-    const vertical = 173 + step * 284;
-    body += text(20, vertical - 69, step ? 'G step: gradient passes through frozen D' : 'D step: stop the fake-sample path into G', { width: 320, weight: 700 });
+    const vertical = 395 + step * 460;
+    body += text(20, vertical - 88, step ? 'G step: pass gradients through frozen D' : 'D step: classify real and detached fake', { width: 320, weight: 700 });
     for (const [node, label] of ['G', 'fake', 'D', 'loss'].entries()) body += circle(49 + node * 86, vertical, 22, node === 2 ? 'state' : 'input') + text(49 + node * 86, vertical + 6, label, { width: 38, anchor: 'middle', size: 14, weight: 700 });
+    for (let edge = 0; edge < 3; edge++) body += arrowBetween([49 + edge * 86 + 25, vertical], [49 + (edge + 1) * 86 - 25, vertical], 'input', tools);
     for (let edge = 0; edge < 3; edge++) body += !step && edge === 0 ? line(112, vertical + 46, 72, vertical + 46, 'warning', true) : arrowBetween([49 + (edge + 1) * 86 - 24, vertical + 46], [49 + edge * 86 + 24, vertical + 46], 'output', tools, 3);
     body += text(20, vertical + 134, step ? 'D weights stay fixed; G owns this update.' : 'D owns the update; G receives no fake-sample gradient.', { width: 320, weight: 700 });
+    body += text(20, vertical + 236, step ? 'Freezing D parameters is not detaching D output. The derivative with respect to its input still reaches G.' : 'Real samples also feed D\'s classification loss. Detach fake samples for this step; do not accidentally update G.', { width: 320 });
   }
-  return { body, height: 658 };
+  const probability = .01;
+  const derivatives = value => [-value, value - 1];
+  const gradients = derivatives(probability);
+  assert.deepEqual(gradients, [-.01, -.99]);
+  const changed = derivatives(.5);
+  assert.equal(changed[0], changed[1]);
+  body += text(20, 1243, 'Confident discriminator toy: fake has real-class probability 0.01. Compare generator-loss derivatives with respect to that same discriminator logit.', { width: 320, weight: 700 });
+  for (const [index, [label, value]] of [['Original saturating loss: minus 0.01', gradients[0]], ['Non-saturating loss: minus 0.99', gradients[1]]].entries()) {
+    const vertical = 1435 + index * 170;
+    body += text(20, vertical, label, { width: 320, weight: 700 })
+      + `<rect x="20" y="${vertical + 35}" width="${Math.abs(value) * 300}" height="28" style="fill:${fill(index ? 'output' : 'warning')};stroke:${color(index ? 'output' : 'warning')};stroke-width:1.5"></rect>`;
+  }
+  body += text(20, 1770, 'At probability one half, both toy derivatives are minus one half. Actual G parameter gradients also depend on the G and D Jacobians.', { width: 320 })
+    + text(20, 1907, 'Changing the loss can strengthen this signal without solving mode collapse or cycling. Stabilizers require their own assumptions and measurements.', { width: 320, tone: 'warning' })
+    + text(20, 2040, 'Check sample quality, diversity/coverage and training dynamics. A one-pass sampling graph alone does not establish a latency win on real hardware.', { width: 320 });
+  return { body, height: 2160 };
+}
+
+function claimEvidenceRelease(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const support = false;
+  const release = true;
+  const samples = Array(5).fill('Approval promised');
+  assert(samples.every(sample => sample === samples[0]));
+  assert(!(support && release));
+  assert(!(true && false));
+  let body = text(20, 27, 'Agreement is not evidence; support is not permission', { width: 320, weight: 700 })
+    + text(20, 117, 'Five sampled answers repeat an approval promise. The authorized passage does not contain that promise.', { width: 320, weight: 700 });
+  for (const [index] of samples.entries()) {
+    const horizontal = 38 + index * 71;
+    body += circle(horizontal, 275, 20, 'input') + text(horizontal, 281, index + 1, { width: 34, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 302], [180, 392], 'input', tools);
+  }
+  body += circle(180, 435, 34, 'warning') + text(180, 441, 'No', { width: 60, anchor: 'middle', weight: 700 })
+    + text(20, 532, 'Claim support is absent. Five copies can share one wrong assumption; token likelihood is not the chance the claim is true.', { width: 320, tone: 'warning' });
+  const controls = [
+    ['Unsupported promise', false, true, 'Abstain, correct with evidence, or route to review; do not release the unsupported claim.'],
+    ['Supported private claim', true, false, 'Evidence supports it, but disclosure is not authorized. Stop at the separate release gate.'],
+    ['Supported releasable claim', true, true, 'Both required gates pass in this stipulated case; other task checks still apply.'],
+  ];
+  assert.deepEqual(controls.map(([, supported, permitted]) => supported && permitted), [false, false, true]);
+  for (const [index, [label, supported, permitted, decision]] of controls.entries()) {
+    const vertical = 735 + index * 350;
+    body += text(20, vertical, label, { width: 320, weight: 700 });
+    for (const [gate, passed] of [supported, permitted].entries()) {
+      const horizontal = 70 + gate * 220;
+      body += circle(horizontal, vertical + 86, 25, passed ? 'output' : 'warning')
+        + text(horizontal, vertical + 92, passed ? 'yes' : 'no', { width: 43, anchor: 'middle', weight: 700 })
+        + text(horizontal, vertical + 145, gate ? 'Release' : 'Support', { width: 115, anchor: 'middle', weight: 700 });
+    }
+    body += line(100, vertical + 86, 260, vertical + 86, 'neutral', true)
+      + text(20, vertical + 213, decision, { width: 320 });
+  }
+  body += text(20, 1835, 'A citation can resolve without its passage entailing the claim. Check source access, freshness and every consequential claim, not just answer formatting.', { width: 320, weight: 700 })
+    + text(20, 1980, 'Knowledge gaps, reasoning errors and context confusion need different tests. RAG, retries, low temperature, sample agreement and human review are not proof of factuality.', { width: 320 })
+    + text(20, 2130, 'Independently label verifier false accepts/rejects and confidence by population/slice. Track unsupported claims, refusals, false alarms, latency and versioned incidents.', { width: 320 })
+    + text(20, 2280, 'Choose fallback and release thresholds from consequence and measured errors. Refusal can be correct; no detector or reviewer establishes zero hallucinations.', { width: 320, tone: 'warning' });
+  return { body, height: 2400 };
+}
+
+function streamMedianBoundaries(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const completed = picture.values.map((value, index) => {
+    const sorted = picture.values.slice(0, index + 1).sort((first, second) => first - second);
+    const count = Math.ceil(sorted.length / 2);
+    const lower = sorted.slice(0, count).reverse();
+    const upper = sorted.slice(count);
+    return { value, lower, upper, median: lower.length > upper.length ? lower[0] : (lower[0] + upper[0]) / 2 };
+  });
+  const ordered = state => !state.upper.length || Math.max(...state.lower) <= Math.min(...state.upper);
+  const balanced = state => state.lower.length === state.upper.length || state.lower.length === state.upper.length + 1;
+  assert.deepEqual(completed.map(state => state.median), [5, 3.5, 5, 4.5]);
+  assert(completed.every(state => ordered(state) && balanced(state)));
+  const repairs = [
+    { label: 'Push ten: order fails, size allowed', lower: [10, 2], upper: [5] },
+    { label: 'Transfer maximum: order holds, size fails', lower: [2], upper: [5, 10] },
+    { label: 'Transfer minimum back: both hold', lower: [5, 2], upper: [10] },
+  ];
+  assert.deepEqual(repairs.map(state => [ordered(state), balanced(state)]), [[false, true], [true, false], [true, true]]);
+  let body = text(20, 27, 'Completed roots expose the middle ranks', { width: 320, weight: 700 })
+    + text(20, 113, 'Insert five, two, ten, four. These are logical heap members and extrema, not a claim that each heap array is sorted.', { width: 320 });
+  const row = (state, vertical, label, tone) => {
+    let drawing = text(20, vertical, label, { width: 320, weight: 700, tone });
+    for (const [side, values] of [state.lower, state.upper].entries()) {
+      const horizontal = 90 + side * 180;
+      drawing += text(horizontal, vertical + 67, side ? 'Upper minimum' : 'Lower maximum', { width: 160, anchor: 'middle', weight: 700 })
+        + circle(horizontal, vertical + 128, 29, values.length ? 'input' : 'neutral')
+        + text(horizontal, vertical + 134, values[0] ?? 'none', { width: 51, anchor: 'middle', weight: 700 })
+        + text(horizontal, vertical + 204, `Members: ${values.length ? values.join(', ') : 'empty'}`, { width: 160, anchor: 'middle' })
+        + text(horizontal, vertical + 248, `Size ${values.length}`, { width: 160, anchor: 'middle' });
+    }
+    return drawing + line(20, vertical + 293, 340, vertical + 293, 'neutral');
+  };
+  for (const [index, state] of completed.entries()) body += row(state, 255 + index * 355, `Added ${state.value}; completed median ${state.median}`, 'output');
+  body += text(20, 1740, 'Inside the insertion of ten: do not query repair frames', { width: 320, weight: 700, tone: 'warning' });
+  for (const [index, state] of repairs.entries()) body += row(state, 1860 + index * 355, state.label, index === 2 ? 'output' : 'warning');
+  body += text(20, 3010, 'Transfer lower maximum to upper; then, if upper is larger, return its minimum to lower. Both completed invariants must hold before reading roots.', { width: 320, weight: 700 })
+    + text(20, 3160, 'Python stores negatives in the lower min-heap to represent a logical max-heap. Odd counts use its root; even counts average the two logical roots.', { width: 320 })
+    + text(20, 3302, 'All history remains: logarithmic heap updates, constant root queries, linear value storage. Repeats count; no deletion. Empty source query raises IndexError.', { width: 320 })
+    + text(20, 3450, 'Float conversion can round or overflow huge integers. Exact fractions preserve roots; nearest-rank quantiles instead change the lower target size and need not average even samples.', { width: 320, tone: 'warning' });
+  return { body, height: 3580 };
+}
+
+function rotatedMinimumRetention(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const search = (values, duplicates = false, wrongCut = false) => {
+    assert(values.length > 0);
+    let left = 0;
+    let right = values.length - 1;
+    const stages = [];
+    while (left < right) {
+      const middle = Math.floor((left + right) / 2);
+      stages.push({ left, right, middle, label: `Middle ${values[middle]}; right ${values[right]}` });
+      if (values[middle] > values[right]) left = middle + 1;
+      else if (duplicates && values[middle] === values[right]) right--;
+      else right = middle - Number(wrongCut);
+    }
+    stages.push({ left, right, middle: left, label: `One survivor: position ${left}, value ${values[left]}` });
+    return { index: left, value: values[left], stages };
+  };
+  const result = search(picture.values);
+  assert.deepEqual(result.stages.map(stage => [stage.left, stage.right]), [[0, 7], [0, 3], [2, 3], [3, 3]]);
+  assert.equal(result.value, 1);
+  assert.equal(result.index, 3);
+  assert.equal(search(picture.values, false, true).value, 6);
+  assert.equal(search([1, 1, 1, 0, 1]).value, 1);
+  assert.equal(search([1, 1, 1, 0, 1], true).value, 0);
+  assert.equal(search([1, 1, 1, 1], true).stages.length - 1, 3);
+  assert.equal(search([1, 2, 3]).value, 1);
+  assert.equal(search([7]).value, 7);
+  assert(result.stages.every(stage => stage.left <= result.index && result.index <= stage.right));
+  let body = text(20, 27, 'The first midpoint is the minimum: retain it', { width: 320, weight: 700 })
+    + text(20, 112, 'Nonempty rotation of distinct increasing integers. Values and original positions stay fixed while the inclusive candidate interval shrinks.', { width: 320 });
+  for (const [index, stage] of result.stages.entries()) {
+    const vertical = 290 + index * 360;
+    const final = index === result.stages.length - 1;
+    body += text(20, vertical, `Retained original positions ${stage.left} through ${stage.right}`, { width: 320, weight: 700 })
+      + text(20, vertical + 71, stage.label, { width: 320, weight: 700, tone: final ? 'output' : 'focus' });
+    for (const [position, value] of picture.values.entries()) {
+      const horizontal = 30 + position * 42;
+      const retained = position >= stage.left && position <= stage.right;
+      const tone = retained ? position === stage.middle ? final ? 'output' : 'focus' : 'input' : 'neutral';
+      body += circle(horizontal, vertical + 151, 16, tone) + text(horizontal, vertical + 157, value, { width: 28, anchor: 'middle', weight: 700 });
+      if (!retained) body += line(horizontal - 14, vertical + 137, horizontal + 14, vertical + 165, 'warning');
+      body += text(horizontal, vertical + 207, position, { width: 28, anchor: 'middle' });
+    }
+    if (!final) body += text(20, vertical + 280, index ? 'Middle exceeds right: discard through the middle.' : 'Middle is below right: discard beyond it, not the middle.', { width: 320 });
+  }
+  body += text(20, 1800, 'Return value one. Returning position three is a changed output contract. Wrongly discarding the first low midpoint makes this source return six.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1950, 'Duplicate control: one, one, one, zero, one. Equal midpoint/right ones do not locate the hidden zero. The distinct-only source incorrectly returns one.', { width: 320 })
+    + text(20, 2100, 'Duplicate-aware equality removes only the right endpoint. If it was a minimum, the equal middle remains a witness; smaller interior values also remain.', { width: 320, weight: 700 })
+    + text(20, 2245, 'All-equal input may remove one item per iteration: linear worst-case work. Distinct inputs halve candidates; both use constant auxiliary state. Empty input has no minimum.', { width: 320 });
+  return { body, height: 2370 };
+}
+
+function treeReachabilityProof(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const traverse = (count, edges) => {
+    if (!count || edges.length !== count - 1) return { accepted: false, frames: [], seen: new Set() };
+    const adjacency = Array.from({ length: count }, () => []);
+    for (const [first, second] of edges) { adjacency[first].push(second); adjacency[second].push(first); }
+    const seen = new Set([0]);
+    const stack = [0];
+    const frames = [{ label: 'Seed only', stack: [...stack], seen: [...seen] }];
+    while (stack.length) {
+      const current = stack.pop();
+      for (const neighbor of adjacency[current]) if (!seen.has(neighbor)) { seen.add(neighbor); stack.push(neighbor); }
+      frames.push({ label: `Expanded ${current}`, stack: [...stack], seen: [...seen] });
+    }
+    return { accepted: seen.size === count, seen, frames };
+  };
+  const result = traverse(picture.nodes, picture.edges);
+  assert(result.accepted);
+  assert.deepEqual(result.frames.map(frame => frame.stack), [[0], [1, 2], [1], [3, 4], [3], []]);
+  assert.equal(result.frames[3].seen.length, 5);
+  const triangle = [[0, 1], [1, 2], [2, 0]];
+  assert(!traverse(4, triangle).accepted);
+  assert.equal(traverse(4, triangle).seen.size, 3);
+  assert(!traverse(3, triangle).accepted);
+  assert(traverse(1, []).accepted);
+  assert(!traverse(0, []).accepted);
+  assert(!traverse(1, [[0, 0]]).accepted);
+  assert(!traverse(3, [[0, 1], [0, 1]]).accepted);
+  let body = text(20, 27, 'Exact edge count plus complete undirected reachability', { width: 320, weight: 700 })
+    + text(20, 110, 'Five declared nodes, four undirected edges. If connected, those edges are exactly a spanning tree, with none left to close a cycle.', { width: 320 });
+  const points = [[180, 335], [90, 455], [280, 455], [35, 585], [150, 585]];
+  for (const [first, second] of picture.edges) body += line(...points[first], ...points[second], 'input');
+  for (const [index, point] of points.entries()) body += circle(...point, 23, 'input') + text(point[0], point[1] + 6, index, { width: 40, anchor: 'middle', weight: 700 });
+  body += text(20, 712, 'Mark on push. Stack top is at the right; seen means discovered, not fully expanded.', { width: 320, weight: 700 });
+  for (const [index, frame] of result.frames.entries()) {
+    const vertical = 840 + index * 148;
+    body += text(20, vertical, `${frame.label}: stack ${frame.stack.length ? frame.stack.join(', ') : 'empty'}`, { width: 320, weight: 700 })
+      + text(20, vertical + 60, `Discovered: ${frame.seen.join(', ')}`, { width: 320 });
+  }
+  body += text(20, 1810, 'All five discovered: accept. A discovered neighbor alone is not a cycle test; the reverse entry of each undirected edge is expected.', { width: 320, weight: 700 })
+    + text(20, 1960, 'Count-only failure: triangle plus isolated node three', { width: 320, weight: 700, tone: 'warning' });
+  const failedPoints = [[60, 2080], [155, 2200], [220, 2080], [315, 2170]];
+  for (const [first, second] of triangle) body += line(...failedPoints[first], ...failedPoints[second], 'warning');
+  for (const [index, point] of failedPoints.entries()) body += circle(...point, 21, index === 3 ? 'neutral' : 'warning') + text(point[0], point[1] + 6, index, { width: 36, anchor: 'middle', weight: 700 });
+  body += text(20, 2320, 'Four nodes, three edges, but only three reachable. A triangle without the isolate is connected, yet fails the edge-count gate. Both conditions matter.', { width: 320, weight: 700 })
+    + text(20, 2472, 'Changed target: edges zero-one and two-three form a forest, not one tree. Forest validation drops connectivity but rejects within-component edges, loops and repeated edges.', { width: 320 })
+    + text(20, 2628, 'Keep the full declared label universe, including isolates. One node without edges is a tree; zero nodes is not. Arbitrary labels need an explicit map, not labels inferred only from edges.', { width: 320 })
+    + text(20, 2785, 'DFS inputs passing the count gate need linear graph work and storage. Directed rooted trees require different incoming-edge and direction conditions.', { width: 320, tone: 'warning' });
+  return { body, height: 2905 };
 }
 
 function countFloor(picture, model, tools) {
   const { text, circle, line } = tools;
-  let body = text(20, 27, 'The joint-pass floor counts actual trial identities', { width: 320, weight: 700 });
-  for (let trial = 0; trial < picture.total; trial++) {
+  const cases = Array.from({ length: picture.total }, (unused, index) => ({ citation: index < 18, support: index < 13 || index === 18 }));
+  const matrix = [[0, 0], [0, 0]];
+  for (const result of cases) matrix[Number(!result.citation)][Number(!result.support)]++;
+  const valid = cases.filter(result => result.citation).length;
+  const supported = cases.filter(result => result.support).length;
+  const joint = cases.filter(result => result.citation && result.support).length;
+  assert.deepEqual(matrix, [[13, 5], [1, 1]]);
+  assert.deepEqual([valid, supported, joint], [18, 14, picture.passed]);
+  assert.equal(picture.required / picture.total, .7);
+  assert.equal((valid / picture.total + supported / picture.total) / 2, .8);
+  assert.equal(valid + supported - joint, 19);
+  let body = text(20, 27, 'Citation IDs and substantive support must overlap', { width: 320, weight: 700 })
+    + text(20, 112, 'Twenty hypothetical held-out answers. Citation validity and independently human-reviewed support are different labels on the same cases.', { width: 320 });
+  const categories = [
+    ['Both valid and supported', matrix[0][0], 'output'],
+    ['Valid citation only', matrix[0][1], 'warning'],
+    ['Support only; invalid citation', matrix[1][0], 'warning'],
+    ['Neither requirement', matrix[1][1], 'warning'],
+  ];
+  for (const [category, [label, count, tone]] of categories.entries()) {
+    const vertical = 293 + category * 166;
+    body += text(20, vertical, `${label}: ${count}`, { width: 320, weight: 700, tone });
+    for (let index = 0; index < count; index++) body += circle(31 + index * 24, vertical + 55, 8, tone, true);
+  }
+  body += text(20, 1002, 'Valid citations: ninety percent. Support: seventy percent. Joint: sixty-five percent, not their eighty-percent average or ninety-five-percent union.', { width: 320, weight: 700 })
+    + text(20, 1150, 'Observed joint floor: fourteen of twenty. Green means both requirements passed on that answer.', { width: 320, weight: 700 });
+  for (const [trial, result] of cases.entries()) {
     const horizontal = 43 + trial % 10 * 30;
-    const vertical = 145 + Math.floor(trial / 10) * 62;
-    body += circle(horizontal, vertical, 7, trial < picture.passed ? 'output' : 'warning', true);
+    const vertical = 1310 + Math.floor(trial / 10) * 62;
+    body += circle(horizontal, vertical, 7, result.citation && result.support ? 'output' : 'warning', true);
     if (trial === picture.required - 1) body += circle(horizontal, vertical, 14, 'focus');
   }
-  body += text(20, 344, `${picture.passed}/${picture.total} = ${picture.passed / picture.total * 100}%; required ${picture.required}/${picture.total}`, { width: 320, weight: 700 }) + text(20, 438, 'Outlined trial fourteen must also become a joint pass.', { width: 320, tone: 'soft' });
-  assert.equal(picture.required / picture.total, .7);
-  return { body, height: 503 };
+  body += text(20, 1490, 'Thirteen joint successes: the observed floor fails. Any one additional joint pass reaches fourteen; the outline marks one possible repair, not a unique required case.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1644, `Total cost forty cents; cost per jointly valid answer about ${Number((picture.cost / joint).toFixed(5))} dollars. Report counts, sampling unit and an uncertainty method.`, { width: 320 })
+    + text(20, 1798, 'Twenty cases do not guarantee population quality. Passing this descriptive floor would not prove improved user task completion.', { width: 320 })
+    + text(20, 1930, 'Record case/source/slice/rubric, hard results, semantic labels, model/judge/prompt versions, latency and cost. Validate consequential scorer errors independently.', { width: 320 })
+    + text(20, 2074, 'Tuning on final cases turns later scores into development evidence. Keep fresh confirmation separate; severe failures need independent release controls.', { width: 320, tone: 'warning' });
+  return { body, height: 2200 };
 }
 
 function replaceOneState(picture, model, tools) {
@@ -5163,13 +9924,85 @@ function replaceOneState(picture, model, tools) {
   return { body, height: 193 + picture.states.length * 178 };
 }
 
+function asrTextScoreControl(picture, model, tools) {
+  const { text, line, color, fill } = tools;
+  const candidates = ['Rare name', 'Common word'];
+  const acoustic = [-5, -2];
+  const language = [-1, -4];
+  const weights = [.5, 1.5];
+  const totals = weights.map(weight => acoustic.map((score, index) => score + weight * language[index]));
+  const winners = totals.map(scores => scores.indexOf(Math.max(...scores)));
+  assert.deepEqual(totals, [[-5.5, -4], [-6.5, -8]]);
+  assert.deepEqual(winners, [1, 0]);
+  assert.deepEqual(acoustic, [-5, -2]);
+  assert.equal([1].filter(index => index === winners[1]).length, 0);
+  let body = text(20, 27, 'Same acoustic scores; different text-side preference', { width: 320, weight: 700 })
+    + text(20, 112, 'Weekly product names; text and pronunciations, little new audio. Fixed acoustic scores: rare minus five, common minus two. LM scores: rare minus one, common minus four.', { width: 320 });
+  for (const [stage, weight] of weights.entries()) {
+    const vertical = 340 + stage * 560;
+    body += text(20, vertical, `External-LM weight ${weight}`, { width: 320, weight: 700 });
+    for (const [candidate, label] of candidates.entries()) {
+      const row = vertical + 110 + candidate * 180;
+      const acousticWidth = -acoustic[candidate] * 30;
+      const textWidth = -language[candidate] * weight * 30;
+      const selected = winners[stage] === candidate;
+      body += text(20, row, `${label}: score ${totals[stage][candidate]}${selected ? '; selected' : ''}`, { width: 320, weight: 700, tone: selected ? 'output' : 'neutral' })
+        + `<rect x="${340 - acousticWidth}" y="${row + 35}" width="${acousticWidth}" height="30" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+        + `<rect x="${340 - acousticWidth - textWidth}" y="${row + 35}" width="${textWidth}" height="30" style="fill:${fill('focus')};stroke:${color('focus')};stroke-width:1.5"></rect>`;
+      if (selected) body += `<rect x="${338 - acousticWidth - textWidth}" y="${row + 32}" width="${acousticWidth + textWidth + 4}" height="36" style="fill:none;stroke:${color('output')};stroke-width:2"></rect>`;
+    }
+    body += line(95, vertical + 420, 340, vertical + 420, 'neutral');
+    for (const value of [-8, -4, 0]) body += text(340 + value * 30, vertical + 468, value, { width: 40, anchor: 'middle' });
+  }
+  body += text(20, 1510, 'Blue acoustic contribution stays fixed; weighted text contribution changes. Scores are negative: the sum closer to zero wins this declared toy.', { width: 320, weight: 700 })
+    + text(20, 1660, 'The rare candidate wins at weight 1.5 without acoustic retraining. This is not measured accuracy or proof it was spoken. If search never supplies it, fixed-list rescoring cannot choose it.', { width: 320 })
+    + text(20, 1823, 'Version token/phone compatibility, lexicon, LM convention, fusion weight, search, graph publication and rollback. Unchanged acoustic weights do not make the update free.', { width: 320, weight: 700 })
+    + text(20, 1973, 'Audit rare-term recall, false insertions, WER slices and delay at matched workloads. A changed microphone needs representative front-end/acoustic evidence, not merely stronger term bias.', { width: 320, tone: 'warning' })
+    + text(20, 2130, 'Hybrid and end-to-end cores place training boundaries differently. External LM, biasing, endpointing and confidence controls can still exist around a jointly trained core.', { width: 320 });
+  return { body, height: 2260 };
+}
+
 function gainFloor(picture, model, tools) {
   const { text, line, circle } = tools;
-  let body = text(20, 27, 'A positive gain can remain below the worthwhile floor', { width: 320, weight: 700 })
-    + line(45, 199, 315, 199) + line(288, 166, 288, 232, 'warning', true) + circle(45 + picture.estimate / picture.required * 243, 199, 8, 'input', true)
-    + text(20, 305, `Estimate ${picture.estimate} point; practical floor ${picture.required} point`, { width: 320, weight: 700 }) + text(20, 409, 'Nonzero and worthwhile are separate questions.', { width: 320, tone: 'soft' });
-  assert(picture.estimate < picture.required);
-  return { body, height: 474 };
+  const fixtures = [{ count: 1000, positive: 20, negative: 12 }, { count: 4000, positive: 80, negative: 48 }];
+  const intervals = fixtures.map(fixture => {
+    const mean = (fixture.positive - fixture.negative) / fixture.count;
+    const variance = (fixture.positive + fixture.negative - fixture.count * mean ** 2) / (fixture.count - 1);
+    const error = Math.sqrt(variance / fixture.count);
+    return { mean: mean * 100, variance, error: error * 100, statistic: mean / error, low: (mean - 1.96 * error) * 100, high: (mean + 1.96 * error) * 100 };
+  });
+  assert(intervals.every(interval => Math.abs(interval.mean - picture.estimate) < 1e-12));
+  assert(Math.abs(intervals[0].low + .308188261280163) < 1e-6);
+  assert(intervals[0].low < 0 && intervals[0].high > picture.required);
+  assert(intervals[1].low > 0 && intervals[1].low < picture.required && intervals[1].high > picture.required);
+  assert(intervals[0].error > intervals[1].error);
+  assert.equal(.05 / 20, .0025);
+  assert(.01 > .05 / 20);
+  const horizontal = point => 45 + (point + .5) * 108;
+  let body = text(20, 27, 'Paired information narrows uncertainty, not the decision rule', { width: 320, weight: 700 })
+    + text(20, 112, 'Two fixed models; independent paired examples from a declared population. Predeclare test direction, level and useful gain: one percentage point.', { width: 320 });
+  for (const [index, fixture] of fixtures.entries()) {
+    const interval = intervals[index];
+    const vertical = 330 + index * 640;
+    body += text(20, vertical, `${fixture.count} pairs: ${fixture.positive} B-only wins, ${fixture.negative} A-only wins`, { width: 320, weight: 700 })
+      + text(20, vertical + 85, `${fixture.count - fixture.positive - fixture.negative} zero differences; estimate 0.8 point`, { width: 320 })
+      + text(20, vertical + 176, `Paired variance ${interval.variance.toFixed(6)}; standard error ${interval.error.toFixed(4)} point`, { width: 320 });
+    body += line(45, vertical + 312, 315, vertical + 312, 'neutral')
+      + line(horizontal(0), vertical + 265, horizontal(0), vertical + 350, 'neutral', true)
+      + line(horizontal(picture.required), vertical + 250, horizontal(picture.required), vertical + 365, 'warning', true)
+      + line(horizontal(interval.low), vertical + 312, horizontal(interval.high), vertical + 312, 'input', false, 5)
+      + line(horizontal(interval.low), vertical + 299, horizontal(interval.low), vertical + 325, 'input')
+      + line(horizontal(interval.high), vertical + 299, horizontal(interval.high), vertical + 325, 'input')
+      + circle(horizontal(interval.mean), vertical + 312, 7, 'input', true);
+    for (const point of [0, 1, 2]) body += text(horizontal(point), vertical + 411, point, { width: 50, anchor: 'middle', weight: 700 });
+    body += text(20, vertical + 499, `Approximate 95-percent interval: ${interval.low.toFixed(3)} to ${interval.high.toFixed(3)} points`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1660, 'Same ruler: grey zero; dashed red one-point useful threshold. First interval spans zero and the threshold. Second is positive but still crosses the useful threshold.', { width: 320, weight: 700 })
+    + text(20, 1820, 'Four thousand new independent pairs supply more information. Repeating the original records four times does not. Keep discordant pairs; separate model marginals lose covariance.', { width: 320 })
+    + text(20, 1970, 'First interval also fails to establish equivalence within a half-point margin. Sampling assumptions and normal-approximation coverage need justification.', { width: 320 })
+    + text(20, 2115, 'Coverage belongs to the repeated-sampling procedure, not a 95-percent posterior claim about this interval. A p-value is null-conditional, not the chance the null is true.', { width: 320, tone: 'warning' })
+    + text(20, 2270, 'Twenty prespecified formal claims at family-wise level 0.05: Bonferroni threshold 0.0025 each. A p-value 0.01 does not reject under that procedure.', { width: 320 });
+  return { body, height: 2400 };
 }
 
 function normalizedRanking(picture, model, tools) {
@@ -5289,7 +10122,7 @@ function storedExecuted(picture, model, tools) {
     const horizontal = 52 + expert * 85;
     body += circle(horizontal, 152, 24, 'input') + text(horizontal, 158, `E${expert + 1}`, { width: 41, anchor: 'middle', weight: 700 });
     body += active ? arrowBetween([horizontal, 183], [horizontal, 328], 'output', tools, 3) : line(horizontal, 183, horizontal, 298, 'warning', true);
-    body += circle(horizontal, 363, 24, active ? 'output' : 'neutral') + text(horizontal, 369, active ? '+' : '-', { width: 41, anchor: 'middle', weight: 700 });
+    body += circle(horizontal, 363, 24, active ? 'output' : 'neutral') + text(horizontal, 369, active ? '\u2713' : '-', { width: 41, anchor: 'middle', weight: 700 });
   }
   body += text(20, 467, 'Four stored identities; two active experts for this token.', { width: 320, weight: 700 });
   return { body, height: 536 };
@@ -5617,6 +10450,26 @@ function splitDependencies(picture, model, tools) {
   return { body, height: 568 };
 }
 
+function epochAdmissionAndStop(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const admit = packet => packet === picture.activeEpoch;
+  assert(!admit(picture.oldEpoch) && admit(picture.activeEpoch));
+  assert.deepEqual(picture.playback, ['queued', 'unknown', 'stopped']);
+  const retired = epochMembers(picture, model, tools);
+  let body = retired.body + text(20, 795, 'Independent client playback path', { width: 320, weight: 700 });
+  const actions = ['retire old', 'stop request', 'device receipt'];
+  for (const [index, state] of picture.playback.entries()) {
+    const vertical = 944 + index * 198;
+    body += text(20, vertical + 7, actions[index], { width: 106, weight: 700 })
+      + circle(173, vertical, 26, 'input') + text(173, vertical + 6, picture.activeEpoch, { width: 45, anchor: 'middle', weight: 700 })
+      + circle(295, vertical, 38, state === 'stopped' ? 'output' : 'warning') + text(295, vertical + 6, state === 'unknown' ? '?' : state, { width: 72, anchor: 'middle', weight: 700 });
+    if (index) body += line(173, vertical - 157, 173, vertical - 36, 'input', true) + line(295, vertical - 157, 295, vertical - 40, index === 2 ? 'output' : 'warning', index === 1);
+  }
+  body += text(122, 1444, 'Active epoch', { width: 106, weight: 700 }) + text(252, 1444, 'Playback', { width: 88, weight: 700 })
+    + text(20, 1543, 'Only the device receipt establishes stopped playback. Old packets remain rejected in every row.', { width: 320, weight: 700 });
+  return { body, height: 1650 };
+}
+
 function epochMembers(picture, model, tools) {
   const { text, circle, line } = tools;
   let body = text(20, 27, picture.title ?? 'Late packets cannot reopen the retired epoch', { width: 320, weight: 700 });
@@ -5624,17 +10477,60 @@ function epochMembers(picture, model, tools) {
     const vertical = 148 + row * 174;
     const accepted = active === packet;
     body += text(20, vertical - 42, `Active ${active}; packet ${packet}`, { width: 320, weight: 700 }) + circle(69, vertical, 25, 'input') + text(69, vertical + 6, packet, { width: 44, anchor: 'middle', weight: 700 })
-      + (accepted ? arrowBetween([100, vertical], [250, vertical], 'output', tools, 3) : line(100, vertical, 232, vertical, 'warning', true)) + circle(284, vertical, 25, accepted ? 'output' : 'warning') + text(284, vertical + 6, accepted ? '+' : 'x', { width: 44, anchor: 'middle', weight: 700 });
+      + (accepted ? arrowBetween([100, vertical], [250, vertical], 'output', tools, 3) : line(100, vertical, 232, vertical, 'warning', true)) + circle(284, vertical, 25, accepted ? 'output' : 'warning') + text(284, vertical + 6, accepted ? '\u2713' : 'x', { width: 44, anchor: 'middle', weight: 700 });
   }
   body += text(20, 634, picture.footer ?? 'Rejecting packet seven leaves active epoch eight intact.', { width: 320, weight: 700 });
   return { body, height: 701 };
 }
 
+function pairedViewsAndCandidates(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const embeddings = picture.angles.map(angles => angles.map(angle => [Math.cos(angle), Math.sin(angle)]));
+  const positiveShares = embeddings.map(points => {
+    const weights = points.slice(1).map(point => Math.exp(point.reduce((sum, value, coordinate) => sum + value * points[0][coordinate], 0)));
+    return weights[0] / weights.reduce((sum, value) => sum + value, 0);
+  });
+  assert(embeddings.flat().every(point => Math.abs(Math.hypot(...point) - 1) < 1e-12));
+  assert.deepEqual(embeddings[0][0], embeddings[1][0]);
+  assert(positiveShares[1] > positiveShares[0]);
+  assert(-Math.log(positiveShares[1]) < -Math.log(positiveShares[0]));
+  let body = text(20, 27, 'Two allowed views; one shared encoder', { width: 320, weight: 700 });
+  for (let view = 0; view < 2; view++) {
+    const horizontal = 25 + view * 190;
+    const tone = view ? 'output' : 'input';
+    body += text(horizontal + 60, 109, view ? 'View P' : 'View A', { width: 115, anchor: 'middle', weight: 700, tone })
+      + `<rect x="${horizontal}" y="145" width="120" height="95" data-picture-contrastive-source-item="O" data-picture-contrastive-view="${view}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + circle(horizontal + 60 + view * 12, 192, 20, tone) + text(horizontal + 60 + view * 12, 198, 'O', { width: 35, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal + 60, 258], [view ? 235 : 125, 337], tone, tools, 2);
+  }
+  body += `<rect x="80" y="350" width="200" height="54" style="fill:${fill('state')};stroke:${color('state')};stroke-width:1.5"></rect>`
+    + text(180, 383, 'Shared encoder', { width: 185, anchor: 'middle', weight: 700 })
+    + text(20, 462, 'All views and negatives use the same weights.', { width: 320 });
+  for (const [stage, points] of embeddings.entries()) {
+    const offset = stage * 470;
+    const center = [200, 700 + offset];
+    body += text(20, 539 + offset, stage ? 'After one illustrative update' : 'Before the illustrative update', { width: 320, weight: 700 })
+      + `<circle cx="${center[0]}" cy="${center[1]}" r="130" style="fill:none;stroke:${color('neutral')};stroke-width:1.5"></circle>`
+      + line(60, center[1], 340, center[1], 'neutral') + line(center[0], center[1] - 140, center[0], center[1] + 140, 'neutral');
+    for (const [example, point] of points.entries()) {
+      const position = [center[0] + point[0] * 130, center[1] - point[1] * 130];
+      const tone = example === 0 ? 'input' : example === 1 ? 'output' : 'warning';
+      const labelVertical = position[1] + (example === 0 ? 24 : point[1] < 0 ? 25 : -19);
+      body += `<g data-picture-contrastive-example="${picture.names[example]}" data-picture-contrastive-stage="${stage}">${circle(...position, 6, tone, true)}${text(position[0], labelVertical, picture.names[example], { width: 30, anchor: 'middle', weight: 700, tone })}</g>`;
+    }
+    body += text(20, 898 + offset, `Positive share: ${(positiveShares[stage] * 100).toFixed(1)}%`, { width: 320, weight: 700, tone: 'output' });
+  }
+  body += text(20, 1435, 'Same unit-length scale. The positive gains relative to both negatives.', { width: 320 });
+  const membership = positiveInWhole(picture, model, tools);
+  body += `<g transform="translate(0 1510)">${membership.body}</g>`;
+  return { body, height: 1510 + membership.height };
+}
+
 function positiveInWhole(picture, model, tools) {
   const { text, circle, line } = tools;
-  let body = text(20, 27, 'The declared positive belongs to numerator and denominator', { width: 320, weight: 700 }) + text(20, 105, 'Numerator: declared positive only', { width: 320, weight: 700 }) + circle(62, 177, 28, 'output') + text(62, 183, '+', { width: 49, anchor: 'middle', weight: 700 })
+  let body = text(20, 27, 'The declared positive belongs to numerator and denominator', { width: 320, weight: 700 }) + text(20, 105, 'Numerator: declared positive only', { width: 320, weight: 700 }) + circle(62, 177, 28, 'output') + text(62, 183, 'P', { width: 49, anchor: 'middle', weight: 700 })
     + text(112, 305, 'Denominator: the whole declared candidate set', { width: 228, weight: 700 });
-  for (let candidate = 0; candidate < 3; candidate++) body += circle(62 + candidate * 118, 401, 28, candidate ? 'input' : 'output') + text(62 + candidate * 118, 407, candidate ? `N${candidate}` : '+', { width: 49, anchor: 'middle', weight: 700 });
+  for (let candidate = 0; candidate < 3; candidate++) body += circle(62 + candidate * 118, 401, 28, candidate ? 'input' : 'output') + text(62 + candidate * 118, 407, candidate ? `N${candidate}` : 'P', { width: 49, anchor: 'middle', weight: 700 });
   body += line(62, 213, 62, 367, 'output') + text(20, 517, 'Same positive identity; negatives remain declared negatives.', { width: 320, weight: 700 });
   return { body, height: 584 };
 }
@@ -5685,6 +10581,63 @@ function lastStepPaths(picture, model, tools) {
   return { body, height: 679 };
 }
 
+function emissionOrderWitness(picture, model, tools) {
+  const { text, circle } = tools;
+  const run = edges => {
+    const remaining = picture.courses.map(course => edges.filter(([, target]) => target === course).length);
+    const ready = picture.courses.filter(course => remaining[course] === 0);
+    const order = [];
+    const frames = [{ emitted: null, ready: [...ready], order: [] }];
+    while (ready.length) {
+      const course = ready.shift();
+      assert(!order.includes(course));
+      order.push(course);
+      for (const [source, target] of edges) if (source === course && --remaining[target] === 0) ready.push(target);
+      frames.push({ emitted: course, ready: [...ready], order: [...order] });
+    }
+    return { order, frames, result: order.length === picture.courses.length ? order : [] };
+  };
+  const valid = (order, edges) => order.length === picture.courses.length && new Set(order).size === picture.courses.length
+    && picture.courses.every(course => order.includes(course)) && edges.every(([source, target]) => order.indexOf(source) < order.indexOf(target));
+  const trace = run(picture.edges);
+  assert.deepEqual(trace.frames.map(frame => frame.ready), [[0], [1, 2], [2], [3], []]);
+  assert.deepEqual(trace.order, [0, 1, 2, 3]);
+  assert(valid(trace.result, picture.edges));
+  assert(valid(run([[0, 2], [0, 1], [1, 3], [2, 3]]).result, picture.edges));
+  assert(!valid([0, 1, 3, 2], picture.edges));
+  const blocked = run([...picture.edges, [3, 2]]);
+  assert.deepEqual(blocked.order, [0, 1]);
+  assert.deepEqual(blocked.result, []);
+  const positions = [[180, 142], [65, 257], [295, 257], [180, 380]];
+  let body = text(20, 27, 'Requirements control eligibility; emission builds the witness', { width: 320, weight: 700 });
+  for (const [source, target] of picture.edges) {
+    const start = positions[source];
+    const end = positions[target];
+    const length = Math.hypot(end[0] - start[0], end[1] - start[1]);
+    const step = [(end[0] - start[0]) / length, (end[1] - start[1]) / length];
+    body += arrowBetween([start[0] + step[0] * 33, start[1] + step[1] * 33], [end[0] - step[0] * 33, end[1] - step[1] * 33], 'input', tools, 2);
+  }
+  for (const course of picture.courses) body += circle(...positions[course], 24, 'input') + text(positions[course][0], positions[course][1] + 6, course, { width: 40, anchor: 'middle', weight: 700 });
+  body += text(20, 450, 'Three needs both one and two; zero starts ready.', { width: 320, weight: 700 });
+  for (const [index, frame] of trace.frames.entries()) {
+    const vertical = 557 + index * 218;
+    body += text(20, vertical, frame.emitted === null ? 'Seed the ready queue' : `Dequeue ${frame.emitted}; append it once`, { width: 320, weight: 700 });
+    for (const [row, [label, members]] of [['ready', frame.ready], ['order', frame.order]].entries()) {
+      const baseline = vertical + 63 + row * 77;
+      body += text(20, baseline + 5, label, { width: 74, weight: 700 });
+      if (!members.length) body += text(113, baseline + 5, 'empty', { width: 210, tone: 'soft' });
+      for (const [position, course] of members.entries()) body += circle(116 + position * 61, baseline, 21, row ? 'output' : 'input') + text(116 + position * 61, baseline + 5, course, { width: 36, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 1684, 'All four saved: return the complete order.', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1775, 'Changed condition: add a requirement from three to two', { width: 320, weight: 700 });
+  body += circle(90, 1880, 25, 'warning') + text(90, 1886, 2, { width: 43, anchor: 'middle', weight: 700 })
+    + circle(270, 1880, 25, 'warning') + text(270, 1886, 3, { width: 43, anchor: 'middle', weight: 700 })
+    + arrowBetween([124, 1865], [236, 1865], 'warning', tools, 2) + arrowBetween([236, 1895], [124, 1895], 'warning', tools, 2)
+    + text(20, 1980, 'Saved zero, one; two and three remain blocked. Return an empty failure result, not the prefix.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 2085 };
+}
+
 function prerequisiteCounter(picture, model, tools) {
   const { text, circle, line } = tools;
   let body = text(20, 27, 'Each emitted parent removes one unmet prerequisite', { width: 320, weight: 700 });
@@ -5695,6 +10648,65 @@ function prerequisiteCounter(picture, model, tools) {
     body += arrowBetween([183, vertical], [257, vertical], unmet ? 'warning' : 'output', tools, 3) + circle(295, vertical, 26, unmet ? 'warning' : 'output') + text(295, vertical + 6, unmet, { width: 46, anchor: 'middle', weight: 700 }) + text(20, vertical + 93, unmet ? `${unmet} unmet: course three remains blocked.` : 'Zero unmet: course three becomes ready.', { width: 320, weight: 700 });
   }
   return { body, height: 674 };
+}
+
+function prefixCompatibleChoice(picture, model, tools) {
+  const { text, circle } = tools;
+  let twoBack = 0;
+  let oneBack = 0;
+  const states = picture.values.map((value, index) => {
+    const take = twoBack + value;
+    const skip = oneBack;
+    const current = Math.max(skip, take);
+    const state = { index, value, twoBack, oneBack, skip, take, current };
+    [twoBack, oneBack] = [oneBack, current];
+    return state;
+  });
+  assert.deepEqual(states.map(state => state.current), [2, 7, 11, 11, 12]);
+  assert.deepEqual([states[3].twoBack, states[3].oneBack, states[3].take], [7, 11, 10]);
+  const spaced = (values, distance) => {
+    const best = [0];
+    for (const [index, value] of values.entries()) best.push(Math.max(best.at(-1), value + best[Math.max(0, index + 1 - distance)]));
+    return best.at(-1);
+  };
+  assert.equal(spaced(picture.values, 2), 12);
+  assert.equal(spaced(picture.values, 4), 9);
+  assert.equal(spaced([-3, -1], 2), 0);
+  assert.equal(spaced([], 2), 0);
+  const witnesses = [[0, 2], [1, 3]];
+  for (const [branch, indices] of witnesses.entries()) {
+    assert(indices.every((index, position) => !position || index - indices[position - 1] > 1));
+    assert.equal(indices.reduce((sum, index) => sum + picture.values[index], 0), branch ? 10 : 11);
+  }
+  assert.equal(states[3].oneBack + states[3].value, 14);
+  let body = text(20, 27, 'Read compatible old prefixes before either state shifts', { width: 320, weight: 700 })
+    + text(20, 104, 'The two-back total need not select its final house. A total alone is not a stored witness.', { width: 320 });
+  for (const [index, value] of picture.values.entries()) {
+    const horizontal = 44 + index * 68;
+    body += text(horizontal, 217, `index ${index}`, { width: 62, anchor: 'middle', size: 14 })
+      + circle(horizontal, 264, 23, 'input') + text(horizontal, 270, value, { width: 40, anchor: 'middle', weight: 700 });
+  }
+  for (const state of states) {
+    const vertical = 452 + state.index * 205;
+    body += text(20, vertical - 32, `At index ${state.index}, value ${state.value}`, { width: 320, weight: 700 })
+      + text(20, vertical + 15, `Old prefix optima: two-back ${state.twoBack}; one-back ${state.oneBack}.`, { width: 320 })
+      + text(20, vertical + 91, `Skip ${state.skip}; compatible take ${state.take}; commit ${state.current}.`, { width: 320, weight: 700, tone: 'output' });
+  }
+  body += text(20, 1465, 'Actual feasible branches at index three', { width: 320, weight: 700 });
+  for (const [branch, indices] of witnesses.entries()) {
+    const vertical = 1590 + branch * 235;
+    body += text(20, vertical - 65, branch ? 'Take: old safe prefix seven, then three' : 'Skip: retain the eleven-valued prefix', { width: 320, weight: 700 });
+    for (const [index, value] of picture.values.slice(0, 4).entries()) {
+      const horizontal = 54 + index * 84;
+      body += circle(horizontal, vertical, 24, indices.includes(index) ? 'output' : 'neutral')
+        + text(horizontal, vertical + 6, `${index}:${value}`, { width: 42, anchor: 'middle', size: 14, weight: 700 });
+    }
+    body += text(20, vertical + 90, `Checked indices ${indices.join(', ')}; total ${branch ? states[3].take : states[3].skip}.`, { width: 320, weight: 700 });
+  }
+  body += text(20, 1980, 'Wrong early shift: eleven plus three gives fourteen, keeping indices zero, two and three. The last two are adjacent.', { width: 320, tone: 'warning' })
+    + text(20, 2130, 'Changed exclusion: skip the preceding three positions. Taking index four can extend only the prefix through zero; this input now has optimum nine.', { width: 320 })
+    + text(20, 2300, 'Linear updates, two scalar slots; input unchanged. Integer-size costs are separate. Recover a plan with prefix history and a declared tie rule.', { width: 320 });
+  return { body, height: 2450 };
 }
 
 function nonadjacentChoice(picture, model, tools) {
@@ -5714,14 +10726,23 @@ function nonadjacentChoice(picture, model, tools) {
 
 function conditionalDiagonal(picture, model, tools) {
   const { text, color, fill, circle, line } = tools;
-  let body = text(20, 27, 'A matching character extends the diagonal predecessor', { width: 320, weight: 700 });
+  const rows = ['', 'A', 'AB'];
+  const columns = ['', 'A', 'AC', 'ACB'];
+  const lengths = rows.map(() => columns.map(() => 0));
+  for (let row = 1; row < rows.length; row++) for (let column = 1; column < columns.length; column++) lengths[row][column] = rows[row].at(-1) === columns[column].at(-1)
+    ? lengths[row - 1][column - 1] + 1 : Math.max(lengths[row - 1][column], lengths[row][column - 1]);
+  assert.deepEqual(lengths, model.values);
+  let body = text(20, 27, 'A matching character extends the diagonal predecessor', { width: 320, weight: 700 })
+    + text(20, 83, 'Rows: AB prefixes. Columns: ACB prefixes.', { width: 320, weight: 700 });
+  for (const [column, prefix] of columns.entries()) body += text(106 + column * 64, 153, prefix || 'empty', { width: 59, anchor: 'middle', size: 14, weight: 700 });
+  for (const [row, prefix] of rows.entries()) body += text(12, 228 + row * 75, prefix || 'empty', { width: 53, size: 14, weight: 700 });
   for (let row = 0; row < 3; row++) for (let column = 0; column < 4; column++) {
-    const horizontal = 44 + column * 69;
-    const vertical = 147 + row * 75;
+    const horizontal = 76 + column * 64;
+    const vertical = 187 + row * 75;
     const selected = row === 2 && column === 3 || row === 1 && column === 2;
-    body += `<rect x="${horizontal}" y="${vertical}" width="64" height="67" style="fill:${fill(selected ? 'input' : 'neutral')};stroke:${color(selected ? 'input' : 'neutral')};stroke-width:2"></rect>` + text(horizontal + 32, vertical + 41, model.values[row][column], { width: 55, anchor: 'middle', weight: 700 });
+    body += `<rect x="${horizontal}" y="${vertical}" width="60" height="67" style="fill:${fill(selected ? 'input' : 'neutral')};stroke:${color(selected ? 'input' : 'neutral')};stroke-width:2"></rect>` + text(horizontal + 30, vertical + 41, model.values[row][column], { width: 51, anchor: 'middle', weight: 700 });
   }
-  body += arrowBetween([251, 277], [266, 292], 'output', tools, 3) + text(20, 453, 'AB versus ACB: matching B uses diagonal one + one = two.', { width: 320, weight: 700 });
+  body += arrowBetween([259, 318], [279, 345], 'output', tools, 3) + text(20, 453, 'AB versus ACB: matching B uses diagonal one + one = two.', { width: 320, weight: 700 });
   assert.equal(model.values[2][3], model.values[1][2] + 1);
   return { body, height: 523 };
 }
@@ -6098,6 +11119,56 @@ function cloneIdentityBoundary(picture, model, tools) {
   return { body, height: 669 };
 }
 
+function rangeOwnedRootConsumption(picture, model, tools) {
+  const { text, circle, color } = tools;
+  const construct = preorder => {
+    let cursor = 0;
+    const trace = [];
+    const build = (lower, upper) => {
+      if (lower >= upper) return null;
+      const value = preorder[cursor];
+      const position = picture.inorder.indexOf(value);
+      assert(position >= lower && position < upper, 'Next preorder root lies outside its assigned inorder range');
+      trace.push({ cursor, value, lower, upper, position });
+      cursor++;
+      return { value, left: build(lower, position), right: build(position + 1, upper) };
+    };
+    const tree = build(0, picture.inorder.length);
+    assert.equal(cursor, preorder.length);
+    return { tree, trace };
+  };
+  const { tree, trace } = construct(picture.preorder);
+  assert.deepEqual(trace.map(step => [step.value, step.lower, step.upper]), [[3, 0, 5], [9, 0, 1], [20, 2, 5], [15, 2, 3], [7, 4, 5]]);
+  assert.deepEqual([...picture.incompatible].sort((first, second) => first - second), [...picture.preorder].sort((first, second) => first - second));
+  assert.throws(() => construct(picture.incompatible), /outside its assigned inorder range/);
+  const traverse = node => node ? [node.value, ...traverse(node.left), ...traverse(node.right)] : [];
+  assert.deepEqual(traverse(tree), picture.preorder);
+  const inorder = node => node ? [...inorder(node.left), node.value, ...inorder(node.right)] : [];
+  assert.deepEqual(inorder(tree), picture.inorder);
+  const partition = rootMembershipSplit(picture, model, tools);
+  let body = partition.body + text(20, 665, 'One preorder cursor; exact inorder membership per call', { width: 320, weight: 700 });
+  for (const [call, step] of trace.entries()) {
+    const vertical = 800 + call * 140;
+    body += text(20, vertical - 57, `Next preorder root: ${step.value}`, { width: 320, weight: 700 });
+    for (const [position, value] of picture.inorder.entries()) {
+      const tone = position === step.position ? 'output' : position >= step.lower && position < step.upper ? 'input' : 'neutral';
+      const horizontal = 45 + position * 64;
+      body += `<g data-picture-traversal-cursor="${step.cursor}" data-picture-traversal-inorder-position="${position}" data-picture-traversal-active="${position >= step.lower && position < step.upper}">${circle(horizontal, vertical, 20, tone)}${text(horizontal, vertical + 6, value, { width: 35, anchor: 'middle', weight: 700 })}</g>`;
+      if (position === step.position) body += `<circle cx="${horizontal}" cy="${vertical}" r="25" style="fill:none;stroke:${color('output')};stroke-width:1.5"></circle>`;
+    }
+  }
+  body += text(20, 1445, 'Five roots consumed; gray positions are outside the current call.', { width: 320 })
+    + text(20, 1530, 'The constructed tree preserves both traversals', { width: 320, weight: 700 });
+  const nodes = [[tree.value, 180, 1610], [tree.left.value, 85, 1730], [tree.right.value, 280, 1730], [tree.right.left.value, 225, 1870], [tree.right.right.value, 335, 1870]];
+  for (const [parent, child] of [[0, 1], [0, 2], [2, 3], [2, 4]]) body += arrowBetween([nodes[parent][1], nodes[parent][2] + 34], [nodes[child][1], nodes[child][2] - 34], 'input', tools, 2);
+  for (const [value, horizontal, vertical] of nodes) body += circle(horizontal, vertical, 22, 'input') + text(horizontal, vertical + 6, value, { width: 38, anchor: 'middle', weight: 700 });
+  body += text(20, 1975, 'Same values; incompatible preorder order', { width: 320, weight: 700 });
+  for (const [position, value] of picture.incompatible.entries()) body += circle(45 + position * 64, 2050, 20, position === 1 ? 'warning' : 'neutral')
+    + text(45 + position * 64, 2056, value, { width: 35, anchor: 'middle', weight: 700 });
+  body += text(20, 2150, 'After root 3, the left call contains only 9. Root 20 is outside.', { width: 320, weight: 700, tone: 'warning' });
+  return { body, height: 2250 };
+}
+
 function rootMembershipSplit(picture, model, tools) {
   const { text, circle, color, line } = tools;
   const root = picture.preorder[0];
@@ -6384,6 +11455,54 @@ function coinPredecessor(picture, model, tools) {
   return { body, height: 723 };
 }
 
+function parsePredecessorsAndValidity(picture, model, tools) {
+  const { text, circle } = tools;
+  const valid = token => token[0] !== '0' && Number(token) >= 1 && Number(token) <= 26;
+  const parse = digits => {
+    if (!digits.length) return [[]];
+    return [1, 2].flatMap(length => {
+      const token = digits.slice(0, length);
+      return token.length === length && valid(token) ? parse(digits.slice(length)).map(path => [token, ...path]) : [];
+    });
+  };
+  const paths = parse(picture.digits);
+  const groups = ['6', '26'].map(token => paths.filter(path => path.at(-1) === token));
+  const counts = [1];
+  for (let end = 1; end <= picture.digits.length; end++) {
+    counts.push((valid(picture.digits.slice(end - 1, end)) ? counts[end - 1] : 0) + (end >= 2 && valid(picture.digits.slice(end - 2, end)) ? counts[end - 2] : 0));
+  }
+  assert.deepEqual(paths.map(path => path.join('|')).sort(), ['2|2|6', '22|6', '2|26'].sort());
+  assert.deepEqual(groups.map(group => group.length), [2, 1]);
+  assert.deepEqual(counts, [1, 1, 2, 3]);
+  assert.equal(paths.length, counts.at(-1));
+  let body = text(20, 27, 'Input 226: group parses by their final token', { width: 320, weight: 700 });
+  let row = 0;
+  for (const [group, members] of groups.entries()) {
+    const finalToken = group ? '26' : '6';
+    body += text(20, 119 + row * 85 + group * 88, `Final ${finalToken}: inherit ${members.length} ${members.length === 1 ? 'parse' : 'parses'} of prefix ${group ? '2' : '22'}`, { width: 320, weight: 700 });
+    for (const path of members) {
+      const vertical = 190 + row++ * 85 + group * 88;
+      for (const [position, token] of path.entries()) {
+        const horizontal = 62 + position * 110;
+        const tone = position === path.length - 1 ? 'output' : 'input';
+        body += `<g data-picture-decoding-parse="${path.join('|')}" data-picture-decoding-token="${position}">${circle(horizontal, vertical, 24, tone)}${text(horizontal, vertical + 6, token, { width: 42, anchor: 'middle', weight: 700, tone })}</g>`;
+      }
+    }
+  }
+  body += text(20, 535, 'Disjoint final-token choices: two and one', { width: 320, weight: 700 });
+  for (const [group, members] of groups.entries()) {
+    const horizontal = 90 + group * 180;
+    body += circle(horizontal, 620, 27, group ? 'state' : 'input') + text(horizontal, 626, members.length, { width: 48, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 657], [group ? 200 : 160, 720], 'output', tools, 2);
+  }
+  body += circle(180, 755, 27, 'output') + text(180, 761, paths.length, { width: 48, anchor: 'middle', weight: 700 })
+    + text(20, 838, 'Remove the final token to reveal its smaller prefix.', { width: 320 })
+    + text(20, 899, 'Separate validity checks', { width: 320, weight: 700 });
+  const gate = decimalPairGate(picture, model, tools);
+  body += `<g transform="translate(0 960)">${gate.body}</g>`;
+  return { body, height: 960 + gate.height };
+}
+
 function decimalPairGate(picture, model, tools) {
   const { text, circle } = tools;
   let body = text(20, 27, 'Keep digit order intact when checking the range ten through twenty-six', { width: 320, weight: 700 });
@@ -6402,20 +11521,120 @@ function decimalPairGate(picture, model, tools) {
 }
 
 function editDiagonalCost(picture, model, tools) {
-  const { text, circle } = tools;
-  const results = [];
-  let body = text(20, 27, 'The mismatch toll is one; the matching diagonal toll is zero', { width: 320, weight: 700 });
-  for (const [row, [left, right]] of picture.pairs.entries()) {
-    const cost = left === right ? 0 : 1;
-    results.push(cost);
-    const vertical = 174 + row * 259;
-    body += text(20, vertical - 66, `Compare ${left} with ${right}; empty-prefix diagonal is zero`, { width: 320, weight: 700 }) + circle(62, vertical, 28, 'input') + text(62, vertical + 6, 0, { width: 49, anchor: 'middle', weight: 700 })
-      + arrowBetween([99, vertical], [261, vertical], cost ? 'warning' : 'output', tools, 3) + text(180, vertical - 25, `+${cost}`, { width: 70, anchor: 'middle', weight: 700 })
-      + circle(298, vertical, 28, cost ? 'warning' : 'output') + text(298, vertical + 6, cost, { width: 49, anchor: 'middle', weight: 700 })
-      + text(20, vertical + 98, cost ? 'Replace a by b: one edit.' : 'Match a with a: inherit the diagonal unchanged.', { width: 320, weight: 700 });
+  const { text, circle, color, fill } = tools;
+  const first = [...picture.first];
+  const second = [...picture.second];
+  const costs = [Array.from({ length: second.length + 1 }, (unused, column) => column)];
+  for (const [row, source] of first.entries()) {
+    const current = [row + 1];
+    for (const [column, target] of second.entries()) current.push(source === target ? costs[row][column] : 1 + Math.min(current[column], costs[row][column + 1], costs[row][column]));
+    costs.push(current);
   }
-  assert.deepEqual(results, [1, 0]);
-  return { body, height: 612 };
+  assert.deepEqual(costs, [[0, 1, 2, 3], [1, 0, 1, 2], [2, 1, 1, 2], [3, 2, 2, 1]]);
+  const candidates = [costs[2][1] + 1, costs[1][2] + 1, costs[1][1] + 1];
+  assert.deepEqual(candidates, [2, 2, 1]);
+  assert.equal(costs[2][2], Math.min(...candidates));
+  assert.equal(first.at(-1), second.at(-1));
+  assert.equal(costs[3][3], costs[2][2]);
+  let body = text(20, 27, 'Minimum edits between two prefixes, not just endpoint letters', { width: 320, weight: 700 })
+    + text(20, 110, 'cat into cut; unit insertion, deletion, replacement', { width: 320, weight: 700 })
+    + text(20, 180, 'Target prefixes across; source prefixes down', { width: 320 });
+  for (let column = 0; column <= second.length; column++) body += text(117 + column * 62, 235, column ? second.slice(0, column).join('') : 'empty', { width: 58, anchor: 'middle', weight: 700 });
+  for (const [row, values] of costs.entries()) {
+    const vertical = 270 + row * 68;
+    body += text(20, vertical + 34, row ? first.slice(0, row).join('') : 'empty', { width: 60, weight: 700 });
+    for (const [column, value] of values.entries()) {
+      const role = row === 2 && column === 2 ? 'Q' : row === 2 && column === 1 ? 'I' : row === 1 && column === 2 ? 'D' : row === 1 && column === 1 ? 'R' : '';
+      const tone = role === 'Q' ? 'focus' : row === 3 && column === 3 ? 'output' : role ? 'input' : 'neutral';
+      body += `<rect data-picture-edit-prefix="${row}-${column}" x="${88 + column * 62}" y="${vertical}" width="57" height="57" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(117 + column * 62, vertical + 34, role ? `${role} ${value}` : value, { width: 49, anchor: 'middle', weight: 700 });
+    }
+  }
+  body += text(20, 605, 'Q is ca into cu. Price every possible final edit:', { width: 320, weight: 700 });
+  for (const [index, [predecessor, operation]] of [['I left: one', 'Insert'], ['D above: one', 'Delete'], ['R diagonal: zero', 'Replace']].entries()) {
+    const horizontal = 65 + index * 115;
+    const tone = index === 2 ? 'output' : 'warning';
+    body += text(horizontal, 710, predecessor, { width: 100, anchor: 'middle', weight: 700 })
+      + arrowBetween([horizontal, 760], [horizontal, 799], tone, tools)
+      + circle(horizontal, 840, 27, tone) + text(horizontal, 846, candidates[index], { width: 46, anchor: 'middle', weight: 700 })
+      + text(horizontal, 913, `${operation} costs one`, { width: 100, anchor: 'middle', tone })
+      + arrowBetween([horizontal, 975], [180, 1050], tone, tools);
+  }
+  body += circle(180, 1095, 28, 'output') + text(180, 1101, costs[2][2], { width: 48, anchor: 'middle', weight: 700 })
+    + text(20, 1170, 'ca into cu: one replacement is cheapest', { width: 320, weight: 700, tone: 'output' })
+    + text(20, 1270, 'The final t matches: inherit the diagonal', { width: 320, weight: 700 })
+    + circle(90, 1370, 26, 'output') + text(90, 1376, 1, { width: 44, anchor: 'middle', weight: 700 })
+    + arrowBetween([125, 1370], [235, 1370], 'output', tools)
+    + circle(270, 1370, 26, 'output') + text(270, 1376, costs[3][3], { width: 44, anchor: 'middle', weight: 700 })
+    + text(180, 1435, 'No new edit', { width: 250, anchor: 'middle', weight: 700, tone: 'output' })
+    + text(20, 1530, 'Keep the previous row intact: above and diagonal come from it; left comes from the growing current row.', { width: 320 })
+    + text(20, 1660, 'Commit only after the row is complete. Empty into cat costs three insertions.', { width: 320, weight: 700 })
+    + text(20, 1770, 'Python characters; no automatic normalization or transposition edit.', { width: 320 });
+  return { body, height: 1870 };
+}
+
+function circularCoverTrace(picture, model, tools) {
+  const { text, circle, line } = tools;
+  const solveLine = (values, start, end) => {
+    const best = [0];
+    for (let index = start; index < end; index++) best.push(Math.max(best.at(-1), values[index] + best[Math.max(0, best.length - 2)]));
+    const selected = [];
+    let offset = best.length - 1;
+    while (offset > 0) {
+      if (best[offset] === best[offset - 1]) offset--;
+      else {
+        selected.push(start + offset - 1);
+        offset -= 2;
+      }
+    }
+    return { best: best.slice(1), value: best.at(-1), selected: selected.reverse() };
+  };
+  const solveCircle = values => values.length <= 1 ? values[0] || 0 : Math.max(solveLine(values, 0, values.length - 1).value, solveLine(values, 1, values.length).value);
+  const cases = [solveLine(picture.values, 0, 3), solveLine(picture.values, 1, 4)];
+  assert.deepEqual(cases.map(result => result.best), [[1, 2, 4], [2, 3, 3]]);
+  assert.deepEqual(cases.map(result => result.selected), [[0, 2], [2]]);
+  const validPlans = [];
+  for (let mask = 0; mask < 2 ** picture.values.length; mask++) {
+    const indices = picture.values.map((value, index) => index).filter(index => mask & 2 ** index);
+    if (indices.some((index, position) => position && index - indices[position - 1] === 1) || indices.includes(0) && indices.includes(picture.values.length - 1)) continue;
+    assert(!indices.includes(0) || !indices.includes(picture.values.length - 1));
+    validPlans.push(indices);
+  }
+  assert.equal(Math.max(...validPlans.map(indices => indices.reduce((sum, index) => sum + picture.values[index], 0))), 4);
+  assert(validPlans.some(indices => indices.length && !indices.includes(0) && !indices.includes(3)));
+  assert.equal(solveCircle(picture.changed), 3);
+  assert.equal(solveLine(picture.changed, 0, picture.changed.length).value, 4);
+  assert.equal(solveCircle([]), 0);
+  assert.equal(solveCircle([6]), 6);
+  const positions = [[82, 264], [278, 264], [278, 434], [82, 434]];
+  let body = text(20, 27, 'Two lines cover valid circles without requiring disjoint plans', { width: 320, weight: 700 })
+    + text(20, 104, 'Original indices and nonnegative values. A colored selection below is a checked witness, not rolling state.', { width: 320 });
+  for (const [index, position] of positions.entries()) {
+    const next = positions[(index + 1) % positions.length];
+    body += line(...position, ...next, index === 3 ? 'warning' : 'input');
+  }
+  for (const [index, value] of picture.values.entries()) body += circle(...positions[index], 26, index === 0 || index === 3 ? 'warning' : 'input')
+    + text(positions[index][0], positions[index][1] + 6, `${index}:${value}`, { width: 46, anchor: 'middle', size: 14, weight: 700 });
+  body += text(20, 527, 'The wraparound edge forbids indices zero and three together.', { width: 320, tone: 'warning' });
+  for (const [frame, result] of cases.entries()) {
+    const excluded = frame ? 0 : 3;
+    const vertical = 735 + frame * 450;
+    body += text(20, vertical - 70, frame ? 'Case B: exclude first; reset both prefix states' : 'Case A: exclude last; start both prefix states at zero', { width: 320, weight: 700 });
+    for (let index = 0; index < 3; index++) if (index !== excluded && index + 1 !== excluded) body += line(54 + index * 84, vertical, 54 + (index + 1) * 84, vertical, 'input');
+    for (const [index, value] of picture.values.entries()) {
+      const horizontal = 54 + index * 84;
+      body += circle(horizontal, vertical, 24, index === excluded ? 'neutral' : result.selected.includes(index) ? 'output' : 'input')
+        + text(horizontal, vertical + 6, `${index}:${value}`, { width: 42, anchor: 'middle', size: 14, weight: 700 });
+      if (index === excluded) body += line(horizontal - 18, vertical - 18, horizontal + 18, vertical + 18, 'warning');
+    }
+    const indices = frame ? [1, 2, 3] : [0, 1, 2];
+    body += text(20, vertical + 110, `Indices ${indices.join(', ')}: prefix optima ${result.best.join(', ')}.`, { width: 320, weight: 700 })
+      + text(20, vertical + 185, `Checked selected indices ${result.selected.join(', ')}; total ${result.value}.`, { width: 320 });
+  }
+  body += text(20, 1470, 'Choose four, not combined seven. Middle-only plans occur in both lines; maximum does not double-count them.', { width: 320, weight: 700 })
+    + text(20, 1600, 'Changed circle two, three, two: both cases score three. An unrestricted line takes both endpoint twos for four, violating the circle.', { width: 320 })
+    + text(20, 1750, 'Empty gives zero; a nonnegative singleton stands alone. Slices cost linear extra storage; index ranges avoid copies. Recovering indices needs history.', { width: 320 });
+  return { body, height: 1900 };
 }
 
 function circularEndpointCases(picture, model, tools) {
@@ -6714,6 +11933,46 @@ function runStartMembership(picture, model, tools) {
   return { body, height: 611 };
 }
 
+function waitingStackAndDistance(picture, model, tools) {
+  const { text, color, fill } = tools;
+  const waiting = [];
+  const answers = picture.temperatures.map(() => 0);
+  const steps = picture.temperatures.map((temperature, day) => {
+    const before = [...waiting];
+    const resolved = [];
+    while (waiting.length && temperature > picture.temperatures[waiting.at(-1)]) {
+      const earlier = waiting.pop();
+      answers[earlier] = day - earlier;
+      resolved.push(earlier);
+    }
+    waiting.push(day);
+    assert(waiting.every((index, position) => !position || picture.temperatures[waiting[position - 1]] >= picture.temperatures[index]));
+    return { before, after: [...waiting], resolved };
+  });
+  assert.deepEqual(steps.map(step => step.after), [[0], [0, 1], [0, 2], [3]]);
+  assert.deepEqual(steps.map(step => step.resolved), [[], [], [1], [2, 0]]);
+  assert.deepEqual(answers, [3, 1, 1, 0]);
+  let body = text(20, 27, 'Keep waiting indices; resolve only colder temperatures', { width: 320, weight: 700 });
+  for (const [day, step] of steps.entries()) {
+    const offset = day * 300;
+    body += text(20, 100 + offset, `Index ${day}: ${picture.temperatures[day]} degrees`, { width: 320, weight: 700 });
+    for (const [phase, indices] of [step.before, step.after].entries()) {
+      const vertical = 130 + offset + phase * 89;
+      body += text(20, vertical + 30, phase ? 'after' : 'before', { width: 75, weight: 700 });
+      if (!indices.length) body += text(110, vertical + 30, 'empty', { width: 180, tone: 'soft' });
+      for (const [slot, index] of indices.entries()) body += `<rect x="${110 + slot * 70}" y="${vertical}" width="60" height="62" data-picture-temperature-arrival="${day}" data-picture-temperature-phase="${phase}" data-picture-temperature-waiting-index="${index}" style="fill:${fill('input')};stroke:${color('input')};stroke-width:1.5"></rect>`
+        + text(140 + slot * 70, vertical + 24, `D${index}`, { width: 53, anchor: 'middle', weight: 700 })
+        + text(140 + slot * 70, vertical + 50, picture.temperatures[index], { width: 53, anchor: 'middle' });
+    }
+    body += text(20, 318 + offset, step.resolved.length ? `Record ${step.resolved.map(index => `D${index}: ${answers[index]} ${answers[index] === 1 ? 'day' : 'days'}`).join('; ')}` : 'No colder waiting day to resolve', { width: 320, weight: 700, tone: step.resolved.length ? 'output' : 'soft' });
+  }
+  body += text(20, 1290, 'Waiting temperatures never rise from left to right.', { width: 320 })
+    + text(20, 1375, 'After the scan, unresolved D3 keeps zero.', { width: 320, weight: 700 });
+  const distance = temperatureVersusIndex(picture, model, tools);
+  body += `<g transform="translate(0 1460)">${distance.body}</g>`;
+  return { body, height: 1460 + distance.height };
+}
+
 function temperatureVersusIndex(picture, model, tools) {
   const { text, color, fill, line } = tools;
   const warmer = picture.temperatures.findIndex((temperature, index) => index > 0 && temperature > picture.temperatures[0]);
@@ -6744,6 +12003,51 @@ function nestedStartMembership(picture, model, tools) {
   }
   body += text(20, 711, 'Six minus the same two starts leaves four exact-three subarrays.', { width: 320, weight: 700 });
   return { body, height: 803 };
+}
+
+function anagramBucketTrace(picture, model, tools) {
+  const { text, circle } = tools;
+  const buckets = new Map();
+  const stages = picture.words.map((word, index) => {
+    const counts = Array(26).fill(0);
+    for (const character of word) counts[character.codePointAt(0) - 'a'.codePointAt(0)]++;
+    assert(counts.slice(2).every(count => count === 0));
+    const key = JSON.stringify(counts);
+    if (!buckets.has(key)) buckets.set(key, { label: String.fromCharCode(65 + buckets.size), words: [], indices: [] });
+    const bucket = buckets.get(key);
+    bucket.words.push(word);
+    bucket.indices.push(index);
+    return { word, index, counts, label: bucket.label, words: [...bucket.words] };
+  });
+  assert.deepEqual([...buckets.values()].map(bucket => bucket.words), picture.expectedGroups);
+  assert.deepEqual([...buckets.values()].map(bucket => bucket.indices), [[0, 1, 4], [2], [3], [5, 6]]);
+  assert.equal(stages[2].word.length, stages[3].word.length);
+  assert.equal(new Set(stages[2].word).size, new Set(stages[3].word).size);
+  assert.notDeepEqual(stages[2].counts, stages[3].counts);
+  let body = text(20, 27, 'Fresh complete counts choose a bucket; every occurrence appends', { width: 320, weight: 700 })
+    + text(20, 104, 'Show a and b counts. All other twenty-four slots stay zero in this input and remain part of each complete key.', { width: 320 });
+  for (const stage of stages) {
+    const vertical = 260 + stage.index * 280;
+    body += text(20, vertical - 73, `Input index ${stage.index}: ${stage.word || 'empty text'}`, { width: 320, weight: 700 });
+    for (const [column, character] of ['a', 'b'].entries()) {
+      const horizontal = column ? 249 : 104;
+      const count = stage.counts[column];
+      body += text(horizontal, vertical - 33, character, { width: 90, anchor: 'middle', weight: 700 });
+      for (let copy = 0; copy < Math.max(1, count); copy++) {
+        const center = horizontal + (copy - (Math.max(1, count) - 1) / 2) * 46;
+        body += circle(center, vertical, 20, count ? 'input' : 'neutral')
+          + text(center, vertical + 6, count ? character : '-', { width: 34, anchor: 'middle', size: 14, weight: 700 });
+      }
+      body += text(horizontal, vertical + 58, `count ${count}`, { width: 100, anchor: 'middle', size: 14, weight: 700 });
+    }
+    body += arrowBetween([180, vertical + 83], [180, vertical + 105], 'output', tools, 2)
+      + text(20, vertical + 142, `Bucket ${stage.label}: ${stage.words.map(word => word || 'empty').join(', ')}`, { width: 320, weight: 700, tone: 'output' });
+  }
+  body += text(20, 2250, 'Seven occurrences survive in four buckets. First appearance orders buckets; input order orders each bucket.', { width: 320, weight: 700 })
+    + text(20, 2385, 'Index output uses the same keys: zero, one, four together; two alone; three alone; five and six together.', { width: 320 })
+    + text(20, 2520, 'Exact full keys decide equality, not raw hash integers. Outside the lowercase contract, Python Z can address the t slot through negative indexing. Change the key before changing alphabets.', { width: 320, tone: 'warning' })
+    + text(20, 2710, 'Expected work counts characters and twenty-six slots per word. Store keys per bucket and every occurrence reference; do not replace output lists with sets.', { width: 320 });
+  return { body, height: 2870 };
 }
 
 function characterCopyCounts(picture, model, tools) {
@@ -6901,20 +12205,59 @@ function nestedRepeatPayload(picture, model, tools) {
 
 function lengthDelimitedPayload(picture, model, tools) {
   const { text, color, fill, line } = tools;
-  const encoded = `${picture.payload.length}${picture.separator}${picture.payload}`;
-  assert.equal(encoded, '3#a#b');
-  assert.equal(encoded.slice(encoded.indexOf(picture.separator) + 1, encoded.indexOf(picture.separator) + 1 + picture.payload.length), picture.payload);
-  let body = text(20, 27, 'Length, not the next separator-looking symbol, ends the payload', { width: 320, weight: 700 });
-  for (const [position, label] of ['length', 'sep', 'three payload chars'].entries()) body += text([60, 120, 242][position], 124, label, { width: [70, 54, 188][position], anchor: 'middle', size: 14, weight: 700 });
-  for (const [position, character] of [...encoded].entries()) {
-    const horizontal = 32 + position * 60;
-    const tone = position > 1 ? 'output' : position ? 'neutral' : 'input';
-    body += `<rect x="${horizontal}" y="181" width="56" height="50" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>` + text(horizontal + 28, 215, character, { width: 48, anchor: 'middle', size: 20, weight: 700 });
+  const encode = values => values.map(value => `${[...value].length}${picture.separator}${value}`).join('');
+  const decode = encoded => {
+    const characters = [...encoded];
+    const records = [];
+    let index = 0;
+    while (index < characters.length) {
+      const separator = characters.indexOf(picture.separator, index);
+      assert(separator > index);
+      const length = Number(characters.slice(index, separator).join(''));
+      const payloadStart = separator + 1;
+      const next = payloadStart + length;
+      assert(Number.isInteger(length) && length >= 0 && next <= characters.length);
+      records.push({ index, separator, payloadStart, next, length, value: characters.slice(payloadStart, next).join('') });
+      assert(next > index);
+      index = next;
+    }
+    return records;
+  };
+  const encoded = encode(picture.payloads);
+  const records = decode(encoded);
+  assert.equal(encoded, '3#a#b0#1#z');
+  assert.deepEqual(records.map(record => record.value), picture.payloads);
+  assert.deepEqual(records.map(record => record.next), [5, 7, 10]);
+  assert.deepEqual(decode(''), []);
+  assert.deepEqual(decode('0#').map(record => record.value), ['']);
+  assert.deepEqual(decode(encode(['\u{1f642}', '#', ''])).map(record => record.value), ['\u{1f642}', '#', '']);
+  let body = text(20, 27, 'Read one header, count its payload, then start the next header', { width: 320, weight: 700 })
+    + text(20, 100, `Trusted stream: ${encoded}`, { width: 320 });
+  for (const [recordIndex, record] of records.entries()) {
+    const vertical = 170 + recordIndex * 282;
+    const characters = [...encoded].slice(record.index, record.next);
+    body += `<g data-picture-framing-record="${recordIndex}" data-picture-framing-next="${record.next}">`
+      + text(20, vertical - 30, `Record ${recordIndex + 1}: length ${record.length}`, { width: 320, weight: 700 });
+    for (const [position, character] of characters.entries()) {
+      const horizontal = 32 + position * 52;
+      const absolute = record.index + position;
+      const tone = absolute >= record.payloadStart ? 'output' : absolute === record.separator ? 'neutral' : 'input';
+      body += `<rect x="${horizontal}" y="${vertical}" width="48" height="50" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+        + text(horizontal + 24, vertical + 33, character, { width: 42, anchor: 'middle', size: 20, weight: 700 });
+    }
+    if (record.length) {
+      const start = 32 + (record.payloadStart - record.index) * 52;
+      const end = 32 + (characters.length - 1) * 52 + 48;
+      body += line(start, vertical + 65, end, vertical + 65, 'output')
+        + line(start, vertical + 57, start, vertical + 73, 'output') + line(end, vertical + 57, end, vertical + 73, 'output');
+    }
+    body += text(20, vertical + 118, record.length ? `Emit: ${record.value}` : 'Emit one empty-string list entry', { width: 320, weight: 700, tone: 'output' })
+      + text(20, vertical + 161, `Next header: character ${record.next}${recordIndex === records.length - 1 ? ' (end)' : ''}`, { width: 320 }) + '</g>';
   }
-  body += line(152, 253, 328, 253, 'output') + line(152, 242, 152, 260, 'output') + line(328, 242, 328, 260, 'output')
-    + text(20, 332, 'The interior hash is counted as payload, not another boundary.', { width: 320, weight: 700 }) + text(180, 463, picture.payload, { width: 280, anchor: 'middle', size: 28, weight: 700, tone: 'output' })
-    + text(20, 563, 'Consume exactly three payload characters, including the interior hash.', { width: 320, weight: 700 });
-  return { body, height: 662 };
+  body += text(20, 980, 'Empty stream: zero list entries.', { width: 320, weight: 700 })
+    + text(20, 1030, '0#: one empty list entry.', { width: 320, weight: 700 })
+    + text(20, 1080, 'Character lengths; byte protocols differ.', { width: 320 });
+  return { body, height: 1150 };
 }
 
 function triePrefixTerminal(picture, model, tools) {
@@ -6935,6 +12278,44 @@ function triePrefixTerminal(picture, model, tools) {
     body += text(178, vertical + 85, frame ? 'app: word' : 'app: prefix', { width: 139, anchor: 'middle', size: 14, weight: 700 }) + text(314, vertical + 85, 'apple: word', { width: 88, anchor: 'middle', size: 14, weight: 700 });
   }
   return { body, height: 650 };
+}
+
+function wildcardBranchAndTerminal(picture, model, tools) {
+  const { text, circle, line, color, fill } = tools;
+  const matches = word => word.length === picture.pattern.length && [...picture.pattern].every((character, position) => character === '.' || character === word[position]);
+  const children = [...new Set(picture.words.map(word => word[1]))].sort();
+  const results = children.map(child => picture.words.some(word => word[1] === child && matches(word)));
+  assert.deepEqual(children, ['a', 'e']);
+  assert.deepEqual(results, [false, true]);
+  assert.deepEqual(picture.words.filter(matches), ['bed']);
+  assert(picture.words.some(word => word.startsWith('ba')) && !picture.words.includes('ba'));
+  const nodes = [{ prefix: 'b', at: [180, 350] }, { prefix: 'ba', at: [80, 535] }, { prefix: 'be', at: [280, 535] }, { prefix: 'bak', at: [80, 720] }, { prefix: 'bed', at: [280, 720] }, { prefix: 'bake', at: [80, 905] }];
+  assert(nodes.every(node => picture.words.some(word => word.startsWith(node.prefix))));
+  let body = text(20, 27, 'Try child alternatives, then require a terminal match', { width: 320, weight: 700 })
+    + text(20, 111, 'Stored words: bake and bed', { width: 320, weight: 700 });
+  for (const [position, character] of [...picture.pattern].entries()) {
+    const tone = character === '.' ? 'focus' : 'input';
+    body += `<rect x="${40 + position * 100}" y="165" width="80" height="50" data-picture-trie-pattern-position="${position}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + text(80 + position * 100, 197, character, { width: 70, anchor: 'middle', weight: 700, tone });
+  }
+  body += arrowBetween([167, 382], [92, 500], 'focus', tools, 2)
+    + arrowBetween([193, 382], [268, 500], 'focus', tools, 2)
+    + text(180, 451, 'Try both children', { width: 75, anchor: 'middle', tone: 'focus' })
+    + line(80, 572, 80, 600, 'warning', true) + line(80, 643, 80, 682, 'warning', true)
+    + line(68, 608, 92, 632, 'warning') + line(92, 608, 68, 632, 'warning')
+    + text(120, 660, 'Need d; only k exists', { width: 110, tone: 'warning' })
+    + arrowBetween([280, 572], [280, 682], 'output', tools, 2)
+    + line(80, 757, 80, 868, 'neutral');
+  for (const [index, node] of nodes.entries()) {
+    const terminal = picture.words.includes(node.prefix);
+    const tone = index === 0 ? 'input' : index < 3 ? 'focus' : index === 3 ? 'warning' : index === 4 ? 'output' : 'neutral';
+    body += `<g data-picture-trie-prefix="${node.prefix}" data-picture-trie-terminal="${terminal}">${circle(...node.at, 24, tone)}${text(node.at[0], node.at[1] + 6, node.prefix.at(-1), { width: 42, anchor: 'middle', weight: 700, tone })}</g>`;
+    if (terminal) body += `<circle cx="${node.at[0]}" cy="${node.at[1]}" r="30" style="fill:none;stroke:${color(tone)};stroke-width:1.5"></circle>`;
+  }
+  body += text(340, 820, 'Terminal bed: true', { width: 125, anchor: 'end', weight: 700, tone: 'output' })
+    + text(20, 995, 'ba reaches a, but a has no word flag: false.', { width: 320, weight: 700, tone: 'warning' })
+    + text(20, 1100, 'The dot uses one character. The suffix still must match.', { width: 320 });
+  return { body, height: 1190 };
 }
 
 function wildcardTerminalSearch(picture, model, tools) {
@@ -7021,22 +12402,50 @@ function topOpenerRefusal(picture, model, tools) {
 }
 
 function causalWeightProducts(picture, model, tools) {
-  const { text, circle } = tools;
+  const { text, circle, line, color, fill } = tools;
   const weights = model.values[picture.query];
   const products = weights.map((weight, index) => weight * picture.values[index]);
   assert(weights.every((weight, index) => index <= picture.query || weight === 0));
   assert.deepEqual(products, [.4, 1.2, 0]);
-  assert(Math.abs(products.reduce((sum, value) => sum + value, 0) - 1.6) < 1e-12);
-  let body = text(20, 27, 'A zero future weight blocks a contribution, not the input\'s existence', { width: 320, weight: 700 });
+  const output = products.reduce((sum, value) => sum + value, 0);
+  assert(Math.abs(output - 1.6) < 1e-12);
+  let body = text(20, 27, 'The current position cannot read the future', { width: 320, weight: 700 });
   for (const [index, value] of picture.values.entries()) {
     const horizontal = 62 + index * 118;
     const allowed = index <= picture.query;
-    body += text(horizontal, 117, `key ${index}`, { width: 102, anchor: 'middle', size: 16, weight: 700 }) + circle(horizontal, 178, 27, allowed ? 'input' : 'warning') + text(horizontal, 184, weights[index], { width: 48, anchor: 'middle', size: 16, weight: 700 })
-      + text(horizontal, 280, 'times', { width: 103, anchor: 'middle', size: 16 }) + circle(horizontal, 380, 27, 'input') + text(horizontal, 386, value, { width: 48, anchor: 'middle', size: 16, weight: 700 })
-      + text(horizontal, 486, 'equals', { width: 103, anchor: 'middle', size: 16 }) + circle(horizontal, 576, 27, allowed ? 'output' : 'warning') + text(horizontal, 582, products[index], { width: 48, anchor: 'middle', size: 16, weight: 700 });
+    const tone = index === 0 ? 'input' : allowed ? 'state' : 'warning';
+    body += `<g data-picture-causal-source="${index}">` + text(horizontal, 111, ['Earlier', 'Current', 'Future'][index], { width: 102, anchor: 'middle', weight: 700 })
+      + circle(horizontal, 173, 27, tone) + text(horizontal, 179, value, { width: 48, anchor: 'middle', size: 16, weight: 700 }) + '</g>';
+    if (allowed) {
+      body += arrowBetween([horizontal, 209], [horizontal, 276], tone, tools, 2 + weights[index] * 5)
+        + text(horizontal, 310, 'readable', { width: 102, anchor: 'middle', tone })
+        + arrowBetween([horizontal, 327], [index ? 210 : 90, 381], tone, tools, 2 + weights[index] * 5);
+    } else {
+      body += `<g data-picture-causal-gate="closed">` + line(horizontal, 209, horizontal, 260, 'warning')
+        + line(horizontal - 15, 249, horizontal + 15, 279, 'warning') + line(horizontal + 15, 249, horizontal - 15, 279, 'warning')
+        + text(horizontal, 310, 'blocked', { width: 102, anchor: 'middle', tone: 'warning' }) + '</g>';
+    }
   }
-  body += text(20, 708, 'Output .4 + 1.2 + 0 = 1.6. The large future scalar contributes exactly zero.', { width: 320, weight: 700 });
-  return { body, height: 813 };
+  let horizontal = 60;
+  for (const [index, contribution] of products.slice(0, picture.query + 1).entries()) {
+    const width = 240 * contribution / output;
+    const tone = index ? 'state' : 'input';
+    body += `<rect data-picture-causal-contribution="${index}" x="${horizontal}" y="393" width="${width}" height="38" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`;
+    horizontal += width;
+  }
+  body += text(180, 464, 'Current output: 1.6', { width: 270, anchor: 'middle', weight: 700 })
+    + text(20, 538, 'Change only the future input', { width: 320, weight: 700 });
+  for (const [index, future] of [100, 1000].entries()) {
+    const vertical = 579 + index * 86;
+    assert.equal(weights.slice(0, picture.query + 1).reduce((sum, weight, position) => sum + weight * picture.values[position], 0) + weights[2] * future, output);
+    body += `<g data-picture-causal-counterfactual="${future}" data-picture-causal-output="${output}">`
+      + text(20, vertical + 24, `Future ${future}`, { width: 113, weight: 700 }) + line(143, vertical + 18, 175, vertical + 18, 'warning')
+      + line(165, vertical + 8, 185, vertical + 28, 'warning') + line(185, vertical + 8, 165, vertical + 28, 'warning')
+      + `<rect x="212" y="${vertical}" width="112" height="36" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></rect>`
+      + text(268, vertical + 24, output, { width: 100, anchor: 'middle', weight: 700 }) + '</g>';
+  }
+  body += text(20, 750, 'Same output; the future path stays closed', { width: 320, weight: 700 });
+  return { body, height: 810 };
 }
 
 function halvedPopcountReuse(picture, model, tools) {
@@ -7065,20 +12474,31 @@ function halvedPopcountReuse(picture, model, tools) {
 }
 
 function sharedNormalizerTarget(picture, model, tools) {
-  const { text, circle } = tools;
+  const { text, circle, color, fill, number } = tools;
   const normalizer = Math.log(picture.logits.reduce((sum, logit) => sum + Math.exp(logit), 0));
   const losses = picture.logits.map(logit => normalizer - logit);
+  const probabilities = picture.logits.map(logit => Math.exp(logit - normalizer));
   assert(Math.abs(losses[0] - .1269280110429726) < 1e-12);
   assert(Math.abs(losses[1] - losses[0] - 2) < 1e-12);
-  let body = text(20, 27, 'The same normalizer forks into target-specific subtractions', { width: 320, weight: 700 }) + text(20, 114, `Logits 2,0; shared logZ = ${normalizer.toFixed(3)}`, { width: 320, size: 16, weight: 700 })
-    + circle(180, 210, 28, 'input') + text(180, 216, 'Z', { width: 49, anchor: 'middle', weight: 700 });
-  for (const [target, logit] of picture.logits.entries()) {
+  assert(Math.abs(probabilities.reduce((sum, value) => sum + value, 0) - 1) < 1e-12);
+  assert(probabilities.every((probability, target) => Math.abs(-Math.log(probability) - losses[target]) < 1e-12));
+  let body = text(20, 27, 'One distribution; the declared target selects loss', { width: 320, weight: 700 })
+    + text(20, 114, 'Logits 2, 0; one shared prediction', { width: 320, size: 16, weight: 700 });
+  let cumulative = 0;
+  for (const [target, probability] of probabilities.entries()) {
     const horizontal = 89 + target * 182;
-    body += arrowBetween([target ? 200 : 160, 242], [horizontal, 338], target ? 'state' : 'input', tools, 3) + circle(horizontal, 374, 27, target ? 'state' : 'input') + text(horizontal, 380, logit, { width: 48, anchor: 'middle', weight: 700 })
-      + text(horizontal, 448, `target ${target} logit`, { width: 155, anchor: 'middle', size: 16 }) + text(horizontal, 513, `Z - ${logit}`, { width: 155, anchor: 'middle', weight: 700 })
-      + circle(horizontal, 579, 31, 'output') + text(horizontal, 585, losses[target].toFixed(3), { width: 54, anchor: 'middle', size: 14, weight: 700 });
+    const tone = target ? 'state' : 'input';
+    body += `<rect x="${20 + cumulative * 320}" y="160" width="${probability * 320}" height="48" data-picture-cross-entropy-probability="${probability}" data-picture-cross-entropy-class="${target}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`
+      + text(horizontal, 244, `Class ${target}: ${number(probability * 100)}%`, { width: 155, anchor: 'middle', weight: 700, tone })
+      + arrowBetween([horizontal, 283], [horizontal, 338], tone, tools, 3)
+      + circle(horizontal, 374, 27, tone) + text(horizontal, 380, probability.toFixed(3), { width: 48, anchor: 'middle', weight: 700 })
+      + text(horizontal, 448, `Target ${target}`, { width: 155, anchor: 'middle', size: 16 })
+      + arrowBetween([horizontal, 477], [horizontal, 532], 'output', tools, 2)
+      + `<rect x="${horizontal - 74}" y="550" width="148" height="25" style="fill:${fill('neutral')};stroke:${color('neutral')}"></rect><rect x="${horizontal - 74}" y="550" width="${148 * losses[target] / Math.max(...losses)}" height="25" data-picture-cross-entropy-loss="${losses[target]}" style="fill:${fill('output')};stroke:${color('output')}"></rect>`
+      + text(horizontal, 620, `Loss ${losses[target].toFixed(3)}`, { width: 155, anchor: 'middle', weight: 700 });
+    cumulative += probability;
   }
-  body += text(20, 697, 'Changing target changes the selected logit and loss, not this shared normalizer.', { width: 320, weight: 700 });
+  body += text(20, 697, 'Same probabilities. A different target selects a different loss.', { width: 320, weight: 700 });
   return { body, height: 798 };
 }
 
@@ -7463,6 +12883,23 @@ function crossedSpiralBoundary(picture, model, tools) {
 }
 
 const drawers = {
+  'gp-mean-noise-envelope': gpMeanNoiseEnvelope,
+  'estimation-and-decision': estimationAndDecision,
+  'gradient-norm-and-step-contract': gradientNormAndStepContract,
+  'shared-feature-interactions': sharedFeatureInteractions,
+  'coding-evaluation-layers': codingEvaluationLayers,
+  'trajectory-outcome-and-budget': trajectoryOutcomeAndBudget,
+  'claim-validity-and-confirmation': claimValidityAndConfirmation,
+  'video-objective-and-exposure': videoObjectiveAndExposure,
+  'hybrid-recall-before-reranking': hybridRecallBeforeReranking,
+  'kv-admission-and-mixed-iteration': kvAdmissionAndMixedIteration,
+  'episode-evidence-and-policy-grade': episodeEvidenceAndPolicyGrade,
+  'publication-promotion-recovery': publicationPromotionRecovery,
+  'monitoring-evidence-and-coverage': monitoringEvidenceAndCoverage,
+  'assignment-to-launch-evidence': assignmentToLaunchEvidence,
+  'owned-adaptive-security-loop': ownedAdaptiveSecurityLoop,
+  'fraud-loss-and-labels': fraudLossAndLabels,
+  'permissioned-lineage-release': permissionedLineageRelease,
   'mark-before-enqueue': markBeforeEnqueue,
   'reversed-height-admission': reversedHeightAdmission,
   'transpose-then-row-reverse': transposeThenRowReverse,
@@ -7486,6 +12923,7 @@ const drawers = {
   'length-delimited-payload': lengthDelimitedPayload,
   'trie-prefix-terminal': triePrefixTerminal,
   'wildcard-terminal-search': wildcardTerminalSearch,
+  'wildcard-branch-and-terminal': wildcardBranchAndTerminal,
   'emit-and-continue-trie': emitAndContinueTrie,
   'used-board-cell-refusal': usedBoardCellRefusal,
   'normalized-end-comparison': normalizedEndComparison,
@@ -7501,13 +12939,17 @@ const drawers = {
   'reachable-jump-frontier': reachableJumpFrontier,
   'run-start-membership': runStartMembership,
   'temperature-versus-index': temperatureVersusIndex,
+  'waiting-stack-and-distance': waitingStackAndDistance,
   'nested-start-membership': nestedStartMembership,
   'character-copy-counts': characterCopyCounts,
+  'anagram-bucket-trace': anagramBucketTrace,
   'set-entry-collapse': setEntryCollapse,
   'coin-predecessor': coinPredecessor,
   'decimal-pair-gate': decimalPairGate,
+  'parse-predecessors-and-validity': parsePredecessorsAndValidity,
   'edit-diagonal-cost': editDiagonalCost,
   'circular-endpoint-cases': circularEndpointCases,
+  'circular-cover-trace': circularCoverTrace,
   'shared-increasing-suffix': sharedIncreasingSuffix,
   'palindrome-occurrence-spans': palindromeOccurrenceSpans,
   'unused-position-availability': unusedPositionAvailability,
@@ -7529,6 +12971,7 @@ const drawers = {
   'branching-return': branchingReturn,
   'clone-identity-boundary': cloneIdentityBoundary,
   'root-membership-split': rootMembershipSplit,
+  'range-owned-root-consumption': rangeOwnedRootConsumption,
   'empty-ready-counterexample': emptyReadyCounterexample,
   'component-membership': componentMembership,
   'frequency-buckets': frequencyBuckets,
@@ -7543,29 +12986,52 @@ const drawers = {
   'subset-rank-order': subsetRankOrder,
   'condition-population': conditionPopulation,
   'square-spread': squareSpread,
+  'bin-confidence-outcome-and-weight': binConfidenceOutcomeAndWeight,
   'weighted-values': weightedValues,
+  'rotate-kv-and-normalize': rotateKvAndNormalize,
+  'tree-message-and-sum': treeMessageAndSum,
+  'query-weighted-values': queryWeightedValues,
   'biased-sample': biasedSample,
+  'sampling-and-error-costs': samplingAndErrorCosts,
   'select-denominator': selectDenominator,
   'forecast-count': forecastCount,
+  'forecast-and-temperature': forecastAndTemperature,
   'logged-support': loggedSupport,
+  'context-choice-and-feedback': contextChoiceAndFeedback,
   'replace-slot': replaceSlot,
+  'slot-reuse-and-admission': slotReuseAndAdmission,
   'nested-cohorts': nestedCohorts,
+  'reserve-dispatch-and-reconcile': reserveDispatchAndReconcile,
+  'traffic-budget-and-evidence': trafficBudgetAndEvidence,
+  'evidence-owner-commit-reopen': evidenceOwnerCommitReopen,
   'bounded-capacity': boundedCapacity,
   'arithmetic-paths': arithmeticPaths,
   'gain-cascade': gainCascade,
   'residual-step': residualStep,
   'linked-scales': linkedScales,
+  'unit-area-mass-and-collapse': unitAreaMassAndCollapse,
+  'eigenbasis-change-and-return': eigenbasisChangeAndReturn,
+  'raw-and-normalized-vectors': rawAndNormalizedVectors,
+  'population-moments-and-dependence': populationMomentsAndDependence,
   'geometric-action': geometricAction,
+  'current-evidence-and-audible-stop': currentEvidenceAndAudibleStop,
   'event-clock': eventClock,
+  'leakage-boundaries': leakageBoundaries,
   'policy-bands': policyBands,
+  'error-prices-and-review-capacity': errorPricesAndReviewCapacity,
   'budget-transfer': budgetTransfer,
   'decay-bypass': decayBypass,
+  'adam-memory-and-scale': adamMemoryAndScale,
   'density-update': densityUpdate,
+  'experiment-and-power': experimentAndPower,
+  'dropout-mode-and-shared-mask': dropoutModeAndSharedMask,
   'random-branch': randomBranch,
   'split-observation': splitObservation,
+  'observation-uncertainty': observationUncertainty,
   'binary-channel': binaryChannel,
   'average-distribution': averageDistribution,
   'channel-pooling': channelPooling,
+  'convolution-and-pooling': convolutionAndPooling,
   'sufficient-compression': sufficientCompression,
   'bit-reassignment': bitReassignment,
   'target-redistribution': targetRedistribution,
@@ -7581,10 +13047,13 @@ const drawers = {
   'potential-loop': potentialLoop,
   'backward-fold': backwardFold,
   'target-corruption': targetCorruption,
+  'bidirectional-target-corruption': bidirectionalTargetCorruption,
   'cluster-resample': clusterResample,
   'gradient-boundary': gradientBoundary,
   'alignment-collapse': alignmentCollapse,
+  'ctc-collapse-and-marginalize': ctcCollapseAndMarginalize,
   'patch-columns': patchColumns,
+  'patch-product-and-backward': patchProductAndBackward,
   'shared-memory': sharedMemory,
   'feature-partition': featurePartition,
   'cache-frontier': cacheFrontier,
@@ -7594,11 +13063,13 @@ const drawers = {
   'relabel-population': relabelPopulation,
   'centered-group': centeredGroup,
   'axis-pooling': axisPooling,
+  'normalization-and-companions': normalizationAndCompanions,
   'count-pooling': countPooling,
   'assigned-centers': assignedCenters,
   'uncertainty-pin': uncertaintyPin,
   'soften-mass': softenMass,
   'ordering-credit': orderingCredit,
+  'token-filter-and-sequence': tokenFilterAndSequence,
   'mass-cutoffs': massCutoffs,
   'joint-paths': jointPaths,
   'iterative-step': iterativeStep,
@@ -7616,17 +13087,21 @@ const drawers = {
   'forward-bypass': forwardBypass,
   'dependent-generation': dependentGeneration,
   'hidden-emissions': hiddenEmissions,
+  'coin-posteriors-and-fixed-bound': coinPosteriorsAndFixedBound,
   'bound-climb': boundClimb,
   'complex-turn': complexTurn,
   'uncertainty-choice': uncertaintyChoice,
   'path-score-movement': pathScoreMovement,
   'opposed-directions': opposedDirections,
   'variance-square': varianceSquare,
+  'variance-and-dependence': varianceAndDependence,
   'saturated-gradient': saturatedGradient,
+  'categorical-target-and-temperature': categoricalTargetAndTemperature,
   'shared-factor-area': sharedFactorArea,
   'parameter-version': parameterVersion,
   'frozen-factor': frozenFactor,
   'coordinate-relabel': coordinateRelabel,
+  'three-discrete-gradient-paths': threeDiscreteGradientPaths,
   'hard-forward-surrogate': hardForwardSurrogate,
   'balanced-reservoirs': balancedReservoirs,
   'weighted-jacobian': weightedJacobian,
@@ -7649,6 +13124,7 @@ const drawers = {
   'feature-summary': featureSummary,
   'position-entry-point': positionEntryPoint,
   'alignment-axes': alignmentAxes,
+  'asr-decoder-contrast': asrDecoderContrast,
   'denominator-members': denominatorMembers,
   'common-rotation': commonRotation,
   'query-rows': queryRows,
@@ -7669,7 +13145,9 @@ const drawers = {
   'shared-mask-weights': sharedMaskWeights,
   'translated-displacement': translatedDisplacement,
   'serial-gates': serialGates,
+  'coherent-recovery-scope': coherentRecoveryScope,
   'evidence-chain': evidenceChain,
+  'policy-exposure-and-maturity': policyExposureAndMaturity,
   'observed-labels': observedLabels,
   'separate-state-rails': separateStateRails,
   'broken-update': brokenUpdate,
@@ -7678,6 +13156,7 @@ const drawers = {
   'retained-evidence': retainedEvidence,
   'persistent-refreshing': persistentRefreshing,
   'node-reassignment': nodeReassignment,
+  'diagnostic-order-and-delivery': diagnosticOrderAndDelivery,
   'assignment-membership': assignmentMembership,
   'conversation-assignment': conversationAssignment,
   'hierarchical-sum': hierarchicalSum,
@@ -7686,18 +13165,25 @@ const drawers = {
   'suppression-route': suppressionRoute,
   'clock-after-boundary': clockAfterBoundary,
   'unscanned-partition': unscannedPartition,
+  'ann-routing-and-compression': annRoutingAndCompression,
   'role-budget': roleBudget,
   'committed-provisional': committedProvisional,
   'versioned-reply': versionedReply,
   'memory-roundtrip': memoryRoundtrip,
+  'scaling-experts-and-fusion': scalingExpertsAndFusion,
   'complement-before-store': complementBeforeStore,
+  'moderation-review-and-appeal': moderationReviewAndAppeal,
   'policy-region': policyRegion,
   'matched-comparison': matchedComparison,
   'group-cut': groupCut,
+  'rotate-structured-folds': rotateStructuredFolds,
   'core-border-source': coreBorderSource,
+  'measured-density-neighborhoods': measuredDensityNeighborhoods,
   'first-failure': firstFailure,
   'alternative-whole': alternativeWhole,
   'conditional-spatial-cut': conditionalSpatialCut,
+  'label-mixture-and-local-split': labelMixtureAndLocalSplit,
+  'pinned-work-and-developer-apply': pinnedWorkAndDeveloperApply,
   'authority-rails': authorityRails,
   'availability-before': availabilityBefore,
   'shared-supply-return': sharedSupplyReturn,
@@ -7705,14 +13191,26 @@ const drawers = {
   'fixed-source-growing-prefix': fixedSourceGrowingPrefix,
   'weighted-tail': weightedTail,
   'restore-common': restoreCommon,
+  'adaptation-diagnostic': adaptationDiagnostic,
   'independent-choices': independentChoices,
+  'permission-dispatch-receipt': permissionDispatchReceipt,
   'independent-evidence': independentEvidence,
+  'curation-exposure-lineage': curationExposureLineage,
+  'scoped-interview-permission': scopedInterviewPermission,
+  'bounded-contribution': boundedContribution,
+  'practice-feedback-loop': practiceFeedbackLoop,
   'stable-tile-merge': stableTileMerge,
+  'dense-attention-storage': denseAttentionStorage,
   'transient-gather': transientGather,
   'gradient-ownership': gradientOwnership,
+  'claim-evidence-release': claimEvidenceRelease,
   'count-floor': countFloor,
+  'stream-median-boundaries': streamMedianBoundaries,
+  'rotated-minimum-retention': rotatedMinimumRetention,
+  'tree-reachability-proof': treeReachabilityProof,
   'replace-one-state': replaceOneState,
   'gain-floor': gainFloor,
+  'asr-text-score-control': asrTextScoreControl,
   'normalized-ranking': normalizedRanking,
   'count-versus-size': countVersusSize,
   'hypothesis-separation': hypothesisSeparation,
@@ -7748,12 +13246,16 @@ const drawers = {
   'different-latent-source': differentLatentSource,
   'cost-per-output': costPerOutput,
   'split-dependencies': splitDependencies,
+  'epoch-admission-and-stop': epochAdmissionAndStop,
   'epoch-members': epochMembers,
   'positive-in-whole': positiveInWhole,
+  'paired-views-and-candidates': pairedViewsAndCandidates,
   'scaled-clipping-order': scaledClippingOrder,
   'last-step-paths': lastStepPaths,
+  'emission-order-witness': emissionOrderWitness,
   'prerequisite-counter': prerequisiteCounter,
   'nonadjacent-choice': nonadjacentChoice,
+  'prefix-compatible-choice': prefixCompatibleChoice,
   'conditional-diagonal': conditionalDiagonal,
   'old-snapshot-extension': oldSnapshotExtension,
   'graph-versus-parents': graphVersusParents,
@@ -7769,7 +13271,16 @@ export function renderMentalPicture(identity, model, tools) {
     return null;
   }
   assert(drawers[picture.operation], `${identity}: supported physical mechanism required`);
-  const drawing = drawers[picture.operation](picture, model, tools);
+  const usedLabels = new Set();
+  const drawing = drawers[picture.operation](picture, model, {
+    ...tools,
+    text(horizontal, vertical, value, options) {
+      const key = String(value);
+      if (Object.hasOwn(picture.plainLabels ?? {}, key)) usedLabels.add(key);
+      return tools.text(horizontal, vertical, picture.plainLabels?.[key] ?? value, options);
+    },
+  });
+  assert.deepEqual([...usedLabels].sort(), Object.keys(picture.plainLabels ?? {}).sort(), `${identity}: every plain-language label must replace an actual drawn label`);
   assert(drawing.height > 0 && !/NaN|undefined|Infinity/.test(drawing.body), identity);
   return { ...drawing, composition: picture.operation };
 }

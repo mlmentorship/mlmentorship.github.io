@@ -1,5 +1,78 @@
 # Visual comprehension review
 
+## Library and reading polish
+
+The existing ten-book, sixty-chapter library remains the browsing entry point; no new preparation step or content taxonomy is introduced.
+Shared Full and Visual links preserve the current book or chapter, while scoped visual search and global search keep readers in the selected mode.
+Chapter lists, article context, section navigation, and previous/next links precede subscription content.
+Visual lessons use an unframed canvas; opening the explanation reveals it on phones, and closing restores the prior reading position.
+Menus dismiss with Escape or outside interaction, and horizontal diagram panning is separate from intentional lesson swipes.
+Contents use an opaque surface, and global search uses Pagefind's native control styling with a compact filter-to-results gap.
+
+Book thumbnails choose the closest-fitting non-trace SVG from the article's authored teaching sequence rather than squeezing a long mechanism into a short frame.
+Featured lessons, full articles, and Visual mode retain the authored mechanism-first lead and complete sequence.
+Thumbnail-only framing does not alter source drawings or lesson presentation.
+
+The normal check and build pass in `check-final-r5.log` and `build-final-r5.log` under `/tmp/mlmentorship-browsing-polish-20261108-ded0c8a3`.
+Fresh `native-r11` validation passes 174 browsing cases across all ten books and sixty chapters, including thumbnails at 320, 390, 768, 1280, and 1920 pixels.
+The source-bound `lessons-r4` sweep passes 323 representative lesson renders across both screen themes, desktop/mobile layouts, print, and selected execution checkpoints.
+Fourteen final screenshots were directly inspected: home layouts at 320, 768, and 1280 pixels; phone library, search, contents, explanation, and reading states; and representative desktop reading and search states.
+This is not a manual inspection claim for every lesson, viewport, theme, or trace state.
+This focused UI qualification does not relabel the earlier full-library visual results below as a new complete 391-post run.
+Changes remain local; no new commit, push, or publication is claimed.
+
+## Authored mechanism-first lessons
+
+The current presentation selects 744 teaching steps across all 391 posts: 427 mechanism views, 211 exposed detail views, and all 106 coding traces.
+It adds 31 purpose-built mechanism scenes where the retained assets did not show the required state, operation, or dependency.
+Two additional compact panels preserve the trie lesson for physical printing.
+These are not 391 new redraws: complete existing pictures are retained after individual review, with small illustration-only repairs where needed.
+All 391 original nonfigure Markdown bodies, public figure identities, 797 checkpoints, and 8,739 ordered motion identities remain unchanged.
+The earlier edition sections below describe historical qualification, not qualification of this presentation.
+
+Every post has an authored available-asset inventory, missing-lesson assessment, and selection rationale in [data/visual-lessons.json](../data/visual-lessons.json).
+The editable owner is [scripts/visual-lessons.mjs](../scripts/visual-lessons.mjs); [scripts/visual-lesson-scenes.mjs](../scripts/visual-lesson-scenes.mjs) owns the additional drawings.
+Generated artwork is deterministic and hash-bound, rather than a second manually maintained version.
+
+The mechanism precedes a resource comparison, correctness counterexample, diagnostic, or numerical proof.
+FlashAttention starts with streamed tiles, retained row state, discarded temporary scores, and output; storage savings and numerical rescaling follow.
+The sharded-matrix scene gathers the missing input columns before computing cross-index outputs.
+Personalized search uses the actual reciprocal-rank scores and the candidate that survives the source example's cutoff.
+Different fixtures, normalization conventions, and equivalent algorithm recipes receive explicit titles; the symmetric GCN example does not reuse a plain-average illustration as if it were equivalent.
+
+Articles server-render the lead above prose and place supporting views at their existing topic locations, monotonically preserving authored order.
+Essential pictures are outside folds. Original figures and fragments remain in reference disclosures; original prose and execution identities are retained.
+Visual mode and featured previews clone the same server-prepared lead; book thumbnails may select a compact authored view as described above.
+None of these surfaces loads a full-library artwork bundle.
+Visual mode starts with explanation closed and reveals one authored step at a time.
+Trace motion reuses the established keyed-state engine, respects reduced motion, and stops synchronously when a figure is hidden or a lesson is replaced.
+
+Print exposes the same authored sequence and every retained trace frame, without browsing controls or the email form.
+It uses authored trie alternatives and bounded windows for other tall SVGs, preserving every nonempty label exactly once and keeping small node shapes intact.
+Wide comparison grids stack; screen drawings and their interactions are unchanged.
+SVG geometry is measured only after the lesson becomes visible, rather than treating hidden stages or responsive alternatives as empty drawings.
+
+`npm run check:lessons` requires exact post coverage, deterministic generation, source asset resolution, complete ordering, unique identities, and retained execution checkpoints.
+The normal check includes this gate. The normal build additionally compares every prepared figure against built article output and compares review metadata with the same authored selection.
+Native validation uses actual 1280px and 390px viewports, both themes and print, accessible-reference checks, readable labels, reachable scroll endpoints, and geometry-stable complete captures.
+`--lessons --all-frames --bind-dist` checks every settled execution checkpoint and binds actual browser article responses to the production build.
+Native no-JavaScript checks require the static lead and every supporting picture to be visible outside folds in authored order.
+
+The mechanism-first edition was qualified before the subsequent UI polish recorded above.
+Its evidence is under `/tmp/mlmentorship-visual-lessons-20261107-cyQbNi`; failed and interrupted attempts remain separate.
+Its normal `npm run check` and `npm run build` gates pass in `check-final-library-r51.log` and `build-final-library-r51.log`.
+Its `production-library-r7` qualification passes 6,484 renders: 1,435 in each desktop/mobile light/dark mode and 744 print views.
+All 782 native no-JavaScript article checks pass, and all 1,071 captured source hashes match the delivered build's current inputs.
+Both final `r54` interaction sweeps pass all 106 routes and 797 checkpoints at each actual 1280px and 390px width.
+All 391 tagged Letter PDFs pass nonblank-page and physical text-bound checks across 1,669 pages, recorded in `physical-pdf-final-r51.json`.
+
+All 31 new teaching scenes were directly inspected in their 33 selected article contexts through 17 unscaled mobile sheets.
+Three representative desktop-dark captures and nine complete physical pages were also directly inspected.
+The final screen PNGs and physical-page rasters are byte-identical to those inspected originals, authenticated by `final-inspection-binding-r56.json` and `physical-page-final-r57/binding.json`.
+This is not a claim that every theme, retained detail, trace state, or physical page was manually viewed again.
+The complete automated matrix and exact original-content preservation are separate from that stated manual scope.
+There is no reader study, measured comprehension improvement, new commit, or publication claim.
+
 ## Mental-picture edition
 
 All 408 primary illustrations have been individually authored, reviewed and revised across 391 articles: 392 registered figures and 16 supplemental drawings, including all 106 coding primaries.

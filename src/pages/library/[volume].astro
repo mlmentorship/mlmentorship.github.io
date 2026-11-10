@@ -24,7 +24,7 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
     <header class="volume-head">
       <p>Book {volume.number}</p>
       <h1>{volume.title}</h1>
-      <div class="volume-intro"><p>{volume.description}</p><span>{volume.chapters.length} chapters · {entryCount} entries</span></div>
+      <div class="volume-intro"><p>{volume.description}</p><span>{volume.chapters.length} chapters · {entryCount} lessons</span></div>
       <p class="mechanism-index-link"><a href="/mechanisms/">Mechanism index</a></p>
     </header>
 
@@ -41,7 +41,7 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
             <div><dt>Difficulty</dt><dd>{chapter.difficulty}</dd></div>
             <div><dt>Useful for</dt><dd>{chapter.roles.join(', ')}</dd></div>
           </dl>
-          <p class="chapter-link"><a href={`/library/${volume.id}/${chapter.id}/`}>Open {chapterEntries.length}-entry chapter <span aria-hidden="true">→</span></a><small data-chapter-progress data-entry-ids={chapterEntries.map((entry) => `entry:${entry.slug}`).join(',')}></small></p>
+          <p class="chapter-link"><a href={`/library/${volume.id}/${chapter.id}/`}>View {chapterEntries.length} lessons <span aria-hidden="true">→</span></a><small data-chapter-progress data-entry-ids={chapterEntries.map((entry) => `entry:${entry.slug}`).join(',')}></small></p>
         </section>
       ))}
     </div>
@@ -65,15 +65,15 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
 
 <style>
   .volume-page { width: min(100%, 46rem); margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.6rem) var(--gutter) 4rem; }
-  .breadcrumb { display: flex; gap: .35rem; margin-bottom: 1.3rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .7rem; }
+  .breadcrumb { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.3rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .8rem; }
   .breadcrumb a { color: var(--c-text-soft); text-decoration: none; }
   .breadcrumb a:hover { text-decoration: underline; }
   .volume-head { padding-bottom: 1.2rem; border-bottom: 1px solid var(--c-rule); }
   .volume-head > p { margin: 0 0 .35rem; color: var(--c-muted); font-size: .7rem; font-weight: 500; }
-  .volume-head h1 { margin: 0 0 .5rem; font-size: clamp(1.75rem, 4vw, 2.35rem); letter-spacing: -.025em; }
+  .volume-head h1 { margin: 0 0 .5rem; font-size: 2rem; line-height: 1.2; letter-spacing: 0; }
   .volume-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: end; }
   .volume-intro p { max-width: 36rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .92rem; line-height: 1.5; }
-  .volume-intro span { color: var(--c-muted); font-size: .68rem; white-space: nowrap; }
+  .volume-intro span { color: var(--c-muted); font-size: .8rem; white-space: nowrap; }
   .mechanism-index-link { margin: .75rem 0 0; font-size: .75rem; }
 
   .chapters-head { display: flex; align-items: baseline; justify-content: space-between; margin-top: 1.6rem; padding-bottom: .35rem; border-bottom: 1px solid var(--c-rule); }
@@ -88,10 +88,10 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
   .chapter header p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; }
   .chapter-meta { display: flex; flex-wrap: wrap; gap: .35rem .8rem; margin: .55rem 0 0 2.85rem; }
   .chapter-meta div { display: flex; flex-wrap: wrap; min-width: 0; gap: .35rem; }
-  .chapter-meta dt { color: var(--c-muted); font-size: .62rem; }
-  .chapter-meta dd { margin: 0; color: var(--c-text-soft); font-size: .66rem; }
-  .chapter-link { margin: .45rem 0 0 2.85rem; font-size: .72rem; font-weight: 550; }
-  .chapter-link a { text-decoration: none; }
+  .chapter-meta dt { color: var(--c-muted); font-size: .76rem; }
+  .chapter-meta dd { margin: 0; color: var(--c-text-soft); font-size: .76rem; overflow-wrap: anywhere; }
+  .chapter-link { margin: .45rem 0 0 2.85rem; font-size: .82rem; font-weight: 550; }
+  .chapter-link a { display: inline-flex; min-height: 44px; align-items: center; gap: .5rem; text-decoration: none; }
   .chapter-link a:hover { text-decoration: underline; }
   .chapter-link small { margin-left: .7rem; color: var(--c-muted); font-family: var(--font-mono); font-size: .65rem; font-weight: 400; }
 
@@ -103,6 +103,7 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
   .volume-nav a:hover strong { color: var(--c-accent); text-decoration: underline; }
 
   @media (max-width: 600px) {
+    .volume-head h1 { font-size: 1.75rem; }
     .volume-intro { grid-template-columns: 1fr; }
     .chapter > header { grid-template-columns: 1.8rem minmax(0, 1fr); }
     .chapter-meta, .chapter-link { margin-left: 2.45rem; }

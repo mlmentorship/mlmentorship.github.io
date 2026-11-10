@@ -14,9 +14,13 @@ const currentBookId = articleSlug
     : undefined;
 const isCodingRoute = currentBookId === 'coding-interview';
 const isReviewRoute = pathname === '/review/' || pathname.startsWith('/review/');
-const showReadingMode = Boolean(articleSlug) || isReviewRoute;
-const visualModeHref = articleSlug ? `/review/#${articleSlug}` : '/review/';
-const fullModeHref = articleSlug ? '#full-explanation' : '/library/foundations/';
+const isLibraryRoute = pathParts[0] === 'library';
+const isCatalogRoute = pathname === '/' || isLibraryRoute;
+const showReadingMode = Boolean(articleSlug) || isReviewRoute || isCatalogRoute;
+const visualModeHref = articleSlug ? `/review/#${articleSlug}` : isLibraryRoute
+  ? `/review/?${new URLSearchParams({ book: pathParts[1], ...(pathParts[2] ? { chapter: pathParts[2] } : {}) })}`
+  : '/review/';
+const fullModeHref = articleSlug ? '#full-explanation' : isReviewRoute ? '/#curriculum' : pathname === '/' ? '#curriculum' : pathname;
 const visualModeActive = isReviewRoute;
 const readingModes = [
   { label: 'Full', description: 'Full lesson mode', href: fullModeHref, active: !visualModeActive, dataKey: 'full' },
@@ -74,8 +78,8 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     <div class="bar-end">
       <Search />
       <ThemeToggle />
-      <details class="mobile-nav">
-        <summary class="menu-trigger" aria-label="Navigation menu">
+      <details class="mobile-nav" data-site-menu>
+        <summary class="menu-trigger" aria-label="Navigation menu" title="Navigation menu">
           <span></span><span></span><span></span>
         </summary>
         <nav class="nav-mobile" aria-label="Mobile">
@@ -99,16 +103,14 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 </header>
 
 <script>
-  const readingModeNav = document.querySelector<HTMLElement>('[data-reading-mode-nav]');
   const masthead = document.querySelector<HTMLElement>('.masthead');
+  const menu = document.querySelector<HTMLDetailsElement>('[data-site-menu]');
   if (masthead) {
     new ResizeObserver(() => document.documentElement.style.setProperty('--header-height', `${Math.ceil(masthead.getBoundingClientRect().height)}px`)).observe(masthead);
   }
 
   function syncReadingMode() {
     const visualActive = window.location.pathname === '/review/';
-    const reviewIndex = window.location.pathname === '/review/' && !window.location.hash;
-    readingModeNav?.toggleAttribute('hidden', reviewIndex);
     document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode]').forEach((link) => {
       const active = link.dataset.readingMode === (visualActive ? 'visual' : 'full');
       link.classList.toggle('active', active);
@@ -122,6 +124,15 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   window.addEventListener('popstate', syncReadingMode);
   window.addEventListener('review-route-change', syncReadingMode);
   document.addEventListener('astro:page-load', syncReadingMode);
+  document.addEventListener('pointerdown', (event) => {
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !menu?.open) return;
+    event.preventDefault();
+    menu.open = false;
+    menu.querySelector('summary')?.focus();
+  });
 </script>
 
 <style>
@@ -153,7 +164,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     font-family: var(--font-display);
     font-size: .92rem;
     font-weight: 500;
-    letter-spacing: -0.015em;
+    letter-spacing: 0;
   }
   .brand-name strong { color: var(--c-accent); font-weight: 750; }
 
@@ -170,11 +181,15 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   }
   .reading-mode-switch--persistent { flex: 0 0 auto; }
   .reading-mode-switch a {
+    display: inline-flex;
     min-width: 3.35rem;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
     padding: .3rem .5rem;
     border-radius: 2px;
     color: var(--c-muted);
-    font-size: .67rem;
+    font-size: .82rem;
     font-weight: 650;
     text-align: center;
     text-decoration: none;
@@ -217,8 +232,8 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   .mobile-nav { display: none; position: relative; }
   .menu-trigger {
     display: flex;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     cursor: pointer;
     list-style: none;
     flex-direction: column;
@@ -262,7 +277,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     border-radius: var(--radius);
     color: var(--c-text-soft);
     font-family: var(--font-ui);
-    font-size: .78rem;
+    font-size: .9rem;
     font-weight: 550;
     letter-spacing: 0;
     text-decoration: none;
@@ -270,15 +285,22 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   .nav-mobile a:hover { background: var(--c-bg-tint); color: var(--c-text); }
   .nav-mobile a.active { background: var(--c-accent-soft); color: var(--c-accent); }
 
-  @media (max-width: 940px) {
+  @media (max-width: 1100px) {
     .nav-desktop { display: none; }
-    .reading-mode-switch--persistent a { min-width: 2.9rem; padding: .3rem .35rem; font-size: .62rem; }
+    .reading-mode-switch--persistent a { min-width: 2.9rem; padding: .3rem .45rem; font-size: .82rem; }
     .bar-end { margin-left: auto; }
     .mobile-nav { display: block; }
+  }
+  @media (max-width: 600px) {
+    .bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .4rem .65rem; }
+    .brand { grid-column: 1; grid-row: 1; }
+    .bar-end { grid-column: 2; grid-row: 1; margin-left: 0; }
+    .reading-mode-switch--persistent { grid-column: 1 / -1; grid-row: 2; }
+    .reading-mode-switch--persistent a { flex: 1; min-height: 44px; }
   }
   @media (max-width: 420px) {
     .brand-name { font-size: .9rem; }
     .bar { gap: 0.5rem; }
-    .reading-mode-switch--persistent a { min-width: 2.5rem; padding: .28rem .25rem; font-size: .6rem; }
+    .reading-mode-switch--persistent a { min-width: 2.5rem; padding: .3rem .45rem; }
   }
 </style>
